@@ -33,34 +33,58 @@ export default function CountdownTimer() {
   }, []);
 
   return (
-    <div className="bg-black/50 backdrop-blur-md rounded-2xl p-8 border border-yellow-400/30">
-      <h3 className="text-yellow-400 text-2xl font-bold text-center mb-6">
-        Festival Starts In
-      </h3>
-      <div className="grid grid-cols-4 gap-4">
-        <div className="text-center">
-          <div className="bg-yellow-400 text-black text-3xl md:text-4xl font-bold rounded-lg p-4 mb-2">
-            {timeLeft.days.toString().padStart(2, '0')}
+    <div className="max-w-4xl mx-auto">
+      <div className="grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-8">
+        {/* Days */}
+        <div className="group relative">
+          <div className="relative bg-gradient-to-br from-yellow-600/20 to-yellow-700/20 backdrop-blur-md rounded-2xl p-6 border border-yellow-400/10 hover:border-yellow-400/50 transition-all duration-500 hover:scale-105">
+            <div className="absolute inset-0 bg-gradient-to-br from-yellow-500/10 to-yellow-600/10 rounded-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
+            <div className="relative z-10 text-center">
+              <div className="text-4xl md:text-6xl font-black text-yellow-400 mb-2 animate-pulse">
+                {timeLeft.days.toString().padStart(2, '0')}
+              </div>
+              <div className="text-yellow-200/70 text-sm font-medium uppercase tracking-wider">Days</div>
+            </div>
           </div>
-          <div className="text-yellow-200 text-sm font-medium">Days</div>
         </div>
-        <div className="text-center">
-          <div className="bg-yellow-400 text-black text-3xl md:text-4xl font-bold rounded-lg p-4 mb-2">
-            {timeLeft.hours.toString().padStart(2, '0')}
+
+        {/* Hours */}
+        <div className="group relative">
+          <div className="relative bg-gradient-to-br from-yellow-700/20 to-yellow-800/20 backdrop-blur-md rounded-2xl p-6 border border-yellow-400/10 hover:border-yellow-400/50 transition-all duration-500 hover:scale-105">
+            <div className="absolute inset-0 bg-gradient-to-br from-yellow-600/10 to-yellow-700/10 rounded-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
+            <div className="relative z-10 text-center">
+              <div className="text-4xl md:text-6xl font-black text-yellow-400 mb-2 animate-pulse">
+                {timeLeft.hours.toString().padStart(2, '0')}
+              </div>
+              <div className="text-yellow-200/70 text-sm font-medium uppercase tracking-wider">Hours</div>
+            </div>
           </div>
-          <div className="text-yellow-200 text-sm font-medium">Hours</div>
         </div>
-        <div className="text-center">
-          <div className="bg-yellow-400 text-black text-3xl md:text-4xl font-bold rounded-lg p-4 mb-2">
-            {timeLeft.minutes.toString().padStart(2, '0')}
+
+        {/* Minutes */}
+        <div className="group relative">
+          <div className="relative bg-gradient-to-br from-yellow-800/20 to-yellow-900/20 backdrop-blur-md rounded-2xl p-6 border border-yellow-400/10 hover:border-yellow-400/50 transition-all duration-500 hover:scale-105">
+            <div className="absolute inset-0 bg-gradient-to-br from-yellow-700/10 to-yellow-800/10 rounded-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
+            <div className="relative z-10 text-center">
+              <div className="text-4xl md:text-6xl font-black text-yellow-400 mb-2 animate-pulse">
+                {timeLeft.minutes.toString().padStart(2, '0')}
+              </div>
+              <div className="text-yellow-200/70 text-sm font-medium uppercase tracking-wider">Minutes</div>
+            </div>
           </div>
-          <div className="text-yellow-200 text-sm font-medium">Minutes</div>
         </div>
-        <div className="text-center">
-          <div className="bg-yellow-400 text-black text-3xl md:text-4xl font-bold rounded-lg p-4 mb-2">
-            {timeLeft.seconds.toString().padStart(2, '0')}
+
+        {/* Seconds */}
+        <div className="group relative">
+          <div className="relative bg-gradient-to-br from-yellow-900/20 to-black/20 backdrop-blur-md rounded-2xl p-6 border border-yellow-400/10 hover:border-yellow-400/50 transition-all duration-500 hover:scale-105">
+            <div className="absolute inset-0 bg-gradient-to-br from-yellow-800/10 to-yellow-900/10 rounded-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
+            <div className="relative z-10 text-center">
+              <div className="text-4xl md:text-6xl font-black text-yellow-400 mb-2 animate-pulse">
+                {timeLeft.seconds.toString().padStart(2, '0')}
+              </div>
+              <div className="text-yellow-200/70 text-sm font-medium uppercase tracking-wider">Seconds</div>
+            </div>
           </div>
-          <div className="text-yellow-200 text-sm font-medium">Seconds</div>
         </div>
       </div>
     </div>
