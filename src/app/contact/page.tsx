@@ -48,7 +48,16 @@ export default function ContactPage() {
   
 
   return (
-    <div className="min-h-screen bg-black text-white py-20">
+    <div className="min-h-screen text-white py-20 relative">
+      {/* Background Image */}
+      <div className="absolute inset-0 z-0">
+        <img 
+          src="/pattern.jpg" 
+          alt="Pattern Background" 
+          className="w-full h-full object-cover"
+        />
+        <div className="absolute inset-0 bg-black/60"></div>
+      </div>
       <div className="container mx-auto max-w-6xl px-4">
         {/* Header Section */}
         <div className="text-center mb-16">

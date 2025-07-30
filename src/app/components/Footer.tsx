@@ -9,9 +9,9 @@ export default function Footer() {
   return (
     <footer className="bg-gradient-to-b from-black to-gray-900 w-full overflow-x-hidden">
       {/* Newsletter Section */}
-      <div className="bg-gradient-to-r from-yellow-600/10 to-yellow-700/10 backdrop-blur-sm py-16 px-4 border-t border-yellow-400/20">
+      <div className="bg-gradient-to-r from-yellow-600/10 to-yellow-700/10 backdrop-blur-sm py-6 px-4 border-t border-yellow-400/20">
         <div className="max-w-3xl mx-auto">
-          <div className="text-center mb-10">
+          <div className="text-center mb-4">
             <p className="text-sm text-yellow-300/80 mb-3">Sign up for Puagmae Newsletter</p>
             <h2 className="text-3xl md:text-4xl font-bold bg-gradient-to-r from-yellow-300 to-yellow-400 bg-clip-text text-transparent mb-4">
               LET'S STAY IN TOUCH
@@ -47,34 +47,30 @@ export default function Footer() {
       <div className="bg-black/60 backdrop-blur-sm">
         <div className="max-w-6xl mx-auto px-4 py-12">
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-            {/* Quick Links */}
-            <div className="text-yellow-200">
-              <h3 className="text-xl font-bold mb-4 text-yellow-400 border-b border-yellow-400/30 pb-2">Quick Links</h3>
-              <div className="space-y-2">
-                <ul className="space-y-2">
-                  <li><Link href="/" className="hover:text-yellow-300 transition-colors flex items-center">
-                    <span className="w-2 h-2 bg-yellow-400 rounded-full mr-3"></span>
-                    Home
-                  </Link></li>
-                  <li><Link href="/about" className="hover:text-yellow-300 transition-colors flex items-center">
-                    <span className="w-2 h-2 bg-yellow-400 rounded-full mr-3"></span>
-                    About Us
-                  </Link></li>
-                  <li><Link href="/schedule" className="hover:text-yellow-300 transition-colors flex items-center">
-                    <span className="w-2 h-2 bg-yellow-400 rounded-full mr-3"></span>
-                    Schedule
-                  </Link></li>
-                  <li><Link href="/gallery" className="hover:text-yellow-300 transition-colors flex items-center">
-                    <span className="w-2 h-2 bg-yellow-400 rounded-full mr-3"></span>
-                    Gallery
-                  </Link></li>
-                  <li><Link href="/contact" className="hover:text-yellow-300 transition-colors flex items-center">
-                    <span className="w-2 h-2 bg-yellow-400 rounded-full mr-3"></span>
-                    Contact
-                  </Link></li>
-                </ul>
-              </div>
-            </div>
+                         {/* Quick Links */}
+             <div className="text-yellow-200">
+               <h3 className="text-xl font-bold mb-4 text-yellow-400 border-b border-yellow-400/30 pb-2">Quick Links</h3>
+               <div className="space-y-2">
+                 <ul className="space-y-2">
+                   <li><Link href="/about" className="hover:text-yellow-300 transition-colors flex items-center">
+                     <span className="w-2 h-2 bg-yellow-400 rounded-full mr-3"></span>
+                     About
+                   </Link></li>
+                   <li><Link href="/schedule" className="hover:text-yellow-300 transition-colors flex items-center">
+                     <span className="w-2 h-2 bg-yellow-400 rounded-full mr-3"></span>
+                     Schedule
+                   </Link></li>
+                   <li><Link href="/gallery" className="hover:text-yellow-300 transition-colors flex items-center">
+                     <span className="w-2 h-2 bg-yellow-400 rounded-full mr-3"></span>
+                     Gallery
+                   </Link></li>
+                   <li><Link href="/testimonials" className="hover:text-yellow-300 transition-colors flex items-center">
+                     <span className="w-2 h-2 bg-yellow-400 rounded-full mr-3"></span>
+                     Testimonials
+                   </Link></li>
+                 </ul>
+               </div>
+             </div>
 
             {/* Social Media */}
             <div className="text-yellow-200">
@@ -109,19 +105,6 @@ export default function Footer() {
 
             {/* Contact Info */}
             <div className="text-yellow-200">
-              {/* Contact Us Button */}
-              <div className="mb-4">
-                <Link 
-                  href="/contact" 
-                  className="inline-block bg-gradient-to-r from-yellow-500 to-yellow-600 hover:from-yellow-600 hover:to-yellow-700 text-black px-4 py-2 rounded-full border border-yellow-400/30 hover:border-yellow-400/60 transition-all duration-300 transform hover:scale-105 shadow-lg hover:shadow-xl"
-                >
-                  <div className="text-center">
-                    <div className="text-xs font-semibold mb-1 tracking-wide">GET IN TOUCH</div>
-                    <div className="text-sm font-medium">Contact us</div>
-                  </div>
-                </Link>
-              </div>
-  
               <h3 className="text-xl font-bold mb-4 text-yellow-400 border-b border-yellow-400/30 pb-2">Contact</h3>
               <div className="space-y-3">
                 <div className="flex items-start">
@@ -161,6 +144,19 @@ export default function Footer() {
                     <span className="text-sm">Ledeta Kefleketema, Kebele 49, At last floor of Haven Hotel</span>
                   </div>
                 </div>
+              </div>
+              
+              {/* Contact Us Button - Moved below contact info */}
+              <div className="mt-6">
+                <Link 
+                  href="/contact" 
+                  className="block w-full bg-gradient-to-r from-yellow-500 to-yellow-600 hover:from-yellow-600 hover:to-yellow-700 text-black px-6 py-3 rounded-full border border-yellow-400/30 hover:border-yellow-400/60 transition-all duration-300 transform hover:scale-105 shadow-lg hover:shadow-xl text-center"
+                >
+                  <div className="text-center">
+                    <div className="text-xs font-semibold mb-1 tracking-wide">GET IN TOUCH</div>
+                    <div className="text-sm font-medium">Contact us</div>
+                  </div>
+                </Link>
               </div>
             </div>
           </div>

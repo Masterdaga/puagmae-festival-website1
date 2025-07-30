@@ -9,9 +9,19 @@ export default function AboutPage() {
   };
 
   return (
-    <div className="min-h-screen bg-black text-white">
+    <div className="min-h-screen text-white relative">
+      {/* Background Image */}
+      <div className="absolute inset-0 z-0">
+        <img 
+          src="/pattern.jpg" 
+          alt="Pattern Background" 
+          className="w-full h-full object-cover"
+        />
+        <div className="absolute inset-0 bg-black/60"></div>
+      </div>
+      
       {/* Hero Section */}
-      <section className="py-20 px-4 bg-gradient-to-b from-blue-900 to-black">
+      <section className="py-20 px-4 relative z-10">
         <div className="container mx-auto max-w-6xl">
           <div className="text-center mb-16">
             <h1 className="text-5xl md:text-6xl font-bold mb-6 text-yellow-400">
@@ -84,7 +94,7 @@ export default function AboutPage() {
       </section>
 
       {/* Additional Sections */}
-      <section className="py-20 px-4 bg-gray-900">
+      <section className="py-20 px-4 relative z-10">
         <div className="container mx-auto max-w-6xl">
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
             {/* Our Story */}

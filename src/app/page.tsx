@@ -1,13 +1,25 @@
+import LandingCarousel from './components/LandingCarousel';
 import HeroSection from './HeroSection';
 import CountdownTimer from './components/CountdownTimer';
+import Testimonials from './components/Testimonials';
 
 export default function Home() {
   return (
-    <main className="min-h-screen bg-gradient-to-br from-black via-gray-900 to-black">
-      <HeroSection />
+    <main className="min-h-screen relative">
+      {/* Background Image */}
+      <div className="absolute inset-0 z-0">
+        <img 
+          src="/pattern.jpg" 
+          alt="Pattern Background" 
+          className="w-full h-full object-cover"
+        />
+        <div className="absolute inset-0 bg-black/60"></div>
+      </div>
+      
+      <LandingCarousel />
       
       {/* Countdown Section */}
-      <section className="py-24 px-4 bg-gradient-to-b from-black/50 to-gray-900/50 backdrop-blur-sm">
+      <section className="py-24 px-4 relative z-10">
         <div className="container mx-auto max-w-6xl">
           <div className="text-center mb-16">
             <h2 className="text-4xl md:text-6xl font-bold text-white mb-6">
@@ -25,38 +37,8 @@ export default function Home() {
         </div>
       </section>
 
-      {/* Newsletter Section - Inspired by Boom Festival */}
-      <section className="py-20 px-4 bg-gradient-to-r from-yellow-600/10 to-yellow-700/10 backdrop-blur-sm">
-        <div className="container mx-auto max-w-4xl text-center">
-          <div className="bg-black/40 backdrop-blur-md rounded-2xl p-12 border border-yellow-400/20">
-            <h2 className="text-3xl md:text-5xl font-bold text-white mb-6">
-              Stay Connected
-            </h2>
-            <p className="text-xl text-yellow-100/80 mb-8 max-w-2xl mx-auto">
-              Sign up to the Puagmae Newsletter and be the first to know about updates, 
-              exclusive content, and festival announcements.
-            </p>
-            
-            <div className="flex flex-col sm:flex-row items-center justify-center gap-4 max-w-md mx-auto">
-              <input 
-                type="email" 
-                placeholder="Enter your email"
-                className="flex-1 px-6 py-4 bg-white/10 border border-yellow-400/30 rounded-full text-white placeholder-yellow-200/60 focus:outline-none focus:border-yellow-400/60 transition-colors backdrop-blur-sm"
-              />
-              <button className="px-8 py-4 bg-gradient-to-r from-yellow-500 to-yellow-600 text-black font-semibold rounded-full hover:from-yellow-600 hover:to-yellow-700 transition-all duration-300 transform hover:scale-105">
-                Subscribe
-              </button>
-            </div>
-            
-            <p className="text-sm text-yellow-200/60 mt-4">
-              We respect your privacy. Unsubscribe at any time.
-            </p>
-          </div>
-        </div>
-      </section>
-
       {/* Features Section */}
-      <section className="py-24 px-4 bg-gradient-to-b from-gray-900/50 to-black">
+      <section className="py-24 px-4 relative z-10">
         <div className="container mx-auto max-w-7xl">
           <div className="text-center mb-20">
             <h2 className="text-4xl md:text-6xl font-bold text-white mb-6">
@@ -137,7 +119,7 @@ export default function Home() {
       </section>
 
       {/* CTA Section */}
-      <section className="py-24 px-4 bg-gradient-to-r from-yellow-600/20 to-yellow-700/20 backdrop-blur-sm">
+      <section className="py-24 px-4 relative z-10">
         <div className="container mx-auto max-w-4xl text-center">
           <h2 className="text-4xl md:text-6xl font-bold text-white mb-8">
             Ready to Experience

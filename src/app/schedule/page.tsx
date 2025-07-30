@@ -31,7 +31,16 @@ const Schedule = () => {
   };
 
   return (
-    <div className='relative py-20 pb-28 bg-ghost-white dark:bg-eerie-black text-vampire-black dark:text-ghost-white transition-colors duration-500' id='schedule'>
+    <div className='relative py-20 pb-28 text-white transition-colors duration-500' id='schedule'>
+      {/* Background Image */}
+      <div className="absolute inset-0 z-0">
+        <img 
+          src="/pattern.jpg" 
+          alt="Pattern Background" 
+          className="w-full h-full object-cover"
+        />
+        <div className="absolute inset-0 bg-black/60"></div>
+      </div>
       <div className='max-w-6xl mx-auto px-4'>
         <h2 className='text-5xl font-extrabold mb-12 text-center text-goldenrod dark:text-goldenrod'>
           Festival Schedule

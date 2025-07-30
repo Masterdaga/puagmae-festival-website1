@@ -47,7 +47,16 @@ const Testimonials = () => {
     };
 
     return (
-        <div className="bg-ghost-white dark:bg-eerie-black text-vampire-black dark:text-ghost-white py-20 pb-28 px-4 transition-colors duration-500" id="testimonials">
+        <div className="text-white py-20 pb-28 px-4 transition-colors duration-500 relative" id="testimonials">
+            {/* Background Image */}
+            <div className="absolute inset-0 z-0">
+                <img 
+                    src="/pattern.jpg" 
+                    alt="Pattern Background" 
+                    className="w-full h-full object-cover"
+                />
+                <div className="absolute inset-0 bg-black/60"></div>
+            </div>
             <div className="max-w-6xl mx-auto">
                 <h1 className="text-4xl md:text-6xl font-extrabold text-center text-goldenrod mb-12">
                     Hear from Our Guests
