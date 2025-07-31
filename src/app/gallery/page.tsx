@@ -98,7 +98,7 @@ export default function GalleryPage() {
           {galleryData.map((item) => (
             <div
               key={item.year}
-              className="bg-white rounded-xl shadow-lg overflow-hidden hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-2 cursor-pointer"
+              className="bg-gradient-to-r from-yellow-400 to-yellow-600 rounded-xl shadow-lg overflow-hidden hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-2 cursor-pointer"
               onClick={() => setSelectedYear(selectedYear === item.year ? null : item.year)}
             >
               <div className="relative h-64 bg-gradient-to-br from-blue-500 to-purple-600">
@@ -136,31 +136,31 @@ export default function GalleryPage() {
               <div className="p-6">
                 <div className="flex items-center justify-between">
                   <div>
-                    <h3 className="text-xl font-semibold text-gray-900">{item.title}</h3>
-                    <p className="text-gray-600 mt-1">Click to explore {item.year} gallery</p>
+                    <h3 className="text-xl font-semibold text-black">{item.title}</h3>
+                    <p className="text-black/80 mt-1">Click to explore {item.year} gallery</p>
                   </div>
                   <div className="flex space-x-2">
-                    {item.type === 'video' && <FaPlay className="text-blue-500" />}
-                    <FaImages className="text-purple-500" />
+                    {item.type === 'video' && <FaPlay className="text-black" />}
+                    <FaImages className="text-black" />
                   </div>
                 </div>
                 
                 {selectedYear === item.year && (
-                  <div className="mt-4 p-4 bg-gray-50 rounded-lg">
-                    <p className="text-sm text-gray-600">
+                  <div className="mt-4 p-4 bg-black/20 rounded-lg">
+                    <p className="text-sm text-black/90">
                       {item.year} was a remarkable year for PUAGMAE. 
                       The event brought together communities and celebrated our shared heritage.
                     </p>
                     <div className="flex space-x-3 mt-3">
                       <Link 
                         href={`/gallery/${item.year}`}
-                        className="text-blue-600 hover:text-blue-800 font-medium"
+                        className="text-black font-medium hover:text-black/80"
                       >
                         View Photos →
                       </Link>
                       <Link 
                         href={`/gallery/${item.year}/videos`}
-                        className="text-purple-600 hover:text-purple-800 font-medium"
+                        className="text-black font-medium hover:text-black/80"
                       >
                         Watch Videos →
                       </Link>

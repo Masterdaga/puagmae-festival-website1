@@ -239,8 +239,8 @@ export default function YearGalleryPage() {
 
       {/* Image Modal */}
       {isModalOpen && selectedImage && (
-        <div className="fixed inset-0 bg-black bg-opacity-75 flex items-center justify-center z-50 p-4">
-          <div className="relative max-w-4xl max-h-full">
+        <div className="fixed inset-0 bg-black bg-opacity-75 flex items-center justify-center z-50 p-4 overflow-y-auto">
+          <div className="relative max-w-4xl w-full my-8">
             <button
               onClick={closeModal}
               className="absolute top-4 right-4 text-white text-2xl hover:text-gray-300 z-10 bg-black bg-opacity-50 rounded-full w-10 h-10 flex items-center justify-center"
@@ -252,7 +252,7 @@ export default function YearGalleryPage() {
               alt="Gallery Image"
               width={800}
               height={600}
-              className="rounded-lg"
+              className="rounded-lg w-full h-auto max-h-[80vh] object-contain"
             />
           </div>
         </div>
