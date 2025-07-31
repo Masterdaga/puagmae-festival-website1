@@ -2,6 +2,7 @@
 import Link from 'next/link';
 import Image from 'next/image';
 import { useState, useEffect } from 'react';
+import { FaArrowRight } from 'react-icons/fa';
 
 export default function Navbar() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -30,7 +31,7 @@ export default function Navbar() {
 
   return (
     <>
-            {/* Sticky Navbar */}
+      {/* Sticky Navbar */}
       <nav className={`fixed top-0 left-0 w-full z-50 transition-transform duration-300 ${isVisible ? 'translate-y-0' : '-translate-y-full'}`}>
         <div className="max-w-full mx-auto px-8 sm:px-12">
           <div className="flex items-center justify-between h-24 py-4">
@@ -52,13 +53,13 @@ export default function Navbar() {
 
             {/* Desktop Nav Links */}
             <div className="hidden md:flex flex-1 items-center justify-center space-x-8">
-              <Link href="/about" className="bg-black/1 backdrop-blur-sm border border-yellow-400/30 text-yellow-400 px-4 py-2 rounded-full font-bold hover:bg-yellow-400/20 hover:border-yellow-400 hover:text-yellow-300 hover:shadow-lg hover:shadow-yellow-400/25 transform transition-all duration-300">About</Link>
-              <Link href="/schedule" className="bg-black/1 backdrop-blur-sm border border-yellow-400/30 text-yellow-400 px-4 py-2 rounded-full font-bold hover:bg-yellow-400/20 hover:border-yellow-400 hover:text-yellow-300 hover:shadow-lg hover:shadow-yellow-400/25 transform transition-all duration-300">Schedule</Link>
+              <Link href="/about" className="bg-gradient-to-r from-yellow-400 to-yellow-600 border border-yellow-400/30 text-black px-4 py-2 rounded-full font-bold hover:from-yellow-600 hover:to-yellow-400 hover:border-yellow-400 hover:text-black hover:shadow-lg hover:shadow-yellow-400/25 transform transition-all duration-300">About</Link>
+              <Link href="/schedule" className="bg-gradient-to-r from-yellow-400 to-yellow-600 border border-yellow-400/30 text-black px-4 py-2 rounded-full font-bold hover:from-yellow-600 hover:to-yellow-400 hover:border-yellow-400 hover:text-black hover:shadow-lg hover:shadow-yellow-400/25 transform transition-all duration-300">Schedule</Link>
               
               {/* Gallery Dropdown */}
               <div className="relative group">
                 <button
-                  className="bg-black/1 backdrop-blur-sm border border-yellow-400/30 text-yellow-400 px-4 py-2 rounded-full font-bold hover:bg-yellow-400/20 hover:border-yellow-400 hover:text-yellow-300 hover:shadow-lg hover:shadow-yellow-400/25 transform transition-all duration-300 flex items-center gap-1"
+                  className="bg-gradient-to-r from-yellow-400 to-yellow-600 border border-yellow-400/30 text-black px-4 py-2 rounded-full font-bold hover:from-yellow-600 hover:to-yellow-400 hover:border-yellow-400 hover:text-black hover:shadow-lg hover:shadow-yellow-400/25 transform transition-all duration-300 flex items-center gap-1"
                   onMouseEnter={() => setIsGalleryDropdownOpen(true)}
                   onMouseLeave={() => setIsGalleryDropdownOpen(false)}
                 >
@@ -68,47 +69,96 @@ export default function Navbar() {
                   </svg>
                 </button>
                 
-                {/* Dropdown Menu */}
+                {/* Extended Dropdown Menu with 3D Effect */}
                 <div 
-                  className={`absolute top-full left-1/2 transform -translate-x-1/2 mt-2 w-48 bg-black/95 backdrop-blur-xl border border-yellow-400/30 rounded-xl shadow-2xl transition-all duration-300 z-50 ${
-                    isGalleryDropdownOpen ? 'opacity-100 visible translate-y-0 scale-100' : 'opacity-0 invisible -translate-y-2 scale-95'
+                  className={`absolute top-full left-1/2 transform -translate-x-1/2 mt-2 w-96 transition-all duration-500 z-50 ${
+                    isGalleryDropdownOpen ? 'opacity-100 visible translate-y-0 scale-100 rotate-x-0' : 'opacity-0 invisible -translate-y-4 scale-95 rotate-x-12'
                   }`}
                   onMouseEnter={() => setIsGalleryDropdownOpen(true)}
                   onMouseLeave={() => setIsGalleryDropdownOpen(false)}
                 >
-                  <div className="py-2">
-                    <Link 
-                      href="/gallery/photos" 
-                      className="block px-4 py-3 text-yellow-400 hover:text-yellow-300 hover:bg-yellow-400/20 transition-all duration-300 flex items-center gap-3 font-medium"
-                    >
-                      <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
-                      </svg>
-                      Photos
-                    </Link>
-                    <Link 
-                      href="/gallery/videos" 
-                      className="block px-4 py-3 text-yellow-400 hover:text-yellow-300 hover:bg-yellow-400/20 transition-all duration-300 flex items-center gap-3 font-medium"
-                    >
-                      <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z" />
-                      </svg>
-                      Videos
-                    </Link>
+                  {/* 3D Container with Multiple Shadows */}
+                  <div className="relative">
+                    {/* Backdrop Shadow */}
+                    <div className="absolute inset-0 bg-black/20 blur-xl rounded-2xl transform translate-y-2 scale-95"></div>
+                    
+                    {/* Main Container */}
+                    <div className="relative bg-gradient-to-br from-black/95 via-gray-900/95 to-black/95 backdrop-blur-2xl border border-yellow-400/40 rounded-2xl shadow-[0_15px_35px_-12px_rgba(0,0,0,0.8)] shadow-yellow-400/20 overflow-hidden">
+                      {/* Glowing Border Effect */}
+                      <div className="absolute inset-0 bg-gradient-to-r from-yellow-400/20 via-yellow-500/10 to-yellow-400/20 rounded-2xl blur-sm"></div>
+                      
+                      {/* Inner Content */}
+                      <div className="relative p-4">
+                        {/* Two Column Layout */}
+                        <div className="grid grid-cols-2 gap-4">
+                          {/* Photos Column */}
+                          <div className="space-y-2">
+                            <div className="flex items-center gap-2 mb-2 p-2 bg-gradient-to-r from-yellow-400/10 to-yellow-600/10 rounded-lg border border-yellow-400/20">
+                              <div className="w-6 h-6 bg-gradient-to-br from-yellow-400 to-yellow-600 rounded-md flex items-center justify-center shadow-lg">
+                                <svg className="w-3 h-3 text-black" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                                </svg>
+                              </div>
+                              <h3 className="text-yellow-400 font-bold text-sm" style={{fontFamily: 'Caveat, cursive'}}>Photos</h3>
+                            </div>
+                            <div className="space-y-1">
+                              {[2011, 2012, 2013, 2014, 2015, 2016].map((year) => (
+                                <Link 
+                                  key={year}
+                                  href={`/gallery/${year}`} 
+                                  className="group block text-yellow-200/90 hover:text-yellow-300 transition-all duration-300 py-1.5 px-2 rounded-md font-medium hover:bg-gradient-to-r hover:from-yellow-400/10 hover:to-yellow-600/10 hover:shadow-md hover:shadow-yellow-400/20 hover:scale-105 transform border border-transparent hover:border-yellow-400/30"
+                                >
+                                  <span style={{fontFamily: 'Caveat, cursive'}} className="flex items-center gap-2 text-sm">
+                                    <span className="w-1.5 h-1.5 bg-yellow-400 rounded-full group-hover:scale-150 transition-transform duration-300"></span>
+                                    PUAGMAE {year}
+                                  </span>
+                                </Link>
+                              ))}
+                            </div>
+                          </div>
+
+                          {/* Videos Column */}
+                          <div className="space-y-2">
+                            <div className="flex items-center gap-2 mb-2 p-2 bg-gradient-to-r from-yellow-400/10 to-yellow-600/10 rounded-lg border border-yellow-400/20">
+                              <div className="w-6 h-6 bg-gradient-to-br from-yellow-400 to-yellow-600 rounded-md flex items-center justify-center shadow-lg">
+                                <svg className="w-3 h-3 text-black" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z" />
+                                </svg>
+                              </div>
+                              <h3 className="text-yellow-400 font-bold text-sm" style={{fontFamily: 'Caveat, cursive'}}>Videos</h3>
+                            </div>
+                            <div className="space-y-1">
+                              {[2011, 2012, 2013, 2014, 2015, 2016].map((year) => (
+                                <Link 
+                                  key={year}
+                                  href={`/gallery/${year}/videos`} 
+                                  className="group block text-yellow-200/90 hover:text-yellow-300 transition-all duration-300 py-1.5 px-2 rounded-md font-medium hover:bg-gradient-to-r hover:from-yellow-400/10 hover:to-yellow-600/10 hover:shadow-md hover:shadow-yellow-400/20 hover:scale-105 transform border border-transparent hover:border-yellow-400/30"
+                                >
+                                  <span style={{fontFamily: 'Caveat, cursive'}} className="flex items-center gap-2 text-sm">
+                                    <span className="w-1.5 h-1.5 bg-yellow-400 rounded-full group-hover:scale-150 transition-transform duration-300"></span>
+                                    PUAGMAE {year}
+                                  </span>
+                                </Link>
+                              ))}
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
                   </div>
                 </div>
               </div>
               
-              <Link href="/testimonials" className="bg-black/1 backdrop-blur-sm border border-yellow-400/30 text-yellow-400 px-4 py-2 rounded-full font-bold hover:bg-yellow-400/20 hover:border-yellow-400 hover:text-yellow-300 hover:shadow-lg hover:shadow-yellow-400/25 transform transition-all duration-300">Testimonials</Link>
+              <Link href="/testimonials" className="bg-gradient-to-r from-yellow-400 to-yellow-600 border border-yellow-400/30 text-black px-4 py-2 rounded-full font-bold hover:from-yellow-600 hover:to-yellow-400 hover:border-yellow-400 hover:text-black hover:shadow-lg hover:shadow-yellow-400/25 transform transition-all duration-300">Testimonials</Link>
             </div>
 
             {/* Tickets Button & Hamburger */}
-            <div className="flex items-center space-x-2">
-              <Link href="/tickets" className="hidden md:inline-block bg-black/1 backdrop-blur-sm border border-yellow-400/30 text-yellow-400 px-20 py-4 rounded-full font-bold hover:bg-yellow-400/20 hover:border-yellow-400 hover:text-yellow-300 hover:shadow-lg hover:shadow-yellow-400/25 transform transition-all duration-300 group mt-2 border-t border-yellow-400/20 pt-2 text-left">
-                <span className="text-left">TICKETS</span> <svg className="w-4 h-4 text-yellow-400 transition-transform duration-300 group-hover:translate-x-1 group-hover:text-yellow-300 inline ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-                </svg>
+            <div className="flex items-center space-x-4">
+              <Link href="/tickets" className="hidden md:inline-block bg-gradient-to-r from-yellow-400 to-yellow-600 border border-yellow-400/30 text-black px-9 py-2 rounded-full font-bold hover:from-yellow-600 hover:to-yellow-400 hover:border-yellow-400 hover:text-black hover:shadow-lg hover:shadow-yellow-400/25 transform transition-all duration-300 flex items-center">
+                TICKETS
+                <FaArrowRight className="ml-2 text-lg" />
               </Link>
+              
               {/* Hamburger for mobile */}
               <button
                 className="md:hidden flex items-center justify-center p-2 rounded focus:outline-none focus:ring-2 focus:ring-yellow-400"
@@ -170,27 +220,50 @@ export default function Navbar() {
                 </button>
                 
                 {/* Mobile Dropdown Options */}
-                <div className={`ml-4 space-y-2 transition-all duration-300 ${isGalleryDropdownOpen ? 'opacity-100 max-h-32' : 'opacity-0 max-h-0 overflow-hidden'}`}>
-                  <Link 
-                    href="/gallery/photos" 
-                    className="block text-yellow-200/80 hover:text-yellow-400 transition-colors hover:scale-105 transform duration-300 flex items-center gap-2"
-                    onClick={() => setIsMenuOpen(false)}
-                  >
-                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
-                    </svg>
-                    Photos
-                  </Link>
-                  <Link 
-                    href="/gallery/videos" 
-                    className="block text-yellow-200/80 hover:text-yellow-400 transition-colors hover:scale-105 transform duration-300 flex items-center gap-2"
-                    onClick={() => setIsMenuOpen(false)}
-                  >
-                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z" />
-                    </svg>
-                    Videos
-                  </Link>
+                <div className={`ml-4 space-y-4 transition-all duration-300 ${isGalleryDropdownOpen ? 'opacity-100 max-h-96' : 'opacity-0 max-h-0 overflow-hidden'}`}>
+                  {/* Photos Section */}
+                  <div className="space-y-2">
+                    <h4 className="text-yellow-400 font-semibold flex items-center gap-2">
+                      <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                      </svg>
+                      <span style={{fontFamily: 'Caveat, cursive'}}>Photos</span>
+                    </h4>
+                    <div className="ml-4 space-y-1">
+                      {[2011, 2012, 2013, 2014, 2015, 2016].map((year) => (
+                        <Link 
+                          key={year}
+                          href={`/gallery/${year}`} 
+                          className="block text-yellow-200/80 hover:text-yellow-400 transition-colors hover:scale-105 transform duration-300 py-1"
+                          onClick={() => setIsMenuOpen(false)}
+                        >
+                          <span style={{fontFamily: 'Caveat, cursive'}}>PUAGMAE {year}</span>
+                        </Link>
+                      ))}
+                    </div>
+                  </div>
+
+                  {/* Videos Section */}
+                  <div className="space-y-2">
+                    <h4 className="text-yellow-400 font-semibold flex items-center gap-2">
+                      <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z" />
+                      </svg>
+                      <span style={{fontFamily: 'Caveat, cursive'}}>Videos</span>
+                    </h4>
+                    <div className="ml-4 space-y-1">
+                      {[2011, 2012, 2013, 2014, 2015, 2016].map((year) => (
+                        <Link 
+                          key={year}
+                          href={`/gallery/${year}/videos`} 
+                          className="block text-yellow-200/80 hover:text-yellow-400 transition-colors hover:scale-105 transform duration-300 py-1"
+                          onClick={() => setIsMenuOpen(false)}
+                        >
+                          <span style={{fontFamily: 'Caveat, cursive'}}>PUAGMAE {year}</span>
+                        </Link>
+                      ))}
+                    </div>
+                  </div>
                 </div>
               </div>
               

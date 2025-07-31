@@ -50,39 +50,41 @@ export default function ContactPage() {
   return (
     <div className="min-h-screen text-white py-20 relative">
       {/* Background Image */}
-      <div className="absolute inset-0 z-0">
+      <div className="fixed inset-0 z-0">
         <img 
           src="/pattern.jpg" 
           alt="Pattern Background" 
           className="w-full h-full object-cover"
         />
-        <div className="absolute inset-0 bg-black/60"></div>
+
       </div>
       <div className="container mx-auto max-w-6xl px-4">
         {/* Header Section */}
         <div className="text-center mb-16">
-          <h1 className="text-5xl md:text-6xl font-bold text-yellow-400 mb-8">
+          <h1 className="text-5xl md:text-6xl font-bold text-yellow-400 mb-8" style={{fontFamily: 'Caveat, cursive'}}>
             Contact Us
           </h1>
-          
-          {/* Paragraph Section */}
-          <div className="max-w-4xl mx-auto space-y-6 text-lg text-gray-300">
-            <p>
+        </div>
+
+        {/* Paragraph Section - Separate from form */}
+        <div className="max-w-4xl mx-auto mb-12 text-center relative z-10">
+          <div className="space-y-6 text-yellow-200 bg-black/20 p-6 rounded-lg">
+            <p className="text-lg font-medium text-yellow-300">
               If you require any info or want to share what your heart tells you, please reach out!
             </p>
-                               <p>
-                     Our team happens thanks to your continuous feedback and support. This is a space for open dialogue and exchanging ideas. Let us know how we can be of service by filling out the form below or by sending us an email.
-                   </p>
-            <div className="mt-8 p-4 bg-blue-900/50 rounded-lg border border-yellow-400/30">
-              <h3 className="text-2xl font-bold text-yellow-400 mb-2">PUAGMAE FESTIVAL</h3>
-              <p className="text-lg">ENTOTO PARK, ADDIS ABABA, ETHIOPIA</p>
+            <p className="text-lg text-yellow-200">
+              Our team happens thanks to your continuous feedback and support. This is a space for open dialogue and exchanging ideas. Let us know how we can be of service by filling out the form below or by sending us an email.
+            </p>
+            <div className="space-y-2">
+              <h3 className="text-xl font-bold text-yellow-400">PUAGMAE FESTIVAL</h3>
+              <p className="text-lg text-yellow-300">ENTOTO PARK, ADDIS ABABA, ETHIOPIA</p>
             </div>
           </div>
         </div>
 
-        {/* Contact Form */}
+        {/* Contact Form - Consistent with website theme */}
         <div className="max-w-4xl mx-auto">
-          <div className="bg-blue-900/50 backdrop-blur-sm p-8 rounded-xl border border-yellow-400/20 shadow-2xl">
+          <div className="bg-black/40 backdrop-blur-sm p-8 rounded-xl border border-yellow-400/30 shadow-2xl">
             <form ref={form} onSubmit={handleFormSubmit} className="space-y-6">
               {/* Name and Email Row */}
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -94,7 +96,7 @@ export default function ContactPage() {
                     type="text"
                     id="name"
                     name="from_name" 
-                    className="w-full p-4 bg-gray-800/80 text-white rounded-lg border border-gray-600 focus:ring-2 focus:ring-yellow-400 focus:border-yellow-400 focus:outline-none transition-all duration-300"
+                    className="w-full p-4 bg-black/60 backdrop-blur-sm text-white rounded-lg border border-yellow-400/30 focus:ring-2 focus:ring-yellow-400 focus:border-yellow-400 focus:outline-none transition-all duration-300 placeholder-yellow-200/60"
                     placeholder="Your Full Name"
                     required
                   />
@@ -108,7 +110,7 @@ export default function ContactPage() {
                     type="email"
                     id="email"
                     name="from_email"
-                    className="w-full p-4 bg-gray-800/80 text-white rounded-lg border border-gray-600 focus:ring-2 focus:ring-yellow-400 focus:border-yellow-400 focus:outline-none transition-all duration-300"
+                    className="w-full p-4 bg-black/60 backdrop-blur-sm text-white rounded-lg border border-yellow-400/30 focus:ring-2 focus:ring-yellow-400 focus:border-yellow-400 focus:outline-none transition-all duration-300 placeholder-yellow-200/60"
                     placeholder="your.email@example.com"
                     required
                   />
@@ -129,7 +131,7 @@ export default function ContactPage() {
                       className={`p-3 rounded-lg border-2 transition-all duration-300 text-center ${
                         selectedCategory === category.value
                           ? 'border-yellow-400 bg-yellow-400/20 text-yellow-400'
-                          : 'border-gray-600 bg-gray-800/80 text-gray-300 hover:border-yellow-400/50 hover:bg-yellow-400/10'
+                          : 'border-yellow-400/30 bg-black/60 backdrop-blur-sm text-yellow-200 hover:border-yellow-400/50 hover:bg-yellow-400/10'
                       }`}
                     >
                       <div className="text-2xl mb-1">{category.icon}</div>
@@ -153,7 +155,7 @@ export default function ContactPage() {
                   type="text"
                   id="subject"
                   name="subject"
-                  className="w-full p-4 bg-gray-800/80 text-white rounded-lg border border-gray-600 focus:ring-2 focus:ring-yellow-400 focus:border-yellow-400 focus:outline-none transition-all duration-300"
+                  className="w-full p-4 bg-black/60 backdrop-blur-sm text-white rounded-lg border border-yellow-400/30 focus:ring-2 focus:ring-yellow-400 focus:border-yellow-400 focus:outline-none transition-all duration-300 placeholder-yellow-200/60"
                   placeholder="Brief description of your inquiry"
                   required
                 />
@@ -168,7 +170,7 @@ export default function ContactPage() {
                   id="message"
                   name="message" 
                   rows={6}
-                  className="w-full p-4 bg-gray-800/80 text-white rounded-lg border border-gray-600 focus:ring-2 focus:ring-yellow-400 focus:border-yellow-400 focus:outline-none resize-none transition-all duration-300"
+                  className="w-full p-4 bg-black/60 backdrop-blur-sm text-white rounded-lg border border-yellow-400/30 focus:ring-2 focus:ring-yellow-400 focus:border-yellow-400 focus:outline-none resize-none transition-all duration-300 placeholder-yellow-200/60"
                   placeholder="Tell us about your festival-related inquiry, feedback, or collaboration idea..."
                   required
                 />

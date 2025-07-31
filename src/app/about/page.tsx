@@ -11,13 +11,13 @@ export default function AboutPage() {
   return (
     <div className="min-h-screen text-white relative">
       {/* Background Image */}
-      <div className="absolute inset-0 z-0">
+      <div className="fixed inset-0 z-0">
         <img 
           src="/pattern.jpg" 
           alt="Pattern Background" 
           className="w-full h-full object-cover"
         />
-        <div className="absolute inset-0 bg-black/60"></div>
+
       </div>
       
       {/* Hero Section */}

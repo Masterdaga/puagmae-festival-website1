@@ -7,13 +7,13 @@ export default function Home() {
   return (
     <main className="min-h-screen relative">
       {/* Background Image */}
-      <div className="absolute inset-0 z-0">
+      <div className="fixed inset-0 z-0">
         <img 
           src="/pattern.jpg" 
           alt="Pattern Background" 
           className="w-full h-full object-cover"
         />
-        <div className="absolute inset-0 bg-black/60"></div>
+
       </div>
       
       <LandingCarousel />
