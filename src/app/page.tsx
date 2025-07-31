@@ -6,6 +6,7 @@ import Testimonials from './components/Testimonials';
 export default function Home() {
   return (
     <main className="min-h-screen relative">
+      
       {/* Background Image */}
       <div className="absolute inset-0 z-0">
         <img 
@@ -13,9 +14,8 @@ export default function Home() {
           alt="Pattern Background" 
           className="w-full h-full object-cover"
         />
-        <div className="absolute inset-0 bg-black/60"></div>
       </div>
-      
+
       <LandingCarousel />
       
       {/* Countdown Section */}
@@ -38,8 +38,14 @@ export default function Home() {
       </section>
 
       {/* Features Section */}
-      <section className="py-24 px-4 relative z-10">
-        <div className="container mx-auto max-w-7xl">
+      <section className="py-24 px-4 relative z-10 overflow-hidden">
+        {/* Pattern2 Background for this section only */}
+        <img 
+          src="/pattern2.jpg"
+          alt="Pattern2 Background"
+          className="absolute inset-0 w-full h-full object-cover z-0"
+        />
+        <div className="container mx-auto max-w-7xl relative z-10">
           <div className="text-center mb-20">
             <h2 className="text-4xl md:text-6xl font-bold text-white mb-6">
               What to Expect
