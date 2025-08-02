@@ -13,53 +13,57 @@ export default function Navbar() {
   useEffect(() => {
     const handleScroll = () => {
       const currentScrollY = window.scrollY;
-      
       if (currentScrollY > lastScrollY && currentScrollY > 100) {
-        // Scrolling down & past 100px - hide navbar
         setIsVisible(false);
       } else {
-        // Scrolling up - show navbar
         setIsVisible(true);
       }
-      
       setLastScrollY(currentScrollY);
     };
-
     window.addEventListener('scroll', handleScroll);
     return () => window.removeEventListener('scroll', handleScroll);
   }, [lastScrollY]);
 
   return (
     <>
-      {/* Sticky Navbar */}
+      {/* Glassy Navbar */}
       <nav className={`fixed top-0 left-0 w-full z-50 transition-transform duration-300 ${isVisible ? 'translate-y-0' : '-translate-y-full'}`}>
-        <div className="max-w-full mx-auto px-8 sm:px-12">
-          <div className="flex items-center justify-between h-24 py-4">
+        <div className="mx-auto px-4 sm:px-8">
+          <div className="flex items-center justify-between h-20 py-2">
             {/* Logo/Brand */}
-            <div className="flex-shrink-0 flex items-center">
-              <Link href="/" className="flex items-center space-x-2 hover:opacity-80 transition-opacity">
-                <Image 
-                  src="/logo.png" 
-                  alt="PUAGMAE STREET FESTIVAL" 
-                  width={120} 
-                  height={120} 
-                  className="w-32 h-32 object-contain"
-                />
-                <span className="text-3xl font-black text-yellow-400 tracking-[0.2em] hidden sm:block bg-gradient-to-r from-yellow-400 to-yellow-600 bg-clip-text text-transparent drop-shadow-lg" style={{fontFamily: 'Caveat, cursive'}}>
-                  PUAGMAE
-                </span>
-              </Link>
-            </div>
+            <Link href="/" className="flex items-center gap-3 hover:opacity-90 transition-opacity">
+  <Image 
+    src="/logo.png" 
+    alt="PUAGMAE STREET FESTIVAL" 
+    width={40} 
+    height={40} 
+    className="w-10 h-10 object-contain"
+  />
+  <span className="text-2xl font-black text-yellow-400 tracking-widest bg-gradient-to-r from-yellow-400 to-yellow-600 bg-clip-text text-transparent drop-shadow-lg hidden sm:block" style={{fontFamily: 'Caveat, cursive'}}>
+    PUAGMAE
+  </span>
+</Link>
 
             {/* Desktop Nav Links */}
-            <div className="hidden md:flex flex-1 items-center justify-center space-x-8">
-              <Link href="/about" className="bg-gradient-to-r from-yellow-400 to-yellow-600 border border-yellow-400/30 text-black px-4 py-2 rounded-full font-bold hover:from-yellow-600 hover:to-yellow-400 hover:border-yellow-400 hover:text-black hover:shadow-lg hover:shadow-yellow-400/25 transform transition-all duration-300">About</Link>
-              <Link href="/schedule" className="bg-gradient-to-r from-yellow-400 to-yellow-600 border border-yellow-400/30 text-black px-4 py-2 rounded-full font-bold hover:from-yellow-600 hover:to-yellow-400 hover:border-yellow-400 hover:text-black hover:shadow-lg hover:shadow-yellow-400/25 transform transition-all duration-300">Schedule</Link>
-              
+            <div className="hidden md:flex items-center gap-6">
+              {[
+                { href: "/about", label: "About" },
+                { href: "/schedule", label: "Schedule" }
+              ].map(link => (
+                <Link
+                  key={link.href}
+                  href={link.href}
+                  className="relative px-3 py-1 text-yellow-100 font-semibold hover:text-yellow-400 transition-colors duration-200"
+                >
+                  {link.label}
+                  <span className="absolute left-0 -bottom-1 w-full h-0.5 bg-gradient-to-r from-yellow-400 to-yellow-600 scale-x-0 hover:scale-x-100 origin-left transition-transform duration-300"></span>
+                </Link>
+              ))}
+
               {/* Gallery Dropdown */}
               <div className="relative group">
                 <button
-                  className="bg-gradient-to-r from-yellow-400 to-yellow-600 border border-yellow-400/30 text-black px-4 py-2 rounded-full font-bold hover:from-yellow-600 hover:to-yellow-400 hover:border-yellow-400 hover:text-black hover:shadow-lg hover:shadow-yellow-400/25 transform transition-all duration-300 flex items-center gap-1"
+                  className="relative px-3 py-1 text-yellow-100 font-semibold hover:text-yellow-400 transition-colors duration-200 flex items-center gap-1"
                   onMouseEnter={() => setIsGalleryDropdownOpen(true)}
                   onMouseLeave={() => setIsGalleryDropdownOpen(false)}
                 >
@@ -68,108 +72,59 @@ export default function Navbar() {
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
                   </svg>
                 </button>
-                
-                {/* Extended Dropdown Menu with 3D Effect */}
+                {/* Dropdown */}
                 <div 
-                  className={`absolute top-full left-1/2 transform -translate-x-1/2 mt-2 w-96 transition-all duration-500 z-50 ${
-                    isGalleryDropdownOpen ? 'opacity-100 visible translate-y-0 scale-100 rotate-x-0' : 'opacity-0 invisible -translate-y-4 scale-95 rotate-x-12'
+                  className={`absolute top-full left-1/2 transform -translate-x-1/2 mt-2 min-w-[220px] bg-black/90 border border-yellow-400/30 rounded-xl shadow-lg backdrop-blur-xl transition-all duration-300 z-50 ${
+                    isGalleryDropdownOpen ? 'opacity-100 visible translate-y-0 scale-100' : 'opacity-0 invisible -translate-y-2 scale-95'
                   }`}
                   onMouseEnter={() => setIsGalleryDropdownOpen(true)}
                   onMouseLeave={() => setIsGalleryDropdownOpen(false)}
                 >
-                  {/* 3D Container with Multiple Shadows */}
-                  <div className="relative">
-                    {/* Backdrop Shadow */}
-                    <div className="absolute inset-0 bg-black/20 blur-xl rounded-2xl transform translate-y-2 scale-95"></div>
-                    
-                    {/* Main Container */}
-                    <div className="relative bg-gradient-to-br from-black/95 via-gray-900/95 to-black/95 backdrop-blur-2xl border border-yellow-400/40 rounded-2xl shadow-[0_15px_35px_-12px_rgba(0,0,0,0.8)] shadow-yellow-400/20 overflow-hidden">
-                      {/* Glowing Border Effect */}
-                      <div className="absolute inset-0 bg-gradient-to-r from-yellow-400/20 via-yellow-500/10 to-yellow-400/20 rounded-2xl blur-sm"></div>
-                      
-                      {/* Inner Content */}
-                      <div className="relative p-4">
-                        {/* Two Column Layout */}
-                        <div className="grid grid-cols-2 gap-4">
-                          {/* Photos Column */}
-                          <div className="space-y-2">
-                            <div className="flex items-center gap-2 mb-2 p-2 bg-gradient-to-r from-yellow-400/10 to-yellow-600/10 rounded-lg border border-yellow-400/20">
-                              <div className="w-6 h-6 bg-gradient-to-br from-yellow-400 to-yellow-600 rounded-md flex items-center justify-center shadow-lg">
-                                <svg className="w-3 h-3 text-black" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
-                                </svg>
-                              </div>
-                              <h3 className="text-yellow-400 font-bold text-sm" style={{fontFamily: 'Caveat, cursive'}}>Photos</h3>
-                            </div>
-                            <div className="space-y-1">
-                              {[2011, 2012, 2013, 2014, 2015, 2016].map((year) => (
-                                <Link 
-                                  key={year}
-                                  href={`/gallery/${year}`} 
-                                  className="group block text-yellow-200/90 hover:text-yellow-300 transition-all duration-300 py-1.5 px-2 rounded-md font-medium hover:bg-gradient-to-r hover:from-yellow-400/10 hover:to-yellow-600/10 hover:shadow-md hover:shadow-yellow-400/20 hover:scale-105 transform border border-transparent hover:border-yellow-400/30"
-                                >
-                                  <span style={{fontFamily: 'Caveat, cursive'}} className="flex items-center gap-2 text-sm">
-                                    <span className="w-1.5 h-1.5 bg-yellow-400 rounded-full group-hover:scale-150 transition-transform duration-300"></span>
-                                    PUAGMAE {year}
-                                  </span>
-                                </Link>
-                              ))}
-                            </div>
-                          </div>
-
-                          {/* Videos Column */}
-                          <div className="space-y-2">
-                            <div className="flex items-center gap-2 mb-2 p-2 bg-gradient-to-r from-yellow-400/10 to-yellow-600/10 rounded-lg border border-yellow-400/20">
-                              <div className="w-6 h-6 bg-gradient-to-br from-yellow-400 to-yellow-600 rounded-md flex items-center justify-center shadow-lg">
-                                <svg className="w-3 h-3 text-black" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z" />
-                                </svg>
-                              </div>
-                              <h3 className="text-yellow-400 font-bold text-sm" style={{fontFamily: 'Caveat, cursive'}}>Videos</h3>
-                            </div>
-                            <div className="space-y-1">
-                              {[2011, 2012, 2013, 2014, 2015, 2016].map((year) => (
-                                <Link 
-                                  key={year}
-                                  href={`/gallery/${year}/videos`} 
-                                  className="group block text-yellow-200/90 hover:text-yellow-300 transition-all duration-300 py-1.5 px-2 rounded-md font-medium hover:bg-gradient-to-r hover:from-yellow-400/10 hover:to-yellow-600/10 hover:shadow-md hover:shadow-yellow-400/20 hover:scale-105 transform border border-transparent hover:border-yellow-400/30"
-                                >
-                                  <span style={{fontFamily: 'Caveat, cursive'}} className="flex items-center gap-2 text-sm">
-                                    <span className="w-1.5 h-1.5 bg-yellow-400 rounded-full group-hover:scale-150 transition-transform duration-300"></span>
-                                    PUAGMAE {year}
-                                  </span>
-                                </Link>
-                              ))}
-                            </div>
-                          </div>
-                        </div>
-                      </div>
-                    </div>
+                  <div className="p-4">
+                    <div className="mb-2 text-yellow-400 font-bold">Photos</div>
+                    {[2011, 2012, 2013, 2014, 2015, 2016].map(year => (
+                      <Link
+                        key={year}
+                        href={`/gallery/${year}`}
+                        className="block px-2 py-1 text-yellow-100 hover:text-yellow-400 rounded transition-colors duration-200"
+                      >
+                        PUAGMAE {year}
+                      </Link>
+                    ))}
+                    <div className="mt-3 mb-2 text-yellow-400 font-bold">Videos</div>
+                    {[2011, 2012, 2013, 2014, 2015, 2016].map(year => (
+                      <Link
+                        key={year}
+                        href={`/gallery/${year}/videos`}
+                        className="block px-2 py-1 text-yellow-100 hover:text-yellow-400 rounded transition-colors duration-200"
+                      >
+                        PUAGMAE {year}
+                      </Link>
+                    ))}
                   </div>
                 </div>
               </div>
-              
-              <Link href="/testimonials" className="bg-gradient-to-r from-yellow-400 to-yellow-600 border border-yellow-400/30 text-black px-4 py-2 rounded-full font-bold hover:from-yellow-600 hover:to-yellow-400 hover:border-yellow-400 hover:text-black hover:shadow-lg hover:shadow-yellow-400/25 transform transition-all duration-300">Testimonials</Link>
-            </div>
 
-            {/* Tickets Button & Hamburger */}
-            <div className="flex items-center space-x-4">
-              <Link href="/tickets" className="hidden md:inline-block bg-gradient-to-r from-yellow-400 to-yellow-600 border border-yellow-400/30 text-black px-9 py-2 rounded-full font-bold hover:from-yellow-600 hover:to-yellow-400 hover:border-yellow-400 hover:text-black hover:shadow-lg hover:shadow-yellow-400/25 transform transition-all duration-300 flex items-center">
-                TICKETS
+              <Link href="/testimonials" className="relative px-3 py-1 text-yellow-100 font-semibold hover:text-yellow-400 transition-colors duration-200">
+                Testimonials
+                <span className="absolute left-0 -bottom-1 w-full h-0.5 bg-gradient-to-r from-yellow-400 to-yellow-600 scale-x-0 hover:scale-x-100 origin-left transition-transform duration-300"></span>
+              </Link>
+              <Link href="/tickets" className="bg-gradient-to-r from-yellow-500 to-yellow-600 text-black px-6 py-2 rounded-full font-bold hover:from-yellow-600 hover:to-yellow-700 hover:scale-105 transition-all duration-200 flex items-center shadow-lg">
+                Tickets
                 <FaArrowRight className="ml-2 text-lg" />
               </Link>
-              
-              {/* Hamburger for mobile */}
-              <button
-                className="md:hidden flex items-center justify-center p-2 rounded focus:outline-none focus:ring-2 focus:ring-yellow-400"
-                onClick={() => setIsMenuOpen(true)}
-                aria-label="Open menu"
-              >
-                <svg className="w-7 h-7 text-yellow-400" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" d="M4 6h16M4 12h16M4 18h16" />
-                </svg>
-              </button>
             </div>
+
+            {/* Hamburger for mobile */}
+            <button
+              className="md:hidden flex items-center justify-center p-2 rounded focus:outline-none focus:ring-2 focus:ring-yellow-400"
+              onClick={() => setIsMenuOpen(true)}
+              aria-label="Open menu"
+            >
+              <svg className="w-7 h-7 text-yellow-400" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" d="M4 6h16M4 12h16M4 18h16" />
+              </svg>
+            </button>
           </div>
         </div>
       </nav>
@@ -194,9 +149,9 @@ export default function Navbar() {
               <Image 
                 src="/logo.png" 
                 alt="PUAGMAE STREET FESTIVAL" 
-                width={40} 
-                height={40} 
-                className="w-10 h-10 object-contain"
+                width={32} 
+                height={32} 
+                className="rounded-full border-2 border-yellow-400"
               />
               <span className="text-lg font-bold text-yellow-400 tracking-widest ml-2">
                 PUAGMAE
@@ -206,7 +161,6 @@ export default function Navbar() {
             <nav className="flex flex-col space-y-6 text-lg font-medium">
               <Link href="/about" className="text-yellow-200 hover:text-yellow-400 transition-colors hover:scale-105 transform duration-300" onClick={() => setIsMenuOpen(false)}>About</Link>
               <Link href="/schedule" className="text-yellow-200 hover:text-yellow-400 transition-colors hover:scale-105 transform duration-300" onClick={() => setIsMenuOpen(false)}>Schedule</Link>
-              
               {/* Mobile Gallery Dropdown */}
               <div className="space-y-2">
                 <button
@@ -218,55 +172,36 @@ export default function Navbar() {
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
                   </svg>
                 </button>
-                
                 {/* Mobile Dropdown Options */}
                 <div className={`ml-4 space-y-4 transition-all duration-300 ${isGalleryDropdownOpen ? 'opacity-100 max-h-96' : 'opacity-0 max-h-0 overflow-hidden'}`}>
-                  {/* Photos Section */}
                   <div className="space-y-2">
-                    <h4 className="text-yellow-400 font-semibold flex items-center gap-2">
-                      <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
-                      </svg>
-                      <span style={{fontFamily: 'Caveat, cursive'}}>Photos</span>
-                    </h4>
-                    <div className="ml-4 space-y-1">
-                      {[2011, 2012, 2013, 2014, 2015, 2016].map((year) => (
-                        <Link 
-                          key={year}
-                          href={`/gallery/${year}`} 
-                          className="block text-yellow-200/80 hover:text-yellow-400 transition-colors hover:scale-105 transform duration-300 py-1"
-                          onClick={() => setIsMenuOpen(false)}
-                        >
-                          <span style={{fontFamily: 'Caveat, cursive'}}>PUAGMAE {year}</span>
-                        </Link>
-                      ))}
-                    </div>
+                    <div className="text-yellow-400 font-semibold">Photos</div>
+                    {[2011, 2012, 2013, 2014, 2015, 2016].map(year => (
+                      <Link 
+                        key={year}
+                        href={`/gallery/${year}`} 
+                        className="block text-yellow-200/80 hover:text-yellow-400 transition-colors hover:scale-105 transform duration-300 py-1"
+                        onClick={() => setIsMenuOpen(false)}
+                      >
+                        PUAGMAE {year}
+                      </Link>
+                    ))}
                   </div>
-
-                  {/* Videos Section */}
                   <div className="space-y-2">
-                    <h4 className="text-yellow-400 font-semibold flex items-center gap-2">
-                      <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z" />
-                      </svg>
-                      <span style={{fontFamily: 'Caveat, cursive'}}>Videos</span>
-                    </h4>
-                    <div className="ml-4 space-y-1">
-                      {[2011, 2012, 2013, 2014, 2015, 2016].map((year) => (
-                        <Link 
-                          key={year}
-                          href={`/gallery/${year}/videos`} 
-                          className="block text-yellow-200/80 hover:text-yellow-400 transition-colors hover:scale-105 transform duration-300 py-1"
-                          onClick={() => setIsMenuOpen(false)}
-                        >
-                          <span style={{fontFamily: 'Caveat, cursive'}}>PUAGMAE {year}</span>
-                        </Link>
-                      ))}
-                    </div>
+                    <div className="text-yellow-400 font-semibold">Videos</div>
+                    {[2011, 2012, 2013, 2014, 2015, 2016].map(year => (
+                      <Link 
+                        key={year}
+                        href={`/gallery/${year}/videos`} 
+                        className="block text-yellow-200/80 hover:text-yellow-400 transition-colors hover:scale-105 transform duration-300 py-1"
+                        onClick={() => setIsMenuOpen(false)}
+                      >
+                        PUAGMAE {year}
+                      </Link>
+                    ))}
                   </div>
                 </div>
               </div>
-              
               <Link href="/testimonials" className="text-yellow-200 hover:text-yellow-400 transition-colors hover:scale-105 transform duration-300" onClick={() => setIsMenuOpen(false)}>Testimonials</Link>
               <Link href="/tickets" className="bg-gradient-to-r from-yellow-500 to-yellow-600 text-black px-5 py-2 rounded-full font-semibold hover:from-yellow-600 hover:to-yellow-700 hover:scale-105 transform transition-all duration-200 mt-4 text-center" onClick={() => setIsMenuOpen(false)}>
                 Tickets
@@ -276,6 +211,7 @@ export default function Navbar() {
             <div className="mt-auto pt-8 border-t border-yellow-400/20">
               <h3 className="text-yellow-400 font-semibold mb-4">Follow Us</h3>
               <div className="flex space-x-4">
+                {/* Social icons unchanged */}
                 <a href="#" className="text-yellow-200 hover:text-yellow-400 transition-colors hover:scale-110 transform duration-300">
                   <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
                     <path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/>
@@ -298,4 +234,4 @@ export default function Navbar() {
       </div>
     </>
   );
-} 
+}
