@@ -68,7 +68,7 @@ export default function HeroSection() {
         {/* CTA Buttons */}
         <div className="flex flex-col sm:flex-row items-center justify-center gap-6 mb-16">
           <button className="group relative px-8 py-4 bg-gradient-to-r from-yellow-500 to-yellow-600 text-black font-bold rounded-full text-lg hover:from-yellow-600 hover:to-yellow-700 transition-all duration-300 transform hover:scale-105 hover:shadow-2xl">
-            <span className="relative z-10">Get Tickets Now</span>
+            <span className="relative z-10">Register Now</span>
             <div className="absolute inset-0 bg-gradient-to-r from-yellow-500 to-yellow-600 rounded-full blur opacity-0 group-hover:opacity-75 transition-opacity duration-300"></div>
           </button>
           

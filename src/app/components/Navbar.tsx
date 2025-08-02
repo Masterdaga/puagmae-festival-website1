@@ -32,21 +32,22 @@ export default function Navbar() {
           <div className="flex items-center justify-between h-20 py-2">
             {/* Logo/Brand */}
             <Link href="/" className="flex items-center gap-3 hover:opacity-90 transition-opacity">
-  <Image 
-    src="/logo.png" 
-    alt="PUAGMAE STREET FESTIVAL" 
-    width={40} 
-    height={40} 
-    className="w-10 h-10 object-contain"
-  />
-  <span className="text-2xl font-black text-yellow-400 tracking-widest bg-gradient-to-r from-yellow-400 to-yellow-600 bg-clip-text text-transparent drop-shadow-lg hidden sm:block" style={{fontFamily: 'Caveat, cursive'}}>
-    PUAGMAE
-  </span>
-</Link>
+              <Image 
+                src="/logo.png" 
+                alt="PUAGMAE STREET FESTIVAL" 
+                width={40} 
+                height={40} 
+                className="w-10 h-10 object-contain"
+              />
+              <span className="text-2xl font-black text-yellow-400 tracking-widest bg-gradient-to-r from-yellow-400 to-yellow-600 bg-clip-text text-transparent drop-shadow-lg hidden sm:block" style={{fontFamily: 'Caveat, cursive'}}>
+                PUAGMAE
+              </span>
+            </Link>
 
             {/* Desktop Nav Links */}
             <div className="hidden md:flex items-center gap-6">
               {[
+                { href: "/", label: "Home" },
                 { href: "/about", label: "About" },
                 { href: "/schedule", label: "Schedule" }
               ].map(link => (
@@ -109,10 +110,11 @@ export default function Navbar() {
                 Testimonials
                 <span className="absolute left-0 -bottom-1 w-full h-0.5 bg-gradient-to-r from-yellow-400 to-yellow-600 scale-x-0 hover:scale-x-100 origin-left transition-transform duration-300"></span>
               </Link>
-              <Link href="/tickets" className="bg-gradient-to-r from-yellow-500 to-yellow-600 text-black px-6 py-2 rounded-full font-bold hover:from-yellow-600 hover:to-yellow-700 hover:scale-105 transition-all duration-200 flex items-center shadow-lg">
-                Tickets
+              <Link href="/Registration#register" scroll={true} className="bg-gradient-to-r from-yellow-500 to-yellow-600 text-black px-6 py-2 rounded-full font-bold hover:from-yellow-600 hover:to-yellow-700 hover:scale-105 transition-all duration-200 flex items-center shadow-lg">
+                Register now
                 <FaArrowRight className="ml-2 text-lg" />
               </Link>
+
             </div>
 
             {/* Hamburger for mobile */}
@@ -159,6 +161,7 @@ export default function Navbar() {
             </div>
             {/* Menu Links */}
             <nav className="flex flex-col space-y-6 text-lg font-medium">
+              <Link href="/" className="text-yellow-200 hover:text-yellow-400 transition-colors hover:scale-105 transform duration-300" onClick={() => setIsMenuOpen(false)}>Home</Link>
               <Link href="/about" className="text-yellow-200 hover:text-yellow-400 transition-colors hover:scale-105 transform duration-300" onClick={() => setIsMenuOpen(false)}>About</Link>
               <Link href="/schedule" className="text-yellow-200 hover:text-yellow-400 transition-colors hover:scale-105 transform duration-300" onClick={() => setIsMenuOpen(false)}>Schedule</Link>
               {/* Mobile Gallery Dropdown */}
@@ -203,9 +206,11 @@ export default function Navbar() {
                 </div>
               </div>
               <Link href="/testimonials" className="text-yellow-200 hover:text-yellow-400 transition-colors hover:scale-105 transform duration-300" onClick={() => setIsMenuOpen(false)}>Testimonials</Link>
-              <Link href="/tickets" className="bg-gradient-to-r from-yellow-500 to-yellow-600 text-black px-5 py-2 rounded-full font-semibold hover:from-yellow-600 hover:to-yellow-700 hover:scale-105 transform transition-all duration-200 mt-4 text-center" onClick={() => setIsMenuOpen(false)}>
-                Tickets
+              <Link href="/Registration#register" scroll={true} className="bg-gradient-to-r from-yellow-500 to-yellow-600 text-black px-6 py-2 rounded-full font-bold hover:from-yellow-600 hover:to-yellow-700 hover:scale-105 transition-all duration-200 flex items-center shadow-lg">
+                Register now
+                <FaArrowRight className="ml-2 text-lg" />
               </Link>
+
             </nav>
             {/* Social Media Section */}
             <div className="mt-auto pt-8 border-t border-yellow-400/20">
