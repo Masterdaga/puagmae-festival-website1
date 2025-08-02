@@ -9,38 +9,39 @@ export default function Footer() {
   return (
     <footer className="bg-gradient-to-b from-black to-gray-900 w-full overflow-x-hidden backdrop-blur-md">
       {/* Newsletter Section */}
-      <div className="bg-gradient-to-r from-yellow-600/10 to-yellow-700/10 backdrop-blur-sm py-3 px-4 border-t border-yellow-400/20">
-        <div className="max-w-3xl mx-auto">
-          <div className="text-center mb-2">
-            <h2 className="text-2xl md:text-3xl font-bold bg-gradient-to-r from-yellow-300 to-yellow-400 bg-clip-text text-transparent mb-2">
-              LET'S STAY IN TOUCH
-            </h2>
-            <p className="text-yellow-200/80 text-sm">
-              Be the first to know about updates and festival announcements.
-            </p>
-          </div>
+      
+<div className="bg-gradient-to-r from-yellow-600/10 to-yellow-700/10 backdrop-blur-sm py-8 px-4 border-t border-yellow-400/20">
+  <div className="max-w-5xl mx-auto">
+    <div className="text-center mb-4">
+      <h2 className="text-4xl md:text-5xl font-extrabold bg-gradient-to-r from-yellow-300 to-yellow-400 bg-clip-text text-transparent mb-3 tracking-wide drop-shadow-lg">
+        LET'S STAY IN TOUCH
+      </h2>
+      <p className="text-yellow-200/90 text-lg">
+        Be the first to know about updates and festival announcements.
+      </p>
+    </div>
 
-          {/* Email Input Section */}
-          <div className="max-w-sm mx-auto">
-            <div className="flex gap-2">
-              <input
-                type="email"
-                placeholder="Enter your email address"
-                className="flex-1 bg-black/40 backdrop-blur-sm border-2 border-yellow-400/30 text-yellow-200 placeholder-yellow-300/60 px-3 py-2 rounded-full focus:outline-none focus:border-yellow-400 transition-colors text-sm"
-              />
-              <button className="bg-gradient-to-r from-yellow-500 to-yellow-600 text-black px-4 py-2 rounded-full font-semibold hover:from-yellow-600 hover:to-yellow-700 transition-all duration-300 transform hover:scale-105 flex items-center justify-center gap-1 text-sm">
-                <span>Subscribe</span>
-                <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
-                  <path fillRule="evenodd" d="M10.293 3.293a1 1 0 011.414 0l6 6a1 1 0 010 1.414l-6 6a1 1 0 01-1.414-1.414L14.586 11H3a1 1 0 110-2h11.586l-4.293-4.293a1 1 0 010-1.414z" clipRule="evenodd" />
-                </svg>
-              </button>
-            </div>
-            <p className="text-xs text-yellow-200/60 text-center mt-2">
-              We respect your privacy. Unsubscribe at any time.
-            </p>
-          </div>
-        </div>
+    {/* Email Input Section */}
+    <div className="max-w-lg mx-auto">
+      <div className="flex gap-3">
+        <input
+          type="email"
+          placeholder="Enter your email address"
+          className="flex-1 bg-black/40 backdrop-blur-sm border-2 border-yellow-400/30 text-yellow-200 placeholder-yellow-300/60 px-5 py-4 rounded-full focus:outline-none focus:border-yellow-400 transition-colors text-lg"
+        />
+        <button className="bg-gradient-to-r from-yellow-500 to-yellow-600 text-black px-6 py-4 rounded-full font-bold text-lg hover:from-yellow-600 hover:to-yellow-700 transition-all duration-300 transform hover:scale-105 flex items-center justify-center gap-2 shadow-lg">
+          <span>Subscribe</span>
+          <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
+            <path fillRule="evenodd" d="M10.293 3.293a1 1 0 011.414 0l6 6a1 1 0 010 1.414l-6 6a1 1 0 01-1.414-1.414L14.586 11H3a1 1 0 110-2h11.586l-4.293-4.293a1 1 0 010-1.414z" clipRule="evenodd" />
+          </svg>
+        </button>
       </div>
+      <p className="text-sm text-yellow-200/70 text-center mt-3">
+        We respect your privacy. Unsubscribe at any time.
+      </p>
+    </div>
+  </div>
+</div>
 
       {/* Main Footer Content */}
       <div className="bg-black/60 backdrop-blur-md">
