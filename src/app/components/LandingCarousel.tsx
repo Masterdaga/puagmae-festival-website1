@@ -37,12 +37,11 @@ export default function LandingCarousel() {
             >
               LEARN MORE
             </Link>
-            <Link 
-              href="/tickets"
-              className="bg-yellow-500 text-black px-6 py-3 rounded-full font-medium hover:bg-yellow-600 transition-all duration-300"
-            >
-              GET TICKETS
+            <Link href="/Registration"
+             className="bg-yellow-500 text-black px-6 py-3 rounded-full font-medium hover:bg-yellow-600 transition-all duration-300">
+            Register now
             </Link>
+
           </div>
         </div>
       </div>

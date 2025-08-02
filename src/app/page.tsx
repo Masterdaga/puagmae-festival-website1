@@ -3,21 +3,21 @@ import LandingCarousel from './components/LandingCarousel';
 import HeroSection from './HeroSection';
 import CountdownTimer from './components/CountdownTimer';
 import Testimonials from './components/Testimonials';
+import Link from 'next/link'; // ✅ Added import
 
 export default function Home() {
   return (
     <main className="min-h-screen relative bg-gradient-to-br from-black via-[#3b2f23] to-black overflow-x-hidden">
-      {/* Navbar overlays everything */}
+     
       <Navbar />
 
-      {/* Animated gold blur background */}
+      
       <div
         className="pointer-events-none fixed top-[-10%] left-1/2 -translate-x-1/2 z-0"
         aria-hidden="true"
       >
         <div className="w-[600px] h-[600px] bg-yellow-700 opacity-30 rounded-full blur-3xl animate-pulse-slow" />
       </div>
-      {/* Optional: Add more animated circles for depth */}
       <div
         className="pointer-events-none fixed bottom-[-15%] right-[-10%] z-0"
         aria-hidden="true"
@@ -118,9 +118,9 @@ export default function Home() {
           </div>
         </section>
 
-        {/* CTA Section */}
+        
         <section className="py-24 px-4 relative">
-          {/* Gold animated blur behind buttons */}
+          
           <div className="absolute left-1/2 top-[70%] -translate-x-1/2 -translate-y-1/2 pointer-events-none z-0">
             <div className="w-[340px] h-[120px] bg-yellow-500 opacity-30 rounded-full blur-2xl animate-pulse-slow"></div>
           </div>
@@ -137,11 +137,13 @@ export default function Home() {
               music, and community spirit.
             </p>
             <div className="flex flex-col sm:flex-row items-center justify-center gap-6">
-              <button className="group relative px-10 py-5 bg-gradient-to-r from-yellow-400 via-yellow-500 to-yellow-600 text-black font-bold rounded-full text-xl shadow-xl hover:from-yellow-500 hover:to-yellow-700 transition-all duration-300 transform hover:scale-105 hover:shadow-yellow-400/40">
-                <span className="relative z-10">Get Your Tickets</span>
-                {/* Gold glow ring */}
-                <span className="absolute inset-0 rounded-full border-2 border-yellow-400 opacity-30 group-hover:opacity-60 transition-all duration-300 pointer-events-none"></span>
-              </button>
+              
+              <Link href="/Registration">
+                <button className="group relative px-10 py-5 bg-gradient-to-r from-yellow-400 via-yellow-500 to-yellow-600 text-black font-bold rounded-full text-xl shadow-xl hover:from-yellow-500 hover:to-yellow-700 transition-all duration-300 transform hover:scale-105 hover:shadow-yellow-400/40">
+                  <span className="relative z-10">Register Now</span>
+                  <span className="absolute inset-0 rounded-full border-2 border-yellow-400 opacity-30 group-hover:opacity-60 transition-all duration-300 pointer-events-none"></span>
+                </button>
+              </Link>
               <button className="px-10 py-5 border-2 border-yellow-400 text-yellow-200 font-semibold rounded-full text-xl bg-black/40 hover:bg-yellow-400/10 hover:border-yellow-400 transition-all duration-300 shadow-lg hover:shadow-yellow-400/30">
                 Learn More
               </button>
