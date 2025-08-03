@@ -3,11 +3,23 @@ import LandingCarousel from './components/LandingCarousel';
 import HeroSection from './HeroSection';
 import CountdownTimer from './components/CountdownTimer';
 import Testimonials from './components/Testimonials';
-import Link from 'next/link'; // ✅ Added import
+import Link from 'next/link'; 
+
+
+
 
 export default function Home() {
   return (
-    <main className="min-h-screen relative bg-gradient-to-br from-black via-[#3b2f23] to-black overflow-x-hidden">
+    <main className="min-h-screen relative overflow-x-hidden">
+  
+  <div
+    className="absolute inset-0 bg-cover bg-center -z-10"
+    style={{ backgroundImage: "url('/new-adeyababa.jpg')" }}
+  />
+  
+  
+  <div className="absolute inset-0 bg-gradient-to-br from-black via-[#3b2f23] to-black opacity-80 -z-10" />
+
      
       <Navbar />
 
@@ -45,8 +57,8 @@ export default function Home() {
           </div>
         </section>
 
-        {/* Features Section */}
-        <section className="py-24 px-4">
+       {/* Features Section */}
+       <section className="py-24 px-4">
           <div className="container mx-auto max-w-7xl">
             <div className="text-center mb-20">
               <h2 className="text-4xl md:text-6xl font-bold text-white mb-6">
@@ -144,9 +156,11 @@ export default function Home() {
                   <span className="absolute inset-0 rounded-full border-2 border-yellow-400 opacity-30 group-hover:opacity-60 transition-all duration-300 pointer-events-none"></span>
                 </button>
               </Link>
-              <button className="px-10 py-5 border-2 border-yellow-400 text-yellow-200 font-semibold rounded-full text-xl bg-black/40 hover:bg-yellow-400/10 hover:border-yellow-400 transition-all duration-300 shadow-lg hover:shadow-yellow-400/30">
+              <Link href="/about">
+               <button className="px-10 py-5 border-2 border-yellow-400 text-yellow-200 font-semibold rounded-full text-xl bg-black/40 hover:bg-yellow-400/10 hover:border-yellow-400 transition-all duration-300 shadow-lg hover:shadow-yellow-400/30">
                 Learn More
-              </button>
+               </button>
+              </Link>
             </div>
           </div>
         </section>
