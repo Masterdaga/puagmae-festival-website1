@@ -15,8 +15,15 @@ export default function LandingCarousel() {
 
   return (
     <div className="relative h-screen w-full overflow-hidden">
-      {/* Stylish Gradient Background */}
-      <div className="absolute inset-0 bg-gradient-to-br from-black via-yellow-900 to-yellow-700" />
+        {/* Background Image */}
+  <div
+    className="absolute inset-0 bg-cover bg-center"
+    style={{ backgroundImage: "url('\puagme.png')" }}
+  />
+
+  {/* Gradient overlay */}
+  <div className="absolute inset-0 bg-gradient-to-br from-black via-yellow-900 to-yellow-700 opacity-70" />
+
 
       {/* Optional: Add a subtle pattern overlay */}
       <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top_right,_var(--tw-gradient-stops))] from-yellow-900/30 via-transparent to-transparent pointer-events-none" />
@@ -46,7 +53,7 @@ export default function LandingCarousel() {
         </div>
       </div>
 
-      {/* Bottom Navigation Dots */}
+     
       <div className="absolute bottom-8 left-1/2 transform -translate-x-1/2 z-50">
         <div className="flex space-x-3">
           {landingSlides.map((_, index) => (

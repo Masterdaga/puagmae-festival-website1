@@ -1,4 +1,4 @@
-"use client";
+'use client';
 import { useState } from 'react';
 
 const testimonials = [
@@ -64,9 +64,16 @@ export default function Testimonials() {
   };
 
   return (
-    <section className="py-24 px-4 bg-gradient-to-b from-black/50 to-gray-900/50 backdrop-blur-sm">
+    <section className="relative min-h-screen py-24 px-4 bg-gradient-to-br from-slate-900 via-amber-800 to-yellow-600 overflow-hidden">
+      <div className="absolute inset-0 opacity-10">
+        <div className="absolute top-20 left-10 w-32 h-32 bg-yellow-400 rounded-full blur-3xl"></div>
+        <div className="absolute top-40 right-20 w-48 h-48 bg-amber-400 rounded-full blur-3xl"></div>
+        <div className="absolute bottom-32 left-1/4 w-40 h-40 bg-orange-400 rounded-full blur-3xl"></div>
+        <div className="absolute bottom-20 right-1/3 w-36 h-36 bg-yellow-300 rounded-full blur-3xl"></div>
+        <div className="absolute top-1/2 left-1/2 w-64 h-64 bg-amber-300 rounded-full blur-3xl transform -translate-x-1/2 -translate-y-1/2"></div>
+      </div>
+
       <div className="container mx-auto max-w-7xl">
-        {/* Section Header */}
         <div className="text-center mb-20">
           <h2 className="text-4xl md:text-6xl font-bold text-white mb-6">
             What People Say
@@ -77,7 +84,6 @@ export default function Testimonials() {
           </p>
         </div>
 
-        {/* Testimonials Grid */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 mb-12">
           {testimonials.map((testimonial, index) => (
             <div
@@ -88,7 +94,6 @@ export default function Testimonials() {
             >
               <div className="absolute inset-0 bg-gradient-to-br from-yellow-500/5 to-yellow-600/5 rounded-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
               <div className="relative z-10">
-                {/* Rating Stars */}
                 <div className="flex mb-4">
                   {[...Array(testimonial.rating)].map((_, i) => (
                     <svg
@@ -101,13 +106,9 @@ export default function Testimonials() {
                     </svg>
                   ))}
                 </div>
-
-                {/* Testimonial Content */}
                 <blockquote className="text-yellow-100/90 leading-relaxed mb-6 italic">
                   "{testimonial.content}"
                 </blockquote>
-
-                {/* Author Info */}
                 <div className="flex items-center">
                   <div className="w-12 h-12 bg-gradient-to-br from-yellow-500 to-yellow-600 rounded-full flex items-center justify-center mr-4">
                     <span className="text-black font-bold text-lg">
@@ -124,7 +125,6 @@ export default function Testimonials() {
           ))}
         </div>
 
-        {/* Navigation Dots */}
         <div className="flex justify-center space-x-2">
           {testimonials.map((_, index) => (
             <button
@@ -140,7 +140,6 @@ export default function Testimonials() {
           ))}
         </div>
 
-        {/* Navigation Arrows */}
         <div className="flex justify-center mt-8 space-x-4">
           <button
             onClick={prevTestimonial}
@@ -162,7 +161,6 @@ export default function Testimonials() {
           </button>
         </div>
 
-        {/* CTA Section */}
         <div className="text-center mt-16">
           <p className="text-yellow-100/80 mb-6 text-lg">
             Join thousands of satisfied festival-goers and create your own memories
@@ -174,4 +172,4 @@ export default function Testimonials() {
       </div>
     </section>
   );
-} 
+}
