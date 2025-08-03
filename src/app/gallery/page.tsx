@@ -67,13 +67,12 @@ export default function GalleryPage() {
   };
 
   return (
-    <div className="min-h-screen pt-24" style={{
-      backgroundImage: 'url(/pattern.jpg)',
-      backgroundSize: 'cover',
-      backgroundPosition: 'center',
-      backgroundRepeat: 'no-repeat',
-      backgroundAttachment: 'fixed'
-    }}>
+    <div className="min-h-screen pt-24 relative overflow-hidden">
+      <div
+        className="fixed inset-0 bg-cover bg-center -z-10"
+        style={{ backgroundImage: "url('/new-adeyababa.jpg')" }}
+      />
+      <div className="absolute inset-0 bg-gradient-to-br from-black via-[#3b2f23] to-black opacity-80 -z-10" />
       {/* Header */}
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <div className="shadow-lg rounded-xl p-6" style={{

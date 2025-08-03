@@ -48,22 +48,22 @@ export default function ContactPage() {
   
 
   return (
-    <div className="min-h-screen text-white py-20 relative">
-      {/* Background Image */}
-      <div className="fixed inset-0 z-0">
-        <img 
-          src="/pattern.jpg" 
-          alt="Pattern Background" 
-          className="w-full h-full object-cover"
-        />
-
-      </div>
+    <div className="min-h-screen text-white py-20 relative overflow-hidden">
+      <div
+        className="fixed inset-0 bg-cover bg-center -z-10"
+        style={{ backgroundImage: "url('/new-adeyababa.jpg')" }}
+      />
+      <div className="absolute inset-0 bg-gradient-to-br from-black via-[#3b2f23] to-black opacity-80 -z-10" />
       <div className="container mx-auto max-w-6xl px-4">
         {/* Header Section */}
-        <div className="text-center mb-16">
-          <h1 className="text-5xl md:text-6xl font-bold text-yellow-400 mb-8" style={{fontFamily: 'Caveat, cursive'}}>
+        <div className="text-center mb-12">
+          <h1 className="text-5xl md:text-6xl font-extrabold mb-4 bg-gradient-to-r from-yellow-400 via-yellow-300 to-yellow-600 bg-clip-text text-transparent drop-shadow-lg tracking-wide">
             Contact Us
           </h1>
+          <div className="w-32 h-1 mx-auto rounded bg-gradient-to-r from-yellow-400 to-yellow-600 mt-4" />
+          <p className="text-yellow-200/90 text-lg max-w-2xl mx-auto mt-6">
+            Have questions about the festival? Want to collaborate? We'd love to hear from you!
+          </p>
         </div>
 
         {/* Paragraph Section - Separate from form */}

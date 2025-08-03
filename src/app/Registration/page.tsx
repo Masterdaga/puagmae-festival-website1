@@ -48,8 +48,13 @@ export default function RegisterPage() {
   return (
     <div
       id="register"
-      className="min-h-screen pt-24 bg-gradient-to-br from-slate-900 via-amber-800 to-yellow-600 relative overflow-hidden px-4 py-16 flex items-center justify-center"
+      className="min-h-screen pt-24 relative overflow-hidden px-4 py-16 flex items-center justify-center"
     >
+      <div
+        className="fixed inset-0 bg-cover bg-center -z-10"
+        style={{ backgroundImage: "url('/new-adeyababa.jpg')" }}
+      />
+      <div className="absolute inset-0 bg-gradient-to-br from-black via-[#3b2f23] to-black opacity-80 -z-10" />
       
       <div className="absolute inset-0 opacity-10">
         <div className="absolute top-20 left-10 w-32 h-32 bg-yellow-400 rounded-full blur-3xl"></div>

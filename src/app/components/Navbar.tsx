@@ -35,9 +35,9 @@ export default function Navbar() {
               <Image 
                 src="/logo.png" 
                 alt="PUAGMAE STREET FESTIVAL" 
-                width={40} 
-                height={40} 
-                className="w-10 h-10 object-contain"
+                width={80} 
+                height={80} 
+                className="w-20 h-20 object-contain"
               />
               <span className="text-2xl font-black text-yellow-400 tracking-widest bg-gradient-to-r from-yellow-400 to-yellow-600 bg-clip-text text-transparent drop-shadow-lg hidden sm:block" style={{fontFamily: 'Caveat, cursive'}}>
                 PUAGMAE
@@ -69,9 +69,15 @@ export default function Navbar() {
                   onMouseLeave={() => setIsGalleryDropdownOpen(false)}
                 >
                   Gallery
-                  <svg className="w-4 h-4 transition-transform duration-300 group-hover:rotate-180" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
-                  </svg>
+                  {isGalleryDropdownOpen ? (
+                    <svg className="w-3 h-3 transition-transform duration-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 15l7-7 7 7" />
+                    </svg>
+                  ) : (
+                    <svg className="w-3 h-3 transition-transform duration-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                    </svg>
+                  )}
                 </button>
                 {/* Dropdown */}
                 <div 
@@ -151,8 +157,8 @@ export default function Navbar() {
               <Image 
                 src="/logo.png" 
                 alt="PUAGMAE STREET FESTIVAL" 
-                width={32} 
-                height={32} 
+                width={64} 
+                height={64} 
                 className="rounded-full border-2 border-yellow-400"
               />
               <span className="text-lg font-bold text-yellow-400 tracking-widest ml-2">
@@ -171,9 +177,15 @@ export default function Navbar() {
                   onClick={() => setIsGalleryDropdownOpen(!isGalleryDropdownOpen)}
                 >
                   <span>Gallery</span>
-                  <svg className={`w-4 h-4 transition-transform duration-300 ${isGalleryDropdownOpen ? 'rotate-180' : ''}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
-                  </svg>
+                  {isGalleryDropdownOpen ? (
+                    <svg className="w-3 h-3 transition-transform duration-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 15l7-7 7 7" />
+                    </svg>
+                  ) : (
+                    <svg className="w-3 h-3 transition-transform duration-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                    </svg>
+                  )}
                 </button>
                 {/* Mobile Dropdown Options */}
                 <div className={`ml-4 space-y-4 transition-all duration-300 ${isGalleryDropdownOpen ? 'opacity-100 max-h-96' : 'opacity-0 max-h-0 overflow-hidden'}`}>

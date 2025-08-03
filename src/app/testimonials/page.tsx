@@ -47,7 +47,12 @@ const Testimonials = () => {
     };
 
     return (
-        <div className="relative min-h-screen py-20 pb-28 px-4 bg-gradient-to-br from-slate-900 via-amber-800 to-yellow-600 overflow-hidden">
+        <div className="relative min-h-screen py-20 pb-28 px-4 overflow-hidden">
+          <div
+            className="fixed inset-0 bg-cover bg-center -z-10"
+            style={{ backgroundImage: "url('/new-adeyababa.jpg')" }}
+          />
+          <div className="absolute inset-0 bg-gradient-to-br from-black via-[#3b2f23] to-black opacity-80 -z-10" />
             <div className="absolute inset-0 opacity-10">
                 <div className="absolute top-20 left-10 w-32 h-32 bg-yellow-400 rounded-full blur-3xl"></div>
                 <div className="absolute top-40 right-20 w-48 h-48 bg-amber-400 rounded-full blur-3xl"></div>

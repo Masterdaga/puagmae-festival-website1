@@ -13,7 +13,7 @@ export default function Home() {
     <main className="min-h-screen relative overflow-x-hidden">
   
   <div
-    className="absolute inset-0 bg-cover bg-center -z-10"
+    className="fixed inset-0 bg-cover bg-center -z-10"
     style={{ backgroundImage: "url('/new-adeyababa.jpg')" }}
   />
   
@@ -22,20 +22,6 @@ export default function Home() {
 
      
       <Navbar />
-
-      
-      <div
-        className="pointer-events-none fixed top-[-10%] left-1/2 -translate-x-1/2 z-0"
-        aria-hidden="true"
-      >
-        <div className="w-[600px] h-[600px] bg-yellow-700 opacity-30 rounded-full blur-3xl animate-pulse-slow" />
-      </div>
-      <div
-        className="pointer-events-none fixed bottom-[-15%] right-[-10%] z-0"
-        aria-hidden="true"
-      >
-        <div className="w-[400px] h-[400px] bg-yellow-900 opacity-20 rounded-full blur-2xl animate-pulse-slower" />
-      </div>
 
       <div className="relative z-10">
         <LandingCarousel />

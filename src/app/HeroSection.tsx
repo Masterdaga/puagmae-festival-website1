@@ -4,19 +4,10 @@ import Image from 'next/image';
 export default function HeroSection() {
   return (
     <section className="relative w-full bg-gradient-to-br from-black via-gray-900 to-black py-32 px-4 flex flex-col items-center justify-center overflow-hidden min-h-screen">
-      {/* Animated background particles */}
-      <div className="absolute inset-0 z-0">
-        <div className="absolute top-20 left-20 w-2 h-2 bg-yellow-400 rounded-full animate-pulse"></div>
-        <div className="absolute top-40 right-32 w-1 h-1 bg-yellow-300 rounded-full animate-ping"></div>
-        <div className="absolute bottom-32 left-32 w-3 h-3 bg-yellow-500 rounded-full animate-bounce"></div>
-        <div className="absolute bottom-20 right-20 w-2 h-2 bg-yellow-400 rounded-full animate-pulse"></div>
-      </div>
-
       {/* Main content */}
       <div className="relative z-10 text-center max-w-6xl mx-auto">
         {/* Event badge */}
         <div className="inline-flex items-center gap-2 bg-yellow-900/20 backdrop-blur-md border border-yellow-400/30 rounded-full px-6 py-3 mb-8 animate-fade-in">
-          <div className="w-2 h-2 bg-yellow-400 rounded-full animate-pulse"></div>
           <span className="text-yellow-200 text-sm font-medium">Live Event</span>
         </div>
 
@@ -91,13 +82,6 @@ export default function HeroSection() {
             <div className="text-3xl md:text-4xl font-bold text-yellow-400 mb-2">10K+</div>
             <div className="text-yellow-200/70 text-sm">Attendees</div>
           </div>
-        </div>
-      </div>
-
-      {/* Scroll indicator */}
-      <div className="absolute bottom-8 left-1/2 transform -translate-x-1/2 animate-bounce">
-        <div className="w-6 h-10 border-2 border-yellow-400/30 rounded-full flex justify-center">
-          <div className="w-1 h-3 bg-yellow-400/60 rounded-full mt-2 animate-pulse"></div>
         </div>
       </div>
 

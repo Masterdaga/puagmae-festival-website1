@@ -7,7 +7,12 @@ export default function AboutPage() {
   const handleReadMore = () => setIsExpanded((v) => !v);
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-black via-[#3b2f23] to-[#4b2e1e] text-yellow-100 relative overflow-x-hidden">
+    <div className="min-h-screen relative overflow-x-hidden">
+      <div
+        className="fixed inset-0 bg-cover bg-center -z-10"
+        style={{ backgroundImage: "url('/new-adeyababa.jpg')" }}
+      />
+      <div className="absolute inset-0 bg-gradient-to-br from-black via-[#3b2f23] to-black opacity-80 -z-10" />
       {/* Subtle gold accent */}
       <div className="pointer-events-none fixed top-0 left-0 z-0">
         <div className="w-40 h-40 bg-yellow-500 opacity-20 rounded-full blur-2xl" />
@@ -27,7 +32,7 @@ export default function AboutPage() {
           <div className="flex flex-col md:flex-row gap-10 items-start">
             {/* Info Card */}
             <div className="flex-1 bg-black/70 rounded-2xl border border-yellow-500 shadow-xl px-12 py-8 space-y-4 min-w-[320px] max-w-4xl mx-auto">
-  <p className="text-lg leading-relaxed">
+  <p className="text-lg leading-relaxed text-yellow-200">
     The Puagmae Festival is a grand celebration of the African Golden 13th Month, a unique cultural event that brings together people from all walks of life to celebrate our rich heritage and traditions. From vibrant performances and cultural displays to delicious food and lively music, this festival is a true reflection of our diverse and colorful culture. Like the Egyptian Coptic calendar, the Ethiopian calendar has a year of 13 months. The first 12 months have 30 days each, and the last 13th month has 5 days and 6 days in a leap year. The name of the 13th month is in Ge'ez and is known as PAGUMIENE. This uniquely short but sweet month of PAGUMIENE just started here in Ethiopia and is going to last for the next six days or five days.
   </p>
 </div>
@@ -55,19 +60,19 @@ export default function AboutPage() {
           {isExpanded && (
             <div className="mt-12 flex justify-center">
               <div className="bg-black/80 rounded-2xl border border-yellow-500 max-w-4xl w-full shadow-xl p-12 space-y-8">
-                <p className="text-lg leading-relaxed">
+                <p className="text-lg leading-relaxed text-yellow-200">
                   At the heart of the Puagmae Festival is the aspiration to represent collective cultural knowledge in a grassroots way. This approach encourages the free and informed participation of tradition bearers who it is hoped will play a central role in the shape of the festival's development and overall outcome.
                 </p>
-                <p className="text-lg leading-relaxed">
+                <p className="text-lg leading-relaxed text-yellow-200">
                   The Puagmae Festival is an opportunity for people to come together and share their stories, traditions, and customs. The festival features a variety of events including traditional dance performances, music concerts, art exhibitions, and food fairs. These events provide a platform for artists and performers to showcase their talents and for attendees to immerse themselves in the rich cultural tapestry of Ethiopia.
                 </p>
-                <p className="text-lg leading-relaxed">
+                <p className="text-lg leading-relaxed text-yellow-200">
                   One of the highlights of the festival is the traditional coffee ceremony, which is an integral part of Ethiopian culture. The ceremony involves roasting coffee beans, grinding them, and brewing the coffee in a special pot called a jebena. This ritual is a symbol of hospitality and community, bringing people together to enjoy the rich flavors and aromas of Ethiopian coffee.
                 </p>
-                <p className="text-lg leading-relaxed">
+                <p className="text-lg leading-relaxed text-yellow-200">
                   The festival also includes cultural sharing from all over African countries, where participants can learn about different customs, languages, and traditions. There are also lively music performances featuring traditional and contemporary African music, fashion shows showcasing vibrant African attire, and cultural trade where artisans and traders display their unique crafts and goods.
                 </p>
-                <p className="text-lg leading-relaxed">
+                <p className="text-lg leading-relaxed text-yellow-200">
                   The Puagmae Festival is not just a celebration of the past but also a time to look forward to the future. It provides a space for dialogue and exchange, fostering a sense of unity and shared identity among participants. Whether you are a local resident or a visitor, the Puagmae Festival offers a unique and enriching experience that will leave you with lasting memories.
                 </p>
               </div>
@@ -88,7 +93,7 @@ export default function AboutPage() {
                 </svg>
               </div>
               <h3 className="text-2xl font-bold mb-4 text-yellow-400">Our Story</h3>
-              <p>
+              <p className="text-yellow-200">
                 Celebrating the unique 13th month of the Ethiopian calendar, PAGUMIENE, through vibrant cultural expressions and community unity.
               </p>
             </div>
@@ -101,7 +106,7 @@ export default function AboutPage() {
                 </svg>
               </div>
               <h3 className="text-2xl font-bold mb-4 text-yellow-400">The 13th Month</h3>
-              <p>
+              <p className="text-yellow-200">
                 A unique 5-6 day period in the Ethiopian calendar, PAGUMIENE, celebrated with special cultural significance and traditional ceremonies.
               </p>
             </div>
@@ -114,7 +119,7 @@ export default function AboutPage() {
                 </svg>
               </div>
               <h3 className="text-2xl font-bold mb-4 text-yellow-400">Our Values</h3>
-              <p>
+              <p className="text-yellow-200">
                 Unity, cultural preservation, community participation, and grassroots representation of collective cultural knowledge.
               </p>
             </div>
