@@ -62,15 +62,10 @@ export default function YearGalleryPage() {
   }, [year]);
 
   const categories = [
-    { id: 'all', name: 'All Photos' },
-    { id: 'cultural', name: 'Cultural Events' },
-    { id: 'community', name: 'Community' },
-    { id: 'performance', name: 'Performances' }
+    { id: 'photos', name: 'Photos' }
   ];
 
-  const filteredPhotos = selectedCategory === 'all' 
-    ? photos 
-    : photos.filter(photo => photo.category === selectedCategory);
+  const filteredPhotos = photos;
 
   const openModal = (imageSrc: string) => {
     setSelectedImage(imageSrc);
@@ -129,28 +124,12 @@ export default function YearGalleryPage() {
          }}>
           <div className="flex items-center justify-between mb-6">
                          <div className="flex items-center space-x-2">
-               <FaFilter className="text-yellow-400" />
-               <h2 className="text-xl font-semibold text-yellow-400">Filter Photos</h2>
+               <FaImages className="text-yellow-400" />
+               <h2 className="text-xl font-semibold text-yellow-400">Photos</h2>
              </div>
              <div className="text-sm text-black font-semibold bg-white/90 px-3 py-1 rounded-full shadow-sm">
                {filteredPhotos.length} photos found
              </div>
-          </div>
-          
-          <div className="flex flex-wrap gap-3">
-            {categories.map((category) => (
-                             <button
-                 key={category.id}
-                 onClick={() => setSelectedCategory(category.id)}
-                 className={`px-4 py-2 rounded-lg font-medium transition-all duration-200 ${
-                   selectedCategory === category.id
-                     ? 'bg-yellow-500 text-black shadow-lg'
-                     : 'bg-black/40 text-yellow-200 hover:bg-black/60 border border-yellow-400/30'
-                 }`}
-               >
-                 {category.name}
-               </button>
-            ))}
           </div>
         </div>
       </div>
@@ -216,19 +195,19 @@ export default function YearGalleryPage() {
                 PUAGMAE {year} Highlights
               </h2>
             <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-              <div className="bg-gradient-to-br from-yellow-400 to-orange-500 rounded-xl p-6 text-white shadow-lg border border-yellow-400/30">
+              <div className="bg-gradient-to-br from-purple-500 via-purple-600 to-indigo-600 rounded-xl p-6 text-white shadow-lg border border-purple-400/30 hover:shadow-purple-500/25 transition-all duration-300 transform hover:scale-105">
                 <h3 className="text-xl font-semibold mb-2">Cultural Unity</h3>
-                <p className="text-yellow-100">Traditional celebrations and cultural performances that brought our community together.</p>
+                <p className="text-purple-100">Traditional celebrations and cultural performances that brought our community together.</p>
               </div>
               
-              <div className="bg-gradient-to-br from-yellow-400 to-orange-500 rounded-xl p-6 text-white shadow-lg border border-yellow-400/30">
+              <div className="bg-gradient-to-br from-emerald-500 via-emerald-600 to-teal-600 rounded-xl p-6 text-white shadow-lg border border-emerald-400/30 hover:shadow-emerald-500/25 transition-all duration-300 transform hover:scale-105">
                 <h3 className="text-xl font-semibold mb-2">Community</h3>
-                <p className="text-yellow-100">Building stronger bonds and fostering understanding among diverse communities.</p>
+                <p className="text-emerald-100">Building stronger bonds and fostering understanding among diverse communities.</p>
               </div>
               
-              <div className="bg-gradient-to-br from-yellow-400 to-orange-500 rounded-xl p-6 text-white shadow-lg border border-yellow-400/30">
+              <div className="bg-gradient-to-br from-rose-500 via-rose-600 to-pink-600 rounded-xl p-6 text-white shadow-lg border border-rose-400/30 hover:shadow-rose-500/25 transition-all duration-300 transform hover:scale-105">
                 <h3 className="text-xl font-semibold mb-2">Performance</h3>
-                <p className="text-yellow-100">Empowering young people to embrace and celebrate their cultural heritage.</p>
+                <p className="text-rose-100">Empowering young people to embrace and celebrate their cultural heritage.</p>
               </div>
             </div>
             </div>

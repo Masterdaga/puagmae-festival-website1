@@ -1,37 +1,49 @@
 "use client";
-import { useRef, useState } from 'react';
-import emailjs from 'emailjs-com';
-import { ToastContainer, toast } from 'react-toastify';
-import 'react-toastify/dist/ReactToastify.css';
+import { useState } from 'react';
 
 export default function ContactPage() {
-  const form = useRef<HTMLFormElement>(null);
-         const [selectedCategory, setSelectedCategory] = useState('');
-       const [isSubmitting, setIsSubmitting] = useState(false);
+  const [selectedCategory, setSelectedCategory] = useState('');
 
-  const handleFormSubmit = (e: React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
-    setIsSubmitting(true);
+  const [formData, setFormData] = useState({
+    name: '',
+    email: '',
+    subject: '',
+    message: ''
+  });
+
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+    setFormData({
+      ...formData,
+      [e.target.name]: e.target.value
+    });
+  };
+
+  const handleEmailClick = () => {
+    const subject = encodeURIComponent(formData.subject || 'PUAGMAE Festival Inquiry');
+    const body = encodeURIComponent(`Hello PUAGMAE Festival Team,
+
+I would like to get in touch regarding the festival.
+
+From: ${formData.name} (${formData.email})
+Category: ${selectedCategory || 'General Inquiry'}
+
+Message:
+${formData.message}
+
+Best regards,
+${formData.name}
+${formData.email}`);
     
-    if (form.current) {
-                   // Add category to the form data
-             const formData = new FormData(form.current);
-             formData.append('category', selectedCategory);
-      
-      emailjs.sendForm('service_sds66sf', 'template_p8soq3v', form.current, 'h4myckedxmxqenmOU')
-        .then((result: any) => {
-          console.log(result.text);
-          toast.success("🎉 Message sent successfully! We'll get back to you soon!");
-          setIsSubmitting(false);
-        }, (error: any) => {
-          console.log(error.text);
-          toast.error("❌ Failed to send message, please try again.");
-          setIsSubmitting(false);
-        });
-    }
-
-             (e.target as HTMLFormElement).reset();
-         setSelectedCategory('');
+    // Direct web email links with fallback
+    const primaryEmail = 'puagmaef@gmail.com';
+    const fallbackEmail = 'pjafrica.2020@gmail.com';
+    
+    const gmailLink = `https://mail.google.com/mail/?view=cm&fs=1&to=${primaryEmail}&su=${subject}&body=${body}`;
+    const outlookLink = `https://outlook.live.com/mail/0/deeplink/compose?to=${primaryEmail}&subject=${subject}&body=${body}`;
+    const yahooLink = `https://compose.mail.yahoo.com/?to=${primaryEmail}&subject=${subject}&body=${body}`;
+    
+    // Open Gmail by default (most popular)
+    window.open(gmailLink, '_blank');
   };
 
   const categories = [
@@ -82,10 +94,17 @@ export default function ContactPage() {
           </div>
         </div>
 
-        {/* Contact Form - Consistent with website theme */}
+        {/* Contact Form - Simple Email Approach */}
         <div className="max-w-4xl mx-auto">
           <div className="bg-black/40 backdrop-blur-sm p-8 rounded-xl border border-yellow-400/30 shadow-2xl">
-            <form ref={form} onSubmit={handleFormSubmit} className="space-y-6">
+            <div className="space-y-6">
+              {/* Simple Instructions */}
+              <div className="text-center mb-6">
+                <p className="text-yellow-200 text-lg">
+                  Fill out the form below, then click "Send Email" to contact our festival team!
+                </p>
+              </div>
+
               {/* Name and Email Row */}
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div>
@@ -95,7 +114,9 @@ export default function ContactPage() {
                   <input
                     type="text"
                     id="name"
-                    name="from_name" 
+                    name="name"
+                    value={formData.name}
+                    onChange={handleInputChange}
                     className="w-full p-4 bg-black/60 backdrop-blur-sm text-white rounded-lg border border-yellow-400/30 focus:ring-2 focus:ring-yellow-400 focus:border-yellow-400 focus:outline-none transition-all duration-300 placeholder-yellow-200/60"
                     placeholder="Your Full Name"
                     required
@@ -109,7 +130,9 @@ export default function ContactPage() {
                   <input
                     type="email"
                     id="email"
-                    name="from_email"
+                    name="email"
+                    value={formData.email}
+                    onChange={handleInputChange}
                     className="w-full p-4 bg-black/60 backdrop-blur-sm text-white rounded-lg border border-yellow-400/30 focus:ring-2 focus:ring-yellow-400 focus:border-yellow-400 focus:outline-none transition-all duration-300 placeholder-yellow-200/60"
                     placeholder="your.email@example.com"
                     required
@@ -139,12 +162,7 @@ export default function ContactPage() {
                     </button>
                   ))}
                 </div>
-                {selectedCategory && (
-                  <input type="hidden" name="category" value={selectedCategory} />
-                )}
               </div>
-
-              
 
               {/* Subject */}
               <div>
@@ -155,6 +173,8 @@ export default function ContactPage() {
                   type="text"
                   id="subject"
                   name="subject"
+                  value={formData.subject}
+                  onChange={handleInputChange}
                   className="w-full p-4 bg-black/60 backdrop-blur-sm text-white rounded-lg border border-yellow-400/30 focus:ring-2 focus:ring-yellow-400 focus:border-yellow-400 focus:outline-none transition-all duration-300 placeholder-yellow-200/60"
                   placeholder="Brief description of your inquiry"
                   required
@@ -168,7 +188,9 @@ export default function ContactPage() {
                 </label>
                 <textarea
                   id="message"
-                  name="message" 
+                  name="message"
+                  value={formData.message}
+                  onChange={handleInputChange}
                   rows={6}
                   className="w-full p-4 bg-black/60 backdrop-blur-sm text-white rounded-lg border border-yellow-400/30 focus:ring-2 focus:ring-yellow-400 focus:border-yellow-400 focus:outline-none resize-none transition-all duration-300 placeholder-yellow-200/60"
                   placeholder="Tell us about your festival-related inquiry, feedback, or collaboration idea..."
@@ -176,47 +198,30 @@ export default function ContactPage() {
                 />
               </div>
 
-              {/* Submit Button */}
+              {/* Email Button */}
               <button
-                type="submit"
-                disabled={isSubmitting || !selectedCategory}
+                onClick={handleEmailClick}
+                disabled={!selectedCategory || !formData.name || !formData.email || !formData.subject || !formData.message}
                 className={`w-full py-4 font-bold text-lg rounded-lg transition-all duration-300 transform ${
-                  isSubmitting || !selectedCategory
+                  !selectedCategory || !formData.name || !formData.email || !formData.subject || !formData.message
                     ? 'bg-gray-600 text-gray-400 cursor-not-allowed'
                     : 'bg-gradient-to-r from-yellow-400 to-yellow-500 text-black hover:from-yellow-500 hover:to-yellow-600 hover:scale-105 shadow-lg hover:shadow-xl'
                 }`}
               >
-                {isSubmitting ? (
-                  <div className="flex items-center justify-center">
-                    <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-black mr-3"></div>
-                    Sending Message...
-                  </div>
-                ) : (
-                  'Send Message'
-                )}
+                Send Email
               </button>
+
+
 
               {/* Form Tips */}
               <div className="text-sm text-gray-400 text-center mt-4">
-                <p>💡 <strong>Tip:</strong> Select a category to help us route your message to the right team member!</p>
-                <p>⏰ We typically respond within 24-48 hours during festival season.</p>
+                <p>💡 <strong>Tip:</strong> Fill out all fields, then click "Send Email" to open Gmail!</p>
+                <p>📧 Opens Gmail.com with pre-filled message to our festival team.</p>
               </div>
-            </form>
+            </div>
           </div>
-        </div>
+                </div>
       </div>
-      <ToastContainer 
-        position="top-right"
-        autoClose={5000}
-        hideProgressBar={false}
-        newestOnTop={false}
-        closeOnClick
-        rtl={false}
-        pauseOnFocusLoss
-        draggable
-        pauseOnHover
-        theme="dark"
-      />
     </div>
   );
 } 

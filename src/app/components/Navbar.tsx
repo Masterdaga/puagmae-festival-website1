@@ -6,7 +6,7 @@ import { FaArrowRight } from 'react-icons/fa';
 
 export default function Navbar() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
-  const [isGalleryDropdownOpen, setIsGalleryDropdownOpen] = useState(false);
+  const [isDesktopGalleryOpen, setIsDesktopGalleryOpen] = useState(false);
   const [isVisible, setIsVisible] = useState(true);
   const [lastScrollY, setLastScrollY] = useState(0);
 
@@ -20,8 +20,12 @@ export default function Navbar() {
       }
       setLastScrollY(currentScrollY);
     };
-    window.addEventListener('scroll', handleScroll);
-    return () => window.removeEventListener('scroll', handleScroll);
+    
+    // Only add event listener on client side
+    if (typeof window !== 'undefined') {
+      window.addEventListener('scroll', handleScroll);
+      return () => window.removeEventListener('scroll', handleScroll);
+    }
   }, [lastScrollY]);
 
   return (
@@ -61,31 +65,22 @@ export default function Navbar() {
                 </Link>
               ))}
 
-              {/* Gallery Dropdown */}
-              <div className="relative group">
-                <button
-                  className="relative px-3 py-1 text-yellow-100 font-semibold hover:text-yellow-400 transition-colors duration-200 flex items-center gap-1"
-                  onMouseEnter={() => setIsGalleryDropdownOpen(true)}
-                  onMouseLeave={() => setIsGalleryDropdownOpen(false)}
-                >
-                  Gallery
-                  {isGalleryDropdownOpen ? (
-                    <svg className="w-3 h-3 transition-transform duration-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 15l7-7 7 7" />
-                    </svg>
-                  ) : (
-                    <svg className="w-3 h-3 transition-transform duration-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
-                    </svg>
-                  )}
-                </button>
+                             {/* Gallery Dropdown */}
+               <div className="relative group">
+                 <button
+                   className="relative px-3 py-1 text-yellow-100 font-semibold hover:text-yellow-400 transition-colors duration-200"
+                   onMouseEnter={() => setIsDesktopGalleryOpen(true)}
+                   onMouseLeave={() => setIsDesktopGalleryOpen(false)}
+                 >
+                   Gallery
+                 </button>
                 {/* Dropdown */}
                 <div 
                   className={`absolute top-full left-1/2 transform -translate-x-1/2 mt-2 min-w-[220px] bg-black/90 border border-yellow-400/30 rounded-xl shadow-lg backdrop-blur-xl transition-all duration-300 z-50 ${
-                    isGalleryDropdownOpen ? 'opacity-100 visible translate-y-0 scale-100' : 'opacity-0 invisible -translate-y-2 scale-95'
+                    isDesktopGalleryOpen ? 'opacity-100 visible translate-y-0 scale-100' : 'opacity-0 invisible -translate-y-2 scale-95'
                   }`}
-                  onMouseEnter={() => setIsGalleryDropdownOpen(true)}
-                  onMouseLeave={() => setIsGalleryDropdownOpen(false)}
+                  onMouseEnter={() => setIsDesktopGalleryOpen(true)}
+                  onMouseLeave={() => setIsDesktopGalleryOpen(false)}
                 >
                   <div className="p-4">
                     <div className="mb-2 text-yellow-400 font-bold">Photos</div>
@@ -170,53 +165,7 @@ export default function Navbar() {
               <Link href="/" className="text-yellow-200 hover:text-yellow-400 transition-colors hover:scale-105 transform duration-300" onClick={() => setIsMenuOpen(false)}>Home</Link>
               <Link href="/about" className="text-yellow-200 hover:text-yellow-400 transition-colors hover:scale-105 transform duration-300" onClick={() => setIsMenuOpen(false)}>About</Link>
               <Link href="/schedule" className="text-yellow-200 hover:text-yellow-400 transition-colors hover:scale-105 transform duration-300" onClick={() => setIsMenuOpen(false)}>Schedule</Link>
-              {/* Mobile Gallery Dropdown */}
-              <div className="space-y-2">
-                <button
-                  className="text-yellow-200 hover:text-yellow-400 transition-colors hover:scale-105 transform duration-300 flex items-center justify-between w-full"
-                  onClick={() => setIsGalleryDropdownOpen(!isGalleryDropdownOpen)}
-                >
-                  <span>Gallery</span>
-                  {isGalleryDropdownOpen ? (
-                    <svg className="w-3 h-3 transition-transform duration-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 15l7-7 7 7" />
-                    </svg>
-                  ) : (
-                    <svg className="w-3 h-3 transition-transform duration-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
-                    </svg>
-                  )}
-                </button>
-                {/* Mobile Dropdown Options */}
-                <div className={`ml-4 space-y-4 transition-all duration-300 ${isGalleryDropdownOpen ? 'opacity-100 max-h-96' : 'opacity-0 max-h-0 overflow-hidden'}`}>
-                  <div className="space-y-2">
-                    <div className="text-yellow-400 font-semibold">Photos</div>
-                    {[2011, 2012, 2013, 2014, 2015, 2016].map(year => (
-                      <Link 
-                        key={year}
-                        href={`/gallery/${year}`} 
-                        className="block text-yellow-200/80 hover:text-yellow-400 transition-colors hover:scale-105 transform duration-300 py-1"
-                        onClick={() => setIsMenuOpen(false)}
-                      >
-                        PUAGMAE {year}
-                      </Link>
-                    ))}
-                  </div>
-                  <div className="space-y-2">
-                    <div className="text-yellow-400 font-semibold">Videos</div>
-                    {[2011, 2012, 2013, 2014, 2015, 2016].map(year => (
-                      <Link 
-                        key={year}
-                        href={`/gallery/${year}/videos`} 
-                        className="block text-yellow-200/80 hover:text-yellow-400 transition-colors hover:scale-105 transform duration-300 py-1"
-                        onClick={() => setIsMenuOpen(false)}
-                      >
-                        PUAGMAE {year}
-                      </Link>
-                    ))}
-                  </div>
-                </div>
-              </div>
+                             <Link href="/gallery" className="text-yellow-200 hover:text-yellow-400 transition-colors hover:scale-105 transform duration-300" onClick={() => setIsMenuOpen(false)}>Gallery</Link>
               <Link href="/testimonials" className="text-yellow-200 hover:text-yellow-400 transition-colors hover:scale-105 transform duration-300" onClick={() => setIsMenuOpen(false)}>Testimonials</Link>
               <Link href="/Registration#register" scroll={true} className="bg-gradient-to-r from-yellow-500 to-yellow-600 text-black px-6 py-2 rounded-full font-bold hover:from-yellow-600 hover:to-yellow-700 hover:scale-105 transition-all duration-200 flex items-center shadow-lg">
                 Register now

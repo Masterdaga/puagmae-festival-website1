@@ -1,74 +1,68 @@
 const express = require('express');
 const cors = require('cors');
-const mysql = require('mysql2');
+const mongoose = require('mongoose');
+require('dotenv').config();
 
 const app = express();
-const PORT = 5000;
+const PORT = process.env.PORT || 5000;
 
 // Middleware
 app.use(cors());
 app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
 
-// ✅ MySQL Database Connection
-const db = mysql.createConnection({
-  host: 'localhost',
-  user: 'root',
-  password: '', // If you set a MySQL password in WAMP, put it here
-  database: 'puagmae_festival'
-});
-
-db.connect(err => {
-  if (err) {
-    console.error('❌ MySQL connection failed:', err.message);
+// MongoDB Connection
+const connectDB = async () => {
+  try {
+    const conn = await mongoose.connect(process.env.MONGODB_URI || 'mongodb://localhost:27017/puagmae-festival', {
+      useNewUrlParser: true,
+      useUnifiedTopology: true,
+    });
+    console.log(`MongoDB Connected: ${conn.connection.host}`);
+  } catch (error) {
+    console.error('MongoDB connection error:', error);
     process.exit(1);
   }
-  console.log('✅ Connected to MySQL database');
-});
+};
 
-// ✅ Root route for testing
-app.get('/', (req, res) => {
-  res.send('Server is running!');
-});
+// Routes
+const newsletterRoutes = require('./routes/newsletter');
+app.use('/api/newsletter', newsletterRoutes);
 
-// ✅ Registration route
-app.post('/register', (req, res) => {
-  console.log('📥 Received POST /register');
-  const { name, email, phone } = req.body;
-
-  // Basic validation
-  if (!name || !email || !phone) {
-    console.log('⚠️ Missing fields:', req.body);
-    return res.status(400).json({ message: 'All fields are required.' });
-  }
-
-  // Check if email already exists
-  const checkQuery = 'SELECT * FROM users WHERE email = ?';
-  db.query(checkQuery, [email], (err, results) => {
-    if (err) {
-      console.error('❌ Error checking email:', err.message);
-      return res.status(500).json({ message: 'Database error' });
-    }
-
-    if (results.length > 0) {
-      console.log('⚠️ Duplicate registration attempt for:', email);
-      return res.status(409).json({ message: 'This email is already registered.' });
-    }
-
-    // Insert new user
-    const insertQuery = 'INSERT INTO users (name, email, phone) VALUES (?, ?, ?)';
-    db.query(insertQuery, [name, email, phone], (err, result) => {
-      if (err) {
-        console.error('❌ Error inserting user:', err.message);
-        return res.status(500).json({ message: 'Registration failed' });
-      }
-
-      console.log('✅ User registered:', { name, email, phone });
-      return res.status(201).json({ message: 'Registration successful!' });
-    });
+// Health check endpoint
+app.get('/health', (req, res) => {
+  res.json({ 
+    status: 'OK', 
+    message: 'PUAGMAE Festival Backend is running',
+    timestamp: new Date().toISOString()
   });
 });
 
-// ✅ Start the server
-app.listen(PORT, () => {
-  console.log(`🚀 Server running on http://localhost:${PORT}`);
+// Error handling middleware
+app.use((err, req, res, next) => {
+  console.error(err.stack);
+  res.status(500).json({ 
+    success: false, 
+    message: 'Something went wrong!' 
+  });
 });
+
+// 404 handler
+app.use('*', (req, res) => {
+  res.status(404).json({ 
+    success: false, 
+    message: 'Route not found' 
+  });
+});
+
+// Start server
+const startServer = async () => {
+  await connectDB();
+  app.listen(PORT, () => {
+    console.log(`🚀 Server running on port ${PORT}`);
+    console.log(`📧 Newsletter API: http://localhost:${PORT}/api/newsletter`);
+    console.log(`🏥 Health check: http://localhost:${PORT}/health`);
+  });
+};
+
+startServer();

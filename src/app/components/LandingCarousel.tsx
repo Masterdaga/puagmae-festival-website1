@@ -52,24 +52,6 @@ export default function LandingCarousel() {
           </div>
         </div>
       </div>
-
-     
-      <div className="absolute bottom-8 left-1/2 transform -translate-x-1/2 z-50">
-        <div className="flex space-x-3">
-          {landingSlides.map((_, index) => (
-            <button
-              key={index}
-              className={`w-3 h-3 rounded-full transition-all duration-300 ${
-                index === currentIndex 
-                  ? 'bg-yellow-400 scale-125' 
-                  : 'bg-white/50 hover:bg-white/70'
-              }`}
-              aria-label={`Go to slide ${index + 1}`}
-              disabled
-            />
-          ))}
-        </div>
-      </div>
     </div>
   );
 }

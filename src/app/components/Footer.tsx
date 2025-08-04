@@ -1,10 +1,48 @@
 "use client";
 import Link from 'next/link';
 import { useState } from 'react';
+import { toast, ToastContainer } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 
 export default function Footer() {
   const [showMap, setShowMap] = useState(false);
   const [isMapPermanent, setIsMapPermanent] = useState(false);
+  const [email, setEmail] = useState('');
+  const [isSubscribing, setIsSubscribing] = useState(false);
+
+    const handleSubscribe = async () => {
+    if (!email || !email.includes('@')) {
+      toast.error('Please enter a valid email address');
+      return;
+    }
+
+    setIsSubscribing(true);
+
+    try {
+      // Send to backend API
+      const response = await fetch('http://localhost:5000/api/newsletter/subscribe', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ email })
+      });
+
+      const data = await response.json();
+
+      if (data.success) {
+        toast.success(data.message);
+        setEmail('');
+      } else {
+        toast.error(data.message);
+      }
+    } catch (error) {
+      console.error('Subscription error:', error);
+      toast.error('❌ Failed to subscribe. Please try again.');
+    } finally {
+      setIsSubscribing(false);
+    }
+  };
 
   return (
     <footer className="bg-gradient-to-b from-black to-gray-900 w-full overflow-x-hidden backdrop-blur-md">
@@ -26,19 +64,70 @@ export default function Footer() {
       <div className="flex gap-3">
         <input
           type="email"
+          value={email}
+          onChange={(e) => setEmail(e.target.value)}
           placeholder="Enter your email address"
           className="flex-1 bg-black/40 backdrop-blur-sm border-2 border-yellow-400/30 text-yellow-200 placeholder-yellow-300/60 px-5 py-4 rounded-full focus:outline-none focus:border-yellow-400 transition-colors text-lg"
+          onKeyPress={(e) => e.key === 'Enter' && handleSubscribe()}
         />
-        <button className="bg-gradient-to-r from-yellow-500 to-yellow-600 text-black px-6 py-4 rounded-full font-bold text-lg hover:from-yellow-600 hover:to-yellow-700 transition-all duration-300 transform hover:scale-105 flex items-center justify-center gap-2 shadow-lg">
-          <span>Subscribe</span>
-          <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
-            <path fillRule="evenodd" d="M10.293 3.293a1 1 0 011.414 0l6 6a1 1 0 010 1.414l-6 6a1 1 0 01-1.414-1.414L14.586 11H3a1 1 0 110-2h11.586l-4.293-4.293a1 1 0 010-1.414z" clipRule="evenodd" />
-          </svg>
+        <button 
+          onClick={handleSubscribe}
+          disabled={isSubscribing || !email}
+          className={`px-6 py-4 rounded-full font-bold text-lg transition-all duration-300 transform flex items-center justify-center gap-2 shadow-lg ${
+            isSubscribing || !email
+              ? 'bg-gray-600 text-gray-400 cursor-not-allowed'
+              : 'bg-gradient-to-r from-yellow-500 to-yellow-600 text-black hover:from-yellow-600 hover:to-yellow-700 hover:scale-105'
+          }`}
+        >
+          {isSubscribing ? (
+            <>
+              <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-black"></div>
+              <span>Subscribing...</span>
+            </>
+          ) : (
+            <>
+              <span>Subscribe</span>
+              <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
+                <path fillRule="evenodd" d="M10.293 3.293a1 1 0 011.414 0l6 6a1 1 0 010 1.414l-6 6a1 1 0 01-1.414-1.414L14.586 11H3a1 1 0 110-2h11.586l-4.293-4.293a1 1 0 010-1.414z" clipRule="evenodd" />
+              </svg>
+            </>
+          )}
         </button>
       </div>
-      <p className="text-sm text-yellow-200/70 text-center mt-3">
-        We respect your privacy. Unsubscribe at any time.
-      </p>
+             <p className="text-sm text-yellow-200/70 text-center mt-3">
+         We respect your privacy. 
+                   <button 
+            onClick={async () => {
+              const email = prompt('Enter your email to unsubscribe:');
+              if (email) {
+                try {
+                  const response = await fetch('http://localhost:5000/api/newsletter/unsubscribe', {
+                    method: 'POST',
+                    headers: {
+                      'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ email })
+                  });
+
+                  const data = await response.json();
+
+                  if (data.success) {
+                    toast.success(data.message);
+                  } else {
+                    toast.warning(data.message);
+                  }
+                } catch (error) {
+                  console.error('Unsubscribe error:', error);
+                  toast.error('❌ Failed to unsubscribe. Please try again.');
+                }
+              }
+            }}
+            className="text-yellow-400 hover:text-yellow-300 underline transition-colors ml-1"
+          >
+            Unsubscribe
+          </button>
+          {' '}at any time.
+       </p>
     </div>
   </div>
 </div>
@@ -76,7 +165,7 @@ export default function Footer() {
             <div className="text-yellow-200">
               <h3 className="text-xl font-bold mb-4 text-yellow-400 border-b border-yellow-400/30 pb-2">Connect With Us</h3>
               <div className="space-y-3">
-                <a href="https://facebook.com/puagmaefestival" target="_blank" rel="noopener noreferrer" className="flex items-center space-x-3 hover:text-yellow-300 transition-colors group">
+                <a href="https://www.facebook.com/profile.php?id=61564049185674" target="_blank" rel="noopener noreferrer" className="flex items-center space-x-3 hover:text-yellow-300 transition-colors group">
                   <div className="w-8 h-8 bg-gradient-to-br from-yellow-500 to-yellow-600 rounded-full flex items-center justify-center group-hover:scale-110 transition-transform">
                     <svg className="w-4 h-4 text-black" fill="currentColor" viewBox="0 0 24 24">
                       <path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/>
@@ -249,6 +338,22 @@ export default function Footer() {
           animation: fade-in 0.3s ease-out;
         }
       `}</style>
+      
+             {/* Toast Container for notifications */}
+       <div className="fixed bottom-4 right-4 z-50">
+         <ToastContainer 
+           position="bottom-right"
+           autoClose={3000}
+           hideProgressBar={false}
+           newestOnTop={false}
+           closeOnClick
+           rtl={false}
+           pauseOnFocusLoss
+           draggable
+           pauseOnHover
+           theme="dark"
+         />
+       </div>
     </footer>
   );
 } 

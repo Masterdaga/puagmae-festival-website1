@@ -10,8 +10,8 @@ export default function CountdownTimer() {
   });
 
   useEffect(() => {
-    // Set the target date: September 10, 2025 at 4:00 PM
-    const targetDate = new Date('2025-09-10T16:00:00').getTime();
+    // Set the target date: September 6, 2025 at 12:00 AM (midnight)
+    const targetDate = new Date('2025-09-06T00:00:00').getTime();
 
     const timer = setInterval(() => {
       const now = new Date().getTime();

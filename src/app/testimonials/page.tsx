@@ -4,34 +4,22 @@ import { FaQuoteLeft, FaChevronLeft, FaChevronRight } from "react-icons/fa";
 
 const testimonials = [
   {
-    quote: "The Puagmae Festival was an incredible experience! The cultural performances and community spirit were truly inspiring. I can't wait to return next year.",
-    name: "Sarah Johnson",
-    title: "Cultural Enthusiast",
-    image: "/testimonials/sarah.jpg"
+    quote: "Attending the Puagmae Festival was an unforgettable experience! The vibrant celebration of culture, tradition, and community left a lasting impression on me. The organizers did an amazing job of bringing together people from all walks of life to celebrate our shared heritage. I can't wait to attend next year!",
+    name: "Loret Sileshi Demissie",
+    title: "Artist",
+    image: "/testimonials/gashabera.png"
   },
   {
-    quote: "As a musician, I was blown away by the traditional Ethiopian music and the fusion performances. The festival perfectly blends tradition with modern creativity.",
-    name: "Michael Chen",
-    title: "Musician & Composer",
-    image: "/testimonials/michael.jpg"
+    quote: "The Puagmae Festival is a true celebration of African culture. The energy, the colors, the music—everything was beautifully organized and truly represented the rich diversity of our continent. It's more than just an event; it's a moment of unity and pride. I felt deeply connected to my roots and to the community around me.",
+    name: "Dr. Getnet Feleke",
+    title: "Astronomical Doctor",
+    image: "/testimonials/getnet.jpg"
   },
   {
-    quote: "The workshops and interactive sessions gave me a deep appreciation for Ethiopian culture. The organizers did an amazing job creating an inclusive environment.",
-    name: "Aisha Patel",
-    title: "Art Educator",
-    image: "/testimonials/aisha.jpg"
-  },
-  {
-    quote: "This festival exceeded all my expectations! The food, music, art, and people made it an unforgettable experience. Highly recommend to everyone!",
-    name: "David Rodriguez",
-    title: "Travel Blogger",
-    image: "/testimonials/david.jpg"
-  },
-  {
-    quote: "The sense of community at Puagmae Festival is unmatched. I made lifelong friends and learned so much about Ethiopian traditions and values.",
-    name: "Emma Thompson",
-    title: "Community Organizer",
-    image: "/testimonials/emma.jpg"
+    quote: "The Puagmae Festival was a remarkable showcase of our cultural heritage. From the traditional performances to the workshops and exhibitions, every aspect of the festival was thoughtfully curated. It was a joy to see the younger generation engage with our traditions in such a meaningful way. Kudos to the organizers for putting together such an inspiring event!",
+    name: "Ashenafi Kidane",
+    title: "Ethio Adams Agro Industry Manager",
+    image: "/testimonials/ashenafi.jpg"
   }
 ];
 

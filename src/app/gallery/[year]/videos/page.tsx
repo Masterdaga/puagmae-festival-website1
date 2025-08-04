@@ -63,15 +63,10 @@ export default function VideoGalleryPage() {
   }, [year]);
 
   const categories = [
-    { id: 'all', name: 'All Videos' },
-    { id: 'ceremony', name: 'Ceremonies' },
-    { id: 'performance', name: 'Performances' },
-    { id: 'community', name: 'Community' }
+    { id: 'videos', name: 'Videos' }
   ];
 
-  const filteredVideos = selectedCategory === 'all' 
-    ? videos 
-    : videos.filter(video => video.category === selectedCategory);
+  const filteredVideos = videos;
 
   const openVideo = (video: Video) => {
     setSelectedVideo(video);
@@ -130,28 +125,12 @@ export default function VideoGalleryPage() {
          }}>
           <div className="flex items-center justify-between mb-6">
                          <div className="flex items-center space-x-2">
-               <FaFilter className="text-yellow-400" />
-               <h2 className="text-xl font-semibold text-yellow-400">Filter Videos</h2>
+               <FaVideo className="text-yellow-400" />
+               <h2 className="text-xl font-semibold text-yellow-400">Videos</h2>
              </div>
              <div className="text-sm text-black font-semibold bg-white/90 px-3 py-1 rounded-full shadow-sm">
                {filteredVideos.length} videos found
              </div>
-          </div>
-          
-          <div className="flex flex-wrap gap-3">
-            {categories.map((category) => (
-                             <button
-                 key={category.id}
-                 onClick={() => setSelectedCategory(category.id)}
-                 className={`px-4 py-2 rounded-lg font-medium transition-all duration-200 ${
-                   selectedCategory === category.id
-                     ? 'bg-yellow-500 text-black shadow-lg'
-                     : 'bg-black/40 text-yellow-200 hover:bg-black/60 border border-yellow-400/30'
-                 }`}
-               >
-                 {category.name}
-               </button>
-            ))}
           </div>
         </div>
       </div>
