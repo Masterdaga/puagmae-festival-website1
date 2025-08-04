@@ -1,7 +1,6 @@
 import Navbar from './components/Navbar';
 import LandingCarousel from './components/LandingCarousel';
 import CountdownTimer from './components/CountdownTimer';
-import Testimonials from './components/Testimonials';
 import Link from 'next/link'; 
 
 
