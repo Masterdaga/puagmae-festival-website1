@@ -195,19 +195,28 @@ export default function YearGalleryPage() {
                 PUAGMAE {year} Highlights
               </h2>
             <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-              <div className="bg-gradient-to-br from-purple-500 via-purple-600 to-indigo-600 rounded-xl p-6 text-white shadow-lg border border-purple-400/30 hover:shadow-purple-500/25 transition-all duration-300 transform hover:scale-105">
-                <h3 className="text-xl font-semibold mb-2">Cultural Unity</h3>
-                <p className="text-purple-100">Traditional celebrations and cultural performances that brought our community together.</p>
+              <div className="rounded-xl p-6 shadow-lg border border-yellow-400/30 hover:shadow-yellow-400/25 transition-all duration-300 transform hover:scale-105" style={{
+                background: 'linear-gradient(to-r, rgba(217, 119, 6, 0.2), rgba(180, 83, 9, 0.2)), linear-gradient(to-r, rgba(0, 0, 0, 0.1), rgba(0, 0, 0, 0.1))',
+                backdropFilter: 'blur(8px)'
+              }}>
+                <h3 className="text-xl font-semibold mb-2 text-yellow-400">Cultural Unity</h3>
+                <p className="text-gray-200">Traditional celebrations and cultural performances that brought our community together.</p>
               </div>
               
-              <div className="bg-gradient-to-br from-emerald-500 via-emerald-600 to-teal-600 rounded-xl p-6 text-white shadow-lg border border-emerald-400/30 hover:shadow-emerald-500/25 transition-all duration-300 transform hover:scale-105">
-                <h3 className="text-xl font-semibold mb-2">Community</h3>
-                <p className="text-emerald-100">Building stronger bonds and fostering understanding among diverse communities.</p>
+              <div className="rounded-xl p-6 shadow-lg border border-yellow-400/30 hover:shadow-yellow-400/25 transition-all duration-300 transform hover:scale-105" style={{
+                background: 'linear-gradient(to-r, rgba(217, 119, 6, 0.2), rgba(180, 83, 9, 0.2)), linear-gradient(to-r, rgba(0, 0, 0, 0.1), rgba(0, 0, 0, 0.1))',
+                backdropFilter: 'blur(8px)'
+              }}>
+                <h3 className="text-xl font-semibold mb-2 text-yellow-400">Community</h3>
+                <p className="text-gray-200">Building stronger bonds and fostering understanding among diverse communities.</p>
               </div>
               
-              <div className="bg-gradient-to-br from-rose-500 via-rose-600 to-pink-600 rounded-xl p-6 text-white shadow-lg border border-rose-400/30 hover:shadow-rose-500/25 transition-all duration-300 transform hover:scale-105">
-                <h3 className="text-xl font-semibold mb-2">Performance</h3>
-                <p className="text-rose-100">Empowering young people to embrace and celebrate their cultural heritage.</p>
+              <div className="rounded-xl p-6 shadow-lg border border-yellow-400/30 hover:shadow-yellow-400/25 transition-all duration-300 transform hover:scale-105" style={{
+                background: 'linear-gradient(to-r, rgba(217, 119, 6, 0.2), rgba(180, 83, 9, 0.2)), linear-gradient(to-r, rgba(0, 0, 0, 0.1), rgba(0, 0, 0, 0.1))',
+                backdropFilter: 'blur(8px)'
+              }}>
+                <h3 className="text-xl font-semibold mb-2 text-yellow-400">Performance</h3>
+                <p className="text-gray-200">Empowering young people to embrace and celebrate their cultural heritage.</p>
               </div>
             </div>
             </div>
