@@ -1,68 +1,43 @@
-const express = require('express');
-const cors = require('cors');
-const mongoose = require('mongoose');
-require('dotenv').config();
+'use client';
+import { useState } from 'react';
 
-const app = express();
-const PORT = process.env.PORT || 5000;
+export default function LoginForm() {
+  const [formData, setFormData] = useState({ email: '', phone: '' });
+  const [message, setMessage] = useState('');
 
-// Middleware
-app.use(cors());
-app.use(express.json());
-app.use(express.urlencoded({ extended: true }));
+  const handleChange = (e) => {
+    setFormData({ ...formData, [e.target.name]: e.target.value });
+  };
 
-// MongoDB Connection
-const connectDB = async () => {
-  try {
-    const conn = await mongoose.connect(process.env.MONGODB_URI || 'mongodb://localhost:27017/puagmae-festival', {
-      useNewUrlParser: true,
-      useUnifiedTopology: true,
-    });
-    console.log(`MongoDB Connected: ${conn.connection.host}`);
-  } catch (error) {
-    console.error('MongoDB connection error:', error);
-    process.exit(1);
-  }
-};
+  const handleSubmit = async (e) => {
+    e.preventDefault();
 
-// Routes
-const newsletterRoutes = require('./routes/newsletter');
-app.use('/api/newsletter', newsletterRoutes);
+    try {
+      const response = await fetch('http://localhost/your-project-folder/login.php', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(formData)
+      });
 
-// Health check endpoint
-app.get('/health', (req, res) => {
-  res.json({ 
-    status: 'OK', 
-    message: 'PUAGMAE Festival Backend is running',
-    timestamp: new Date().toISOString()
-  });
-});
+      const result = await response.json();
+      setMessage(result.message || 'Login failed.');
+    } catch (error) {
+      setMessage('Something went wrong.');
+      console.error(error);
+    }
+  };
 
-// Error handling middleware
-app.use((err, req, res, next) => {
-  console.error(err.stack);
-  res.status(500).json({ 
-    success: false, 
-    message: 'Something went wrong!' 
-  });
-});
-
-// 404 handler
-app.use('*', (req, res) => {
-  res.status(404).json({ 
-    success: false, 
-    message: 'Route not found' 
-  });
-});
-
-// Start server
-const startServer = async () => {
-  await connectDB();
-  app.listen(PORT, () => {
-    console.log(`🚀 Server running on port ${PORT}`);
-    console.log(`📧 Newsletter API: http://localhost:${PORT}/api/newsletter`);
-    console.log(`🏥 Health check: http://localhost:${PORT}/health`);
-  });
-};
-
-startServer();
+  return (
+    <div className="p-4 max-w-md mx-auto">
+      <h2 className="text-xl mb-4 font-bold">Login</h2>
+      <form onSubmit={handleSubmit} className="space-y-4">
+        <input type="email" name="email" onChange={handleChange} placeholder="Email" className="w-full border p-2" />
+        <input type="text" name="phone" onChange={handleChange} placeholder="Phone" className="w-full border p-2" />
+        <button type="submit" className="bg-green-500 text-white px-4 py-2">Login</button>
+      </form>
+      {message && <p className="mt-2 text-center text-red-600">{message}</p>}
+    </div>
+  );
+}
