@@ -4,7 +4,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 
 const schedule = [
   {
-    date: 'Sept 6, 2025',
+    date: 'PUAGME 1 - September 6, 2025',
     theme: 'Peace and Love Day',
     image: "/peace_and_love.jpg",
     activities: [
@@ -17,7 +17,7 @@ const schedule = [
     color: 'from-amber-100 to-yellow-50'
   },
   {
-    date: 'Sept 7, 2025',
+    date: 'PUAGME 2 - September 7, 2025',
     theme: 'Pan-Africanism Day',
     image: "/panafricanism_day.jpg",
     activities: [
@@ -30,7 +30,7 @@ const schedule = [
     color: 'from-orange-100 to-amber-50'
   },
   {
-    date: 'Sept 8, 2025',
+    date: 'PUAGME 3 - September 8, 2025',
     theme: 'Run on Rain Day',
     image: "/children_on_rain.jpg",
     activities: [
@@ -43,7 +43,7 @@ const schedule = [
     color: 'from-blue-100 to-cyan-50'
   },
   {
-    date: 'Sept 9, 2025',
+    date: 'PUAGME 4 - September 9, 2025',
     theme: 'Trade Day',
     image: "/trade.jpg",
     activities: [
@@ -56,7 +56,7 @@ const schedule = [
     color: 'from-emerald-100 to-green-50'
   },
   {
-    date: 'Sept 10, 2025',
+    date: 'PUAGME 5 - September 10, 2025',
     theme: 'Beauty Day',
     image: "/a_runway_scene_fea_image_.jpg",
     activities: [
