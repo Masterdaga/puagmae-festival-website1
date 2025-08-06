@@ -6,6 +6,7 @@ import { FaArrowRight } from 'react-icons/fa';
 
 export default function Navbar() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const [isDesktopGalleryOpen, setIsDesktopGalleryOpen] = useState(false);
   const [isVisible, setIsVisible] = useState(true);
   const [lastScrollY, setLastScrollY] = useState(0);
 
@@ -20,6 +21,7 @@ export default function Navbar() {
       setLastScrollY(currentScrollY);
     };
     
+    // Only add event listener on client side
     if (typeof window !== 'undefined') {
       window.addEventListener('scroll', handleScroll);
       return () => window.removeEventListener('scroll', handleScroll);
@@ -41,7 +43,7 @@ export default function Navbar() {
                 height={80} 
                 className="w-20 h-20 object-contain"
               />
-              <span className="text-2xl font-black text-yellow-400 tracking-widest bg-gradient-to-r from-yellow-400 to-yellow-600 bg-clip-text text-transparent drop-shadow-lg hidden sm:block" style={{ fontFamily: 'Caveat, cursive' }}>
+              <span className="text-2xl font-black text-yellow-400 tracking-widest bg-gradient-to-r from-yellow-400 to-yellow-600 bg-clip-text text-transparent drop-shadow-lg hidden sm:block" style={{fontFamily: 'Caveat, cursive'}}>
                 PUAGMAE
               </span>
             </Link>
@@ -63,11 +65,47 @@ export default function Navbar() {
                 </Link>
               ))}
 
-              {/* Gallery Link */}
-              <Link href="/gallery" className="relative px-3 py-1 text-yellow-100 font-semibold hover:text-yellow-400 transition-colors duration-200">
-                Gallery
-                <span className="absolute left-0 -bottom-1 w-full h-0.5 bg-gradient-to-r from-yellow-400 to-yellow-600 scale-x-0 hover:scale-x-100 origin-left transition-transform duration-300"></span>
-              </Link>
+                             {/* Gallery Dropdown */}
+               <div className="relative group">
+                 <button
+                   className="relative px-3 py-1 text-yellow-100 font-semibold hover:text-yellow-400 transition-colors duration-200"
+                   onMouseEnter={() => setIsDesktopGalleryOpen(true)}
+                   onMouseLeave={() => setIsDesktopGalleryOpen(false)}
+                 >
+                   Gallery
+                 </button>
+                {/* Dropdown */}
+                <div 
+                  className={`absolute top-full left-1/2 transform -translate-x-1/2 mt-2 min-w-[220px] bg-black/90 border border-yellow-400/30 rounded-xl shadow-lg backdrop-blur-xl transition-all duration-300 z-50 ${
+                    isDesktopGalleryOpen ? 'opacity-100 visible translate-y-0 scale-100' : 'opacity-0 invisible -translate-y-2 scale-95'
+                  }`}
+                  onMouseEnter={() => setIsDesktopGalleryOpen(true)}
+                  onMouseLeave={() => setIsDesktopGalleryOpen(false)}
+                >
+                  <div className="p-4">
+                    <div className="mb-2 text-yellow-400 font-bold">Photos</div>
+                    {[2011, 2012, 2013, 2014, 2015, 2016].map(year => (
+                      <Link
+                        key={year}
+                        href={`/gallery/${year}`}
+                        className="block px-2 py-1 text-yellow-100 hover:text-yellow-400 rounded transition-colors duration-200"
+                      >
+                        PUAGMAE {year}
+                      </Link>
+                    ))}
+                    <div className="mt-3 mb-2 text-yellow-400 font-bold">Videos</div>
+                    {[2011, 2012, 2013, 2014, 2015, 2016].map(year => (
+                      <Link
+                        key={year}
+                        href={`/gallery/${year}/videos`}
+                        className="block px-2 py-1 text-yellow-100 hover:text-yellow-400 rounded transition-colors duration-200"
+                      >
+                        PUAGMAE {year}
+                      </Link>
+                    ))}
+                  </div>
+                </div>
+              </div>
 
               <Link href="/testimonials" className="relative px-3 py-1 text-yellow-100 font-semibold hover:text-yellow-400 transition-colors duration-200">
                 Testimonials
@@ -77,6 +115,7 @@ export default function Navbar() {
                 Register now
                 <FaArrowRight className="ml-2 text-lg" />
               </Link>
+
             </div>
 
             {/* Hamburger for mobile */}
@@ -95,7 +134,9 @@ export default function Navbar() {
 
       {/* Mobile Menu Overlay */}
       <div className={`fixed inset-0 z-50 md:hidden transition-all duration-300 ${isMenuOpen ? 'opacity-100 visible' : 'opacity-0 invisible pointer-events-none'}`}>
+        {/* Backdrop */}
         <div className="absolute inset-0 bg-black/80 backdrop-blur-sm" onClick={() => setIsMenuOpen(false)}></div>
+        {/* Slide-in Menu */}
         <div className={`absolute top-0 right-0 h-full w-64 bg-black/95 backdrop-blur-md border-l border-yellow-400/20 p-8 transition-transform duration-300 ${isMenuOpen ? 'translate-x-0' : 'translate-x-full'}`}>
           <div className="flex flex-col h-full">
             {/* Close Button */}
@@ -124,12 +165,13 @@ export default function Navbar() {
               <Link href="/" className="text-yellow-200 hover:text-yellow-400 transition-colors hover:scale-105 transform duration-300" onClick={() => setIsMenuOpen(false)}>Home</Link>
               <Link href="/about" className="text-yellow-200 hover:text-yellow-400 transition-colors hover:scale-105 transform duration-300" onClick={() => setIsMenuOpen(false)}>About</Link>
               <Link href="/schedule" className="text-yellow-200 hover:text-yellow-400 transition-colors hover:scale-105 transform duration-300" onClick={() => setIsMenuOpen(false)}>Schedule</Link>
-              <Link href="/gallery" className="text-yellow-200 hover:text-yellow-400 transition-colors hover:scale-105 transform duration-300" onClick={() => setIsMenuOpen(false)}>Gallery</Link>
+                             <Link href="/gallery" className="text-yellow-200 hover:text-yellow-400 transition-colors hover:scale-105 transform duration-300" onClick={() => setIsMenuOpen(false)}>Gallery</Link>
               <Link href="/testimonials" className="text-yellow-200 hover:text-yellow-400 transition-colors hover:scale-105 transform duration-300" onClick={() => setIsMenuOpen(false)}>Testimonials</Link>
               <Link href="/Registration#register" scroll={true} className="bg-gradient-to-r from-yellow-500 to-yellow-600 text-black px-6 py-2 rounded-full font-bold hover:from-yellow-600 hover:to-yellow-700 hover:scale-105 transition-all duration-200 flex items-center shadow-lg">
                 Register now
                 <FaArrowRight className="ml-2 text-lg" />
               </Link>
+
             </nav>
             {/* Social Media Section */}
             <div className="mt-auto pt-8 border-t border-yellow-400/20">

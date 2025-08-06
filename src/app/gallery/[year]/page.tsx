@@ -1,273 +1,249 @@
 'use client';
 
-import { useState, useEffect, useCallback, useRef } from 'react';
+import { useState, useEffect } from 'react';
+import { useParams } from 'next/navigation';
 import Image from 'next/image';
+import { FaArrowLeft, FaExpand, FaFilter, FaImages, FaCalendarAlt, FaPlay } from 'react-icons/fa';
+import Link from 'next/link';
 
-interface GalleryItem {
-  image: string;
-  type: 'photo' | 'video';
+interface Photo {
+  id: string;
+  src: string;
+  alt: string;
+  category: string;
+  year: string;
 }
 
-const galleryData: GalleryItem[] = [
-  { image: '/photos/img 1.jpg', type: 'photo' },
-  { image: '/photos/img 2.jpg', type: 'photo' },
-  { image: '/photos/img 3.jpg', type: 'photo' },
-  { image: '/photos/img 5.jpg', type: 'photo' },
-  { image: '/photos/img 6.jpg', type: 'photo' },
-  { image: '/photos/img 7.jpg', type: 'photo' },
-  { image: '/photos/img 8.jpg', type: 'photo' },
-  { image: '/photos/img 9.jpg', type: 'photo' },
-  { image: '/photos/img 10.jpg', type: 'photo' },
-  { image: '/photos/img 11.jpg', type: 'photo' },
-  { image: '/photos/img 12.jpg', type: 'photo' },
-  { image: '/photos/img 13.jpg', type: 'photo' },
-  { image: '/photos/img 14.jpg', type: 'photo' },
-  { image: '/photos/img 15.jpg', type: 'photo' },
-  { image: '/photos/img 16.jpg', type: 'photo' },
-  { image: '/photos/img 17.jpg', type: 'photo' },
-  { image: '/photos/img 18.jpg', type: 'photo' },
-  { image: '/photos/img 19.jpg', type: 'photo' },
-  { image: '/photos/img 20.jpg', type: 'photo' },
-  { image: '/photos/img 21.jpg', type: 'photo' },
-  { image: '/photos/img 22.jpg', type: 'photo' },
-  { image: '/photos/img 23.jpg', type: 'photo' },
-  { image: '/photos/img 24.jpg', type: 'photo' },
-  { image: '/photos/img 25.jpg', type: 'photo' },
-  { image: '/photos/img 26.jpg', type: 'photo' },
-  { image: '/photos/img 27.jpg', type: 'photo' },
-  { image: '/photos/img 28.jpg', type: 'photo' },
-  { image: '/videos/video 1.mp4', type: 'video' },
-  { image: '/videos/video 2.mp4', type: 'video' },
-];
-
-export default function GalleryPage() {
-  const [selectedIndex, setSelectedIndex] = useState<number | null>(null);
+export default function YearGalleryPage() {
+  const params = useParams();
+  const year = params.year as string;
+  const [selectedImage, setSelectedImage] = useState<string | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [mediaType, setMediaType] = useState<'photo' | 'video' | null>(null);
-  const [currentVideoIndex, setCurrentVideoIndex] = useState(0);
-  const [isPlaying, setIsPlaying] = useState(false);
-  const [userMutedStates, setUserMutedStates] = useState<boolean[]>([]);
-  const videoRefs = useRef<(HTMLVideoElement | null)[]>([]);
+  const [selectedCategory, setSelectedCategory] = useState<string>('all');
+  const [photos, setPhotos] = useState<Photo[]>([]);
 
-  const photos = [...galleryData.filter(item => item.type === 'photo')].reverse();
-  const videos = galleryData.filter(item => item.type === 'video');
-
-  useEffect(() => {
-    videoRefs.current = videoRefs.current.slice(0, videos.length);
-    setUserMutedStates(Array(videos.length).fill(true));
-  }, [videos.length]);
-
-  useEffect(() => {
-    const videoInterval = setInterval(() => {
-      setCurrentVideoIndex(prev => (prev + 1) % videos.length);
-    }, 30000);
-
-    return () => clearInterval(videoInterval);
-  }, [videos.length]);
-
-  useEffect(() => {
-    videoRefs.current.forEach((video, index) => {
-      if (!video) return;
-      
-      if (index === currentVideoIndex) {
-        video.muted = userMutedStates[index];
-        video.play().catch(e => console.log("Autoplay prevented:", e));
-      } else {
-        video.pause();
-        video.currentTime = 0;
-        video.muted = true;
-      }
-    });
-  }, [currentVideoIndex, userMutedStates]);
-
-  const handleMuteChange = (index: number, isMuted: boolean) => {
-    setUserMutedStates(prev => {
-      const newStates = [...prev];
-      newStates[index] = isMuted;
-      return newStates;
-    });
-  };
-
-  const openModal = (index: number, type: 'photo' | 'video') => {
-    setSelectedIndex(index);
-    setMediaType(type);
-    setIsModalOpen(true);
-    if (type === 'video') {
-      setIsPlaying(true);
+  // Mock data - in a real app, you'd fetch this from an API
+  const mockPhotos: Photo[] = [
+    // Cultural Photos
+    {
+      id: '1',
+      src: `/PUAGMAE ${year}/cultural-1.jpg?v=4`,
+      alt: `PUAGMAE ${year} Traditional Dance Performance`,
+      category: 'cultural',
+      year: year
     }
+    
+    // Add more photos here when you have them:
+    // {
+    //   id: '2',
+    //   src: `/PUAGMAE ${year}/cultural-2.jpg`,
+    //   alt: `PUAGMAE ${year} Cultural Exhibition`,
+    //   category: 'cultural',
+    //   year: year
+    // },
+    // {
+    //   id: '3',
+    //   src: `/PUAGMAE ${year}/community-1.jpg`,
+    //   alt: `PUAGMAE ${year} Community Gathering`,
+    //   category: 'community',
+    //   year: year
+    // },
+    // {
+    //   id: '4',
+    //   src: `/PUAGMAE ${year}/performance-1.jpg`,
+    //   alt: `PUAGMAE ${year} Live Music Performance`,
+    //   category: 'performance',
+    //   year: year
+    // }
+  ];
+
+  useEffect(() => {
+    setPhotos(mockPhotos);
+  }, [year]);
+
+  const categories = [
+    { id: 'photos', name: 'Photos' }
+  ];
+
+  const filteredPhotos = photos;
+
+  const openModal = (imageSrc: string) => {
+    setSelectedImage(imageSrc);
+    setIsModalOpen(true);
   };
 
   const closeModal = () => {
     setIsModalOpen(false);
-    setSelectedIndex(null);
-    setIsPlaying(false);
+    setSelectedImage(null);
   };
 
-  const handleNext = useCallback(() => {
-    if (selectedIndex !== null && mediaType) {
-      const items = mediaType === 'photo' ? photos : videos;
-      const newIndex = (selectedIndex + 1) % items.length;
-      setSelectedIndex(newIndex);
-      if (mediaType === 'video') {
-        setIsPlaying(true);
-      }
-    }
-  }, [selectedIndex, mediaType, photos, videos]);
-
-  const handlePrev = useCallback(() => {
-    if (selectedIndex !== null && mediaType) {
-      const items = mediaType === 'photo' ? photos : videos;
-      const newIndex = (selectedIndex - 1 + items.length) % items.length;
-      setSelectedIndex(newIndex);
-      if (mediaType === 'video') {
-        setIsPlaying(true);
-      }
-    }
-  }, [selectedIndex, mediaType, photos, videos]);
-
-  useEffect(() => {
-    const handleKeyDown = (e: KeyboardEvent) => {
-      if (!isModalOpen) return;
-      
-      if (e.key === 'Escape') {
-        closeModal();
-      } else if (e.key === 'ArrowRight') {
-        handleNext();
-      } else if (e.key === 'ArrowLeft') {
-        handlePrev();
-      }
-    };
-
-    window.addEventListener('keydown', handleKeyDown);
-    return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [isModalOpen, handleNext, handlePrev]);
-
   return (
-    <div className="min-h-screen pt-24 bg-gradient-to-b from-[#3b2f23] to-black">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 text-center">
-        <h1 className="text-4xl font-bold text-yellow-400 mb-4">PUAGMAE Gallery</h1>
-        <div className="text-xl text-yellow-200/80">
-          Explore the rich history and memorable moments from PUAGMAE events.
+    <div className="min-h-screen pt-24 relative overflow-hidden">
+      <div
+        className="fixed inset-0 bg-cover bg-center -z-10"
+        style={{ backgroundImage: "url('/new-adeyababa.jpg')" }}
+      />
+      <div className="absolute inset-0 bg-gradient-to-br from-black via-[#3b2f23] to-black opacity-80 -z-10" />
+                    {/* Header */}
+       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+         <div className="shadow-lg rounded-xl p-6" style={{
+           background: 'linear-gradient(to-r, rgba(217, 119, 6, 0.3), rgba(180, 83, 9, 0.3)), linear-gradient(to-r, rgba(0, 0, 0, 0.2), rgba(0, 0, 0, 0.2))',
+           backdropFilter: 'blur(8px)'
+         }}>
+          <div className="flex items-center justify-between">
+            <div className="flex items-center space-x-4">
+              <Link 
+                href="/gallery"
+                className="bg-gradient-to-r from-yellow-400 to-yellow-600 border border-yellow-400/30 text-black px-4 py-2 rounded-full font-bold hover:from-yellow-600 hover:to-yellow-400 hover:border-yellow-400 hover:text-black hover:shadow-lg hover:shadow-yellow-400/25 transform transition-all duration-300 flex items-center"
+              >
+                <FaArrowLeft className="mr-2" />
+                Back to Gallery
+              </Link>
+            </div>
+                         <div className="text-center">
+               <h1 className="text-4xl font-bold text-yellow-400 mb-2">
+                 PUAGMAE {year}
+               </h1>
+               <p className="text-xl text-yellow-200/80">
+                 Relive the memories and moments from {year}
+               </p>
+             </div>
+             <div className="flex items-center space-x-2 text-yellow-400">
+               <FaCalendarAlt />
+               <span className="font-semibold">{year}</span>
+             </div>
+          </div>
         </div>
       </div>
 
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pb-12">
-        {/* Photos Section */}
-        <div className="mb-16">
-          <h2 className="text-2xl font-bold text-yellow-400 mb-6 pb-2 border-b border-yellow-400/30">Photos</h2>
-          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4">
-            {photos.map((item, index) => (
-              <div 
-                key={index} 
-                className="relative aspect-square w-full cursor-pointer group"
-                onClick={() => openModal(index, 'photo')}
+             {/* Filter Section */}
+       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+         <div className="rounded-xl shadow-lg p-6" style={{
+           background: 'linear-gradient(to-r, rgba(217, 119, 6, 0.3), rgba(180, 83, 9, 0.3)), linear-gradient(to-r, rgba(0, 0, 0, 0.2), rgba(0, 0, 0, 0.2))',
+           backdropFilter: 'blur(8px)'
+         }}>
+          <div className="flex items-center justify-between mb-6">
+                         <div className="flex items-center space-x-2">
+               <FaImages className="text-yellow-400" />
+               <h2 className="text-xl font-semibold text-yellow-400">Photos</h2>
+             </div>
+             <div className="text-sm text-black font-semibold bg-white/90 px-3 py-1 rounded-full shadow-sm">
+               {filteredPhotos.length} photos found
+             </div>
+          </div>
+        </div>
+      </div>
+
+      {/* Photo Grid */}
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        {filteredPhotos.length > 0 ? (
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+            {filteredPhotos.map((photo) => (
+              <div
+                key={photo.id}
+                className="group relative bg-white rounded-xl shadow-lg overflow-hidden hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-2 cursor-pointer"
+                onClick={() => openModal(photo.src)}
               >
-                <Image
-                  src={item.image}
-                  alt={`Gallery Image ${photos.length - index}`}
-                  fill
-                  className="object-cover rounded-lg shadow-lg transition-transform duration-300 group-hover:scale-105"
-                />
-                <div className="absolute inset-0 bg-black/20 opacity-0 group-hover:opacity-100 transition-opacity duration-300 rounded-lg" />
+                <div className="h-64 bg-gradient-to-br from-gray-100 to-gray-200 flex items-center justify-center overflow-hidden">
+                  <img
+                    src={photo.src}
+                    alt={photo.alt}
+                    className="w-full h-full object-cover"
+                  />
+                </div>
+                
+                <div className="p-4 bg-gradient-to-r from-yellow-400 to-yellow-600">
+                  <h3 className="font-semibold text-black mb-1">{photo.alt}</h3>
+                  <p className="text-sm text-black/80 capitalize">{photo.category}</p>
+                </div>
               </div>
             ))}
           </div>
-        </div>
+        ) : (
+          <div className="text-center py-16">
+            <FaImages className="text-6xl text-gray-400 mx-auto mb-4" />
+            <h3 className="text-xl font-semibold text-gray-600 mb-2">No photos found</h3>
+            <p className="text-gray-500">Try selecting a different category or check back later.</p>
+          </div>
+        )}
+      </div>
 
-        {/* Videos Section */}
-        <div>
-          <h2 className="text-2xl font-bold text-yellow-400 mb-6 pb-2 border-b border-yellow-400/30">Videos</h2>
-          <div className="relative aspect-video w-full overflow-hidden rounded-xl shadow-2xl bg-black/50">
-            <div className="absolute inset-0 flex transition-transform duration-1000 ease-in-out"
-                style={{ transform: `translateX(-${currentVideoIndex * 100}%)` }}>
-              {videos.map((item, index) => (
-                <div key={index} className="relative min-w-full h-full">
-                  <video
-                    ref={el => { videoRefs.current[index] = el }}
-                    src={item.image}
-                    className="w-full h-full object-cover"
-                    controls
-                    autoPlay={currentVideoIndex === index}
-                    muted={currentVideoIndex !== index || userMutedStates[index]}
-                    loop
-                    onVolumeChange={(e) => 
-                      handleMuteChange(index, e.currentTarget.muted)
-                    }
-                  />
-                </div>
-              ))}
+      {/* Navigation to Videos */}
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        <div className="bg-gradient-to-r from-yellow-400 to-yellow-600 rounded-xl p-8 text-black text-center shadow-lg">
+          <h3 className="text-2xl font-bold mb-4">Want to see more from {year}?</h3>
+          <p className="text-black/80 mb-6">Explore our video collection featuring performances, ceremonies, and community moments.</p>
+          <Link 
+            href={`/gallery/${year}/videos`}
+            className="inline-flex items-center px-6 py-3 bg-black text-yellow-400 rounded-lg font-semibold hover:bg-gray-800 transition-colors"
+          >
+            <FaPlay className="mr-2" />
+            Watch Videos
+          </Link>
+        </div>
+      </div>
+
+      {/* Year Summary */}
+      <div className="py-16">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="shadow-lg rounded-xl p-6" style={{
+            background: 'linear-gradient(to-r, rgba(217, 119, 6, 0.3), rgba(180, 83, 9, 0.3)), linear-gradient(to-r, rgba(0, 0, 0, 0.2), rgba(0, 0, 0, 0.2))',
+            backdropFilter: 'blur(8px)'
+          }}>
+            <div className="text-center">
+              <h2 className="text-3xl font-bold text-yellow-400 mb-6">
+                PUAGMAE {year} Highlights
+              </h2>
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+              <div className="rounded-xl p-6 shadow-lg border border-yellow-400/30 hover:shadow-yellow-400/25 transition-all duration-300 transform hover:scale-105" style={{
+                background: 'linear-gradient(to-r, rgba(217, 119, 6, 0.2), rgba(180, 83, 9, 0.2)), linear-gradient(to-r, rgba(0, 0, 0, 0.1), rgba(0, 0, 0, 0.1))',
+                backdropFilter: 'blur(8px)'
+              }}>
+                <h3 className="text-xl font-semibold mb-2 text-yellow-400">Cultural Unity</h3>
+                <p className="text-gray-200">Traditional celebrations and cultural performances that brought our community together.</p>
+              </div>
+              
+              <div className="rounded-xl p-6 shadow-lg border border-yellow-400/30 hover:shadow-yellow-400/25 transition-all duration-300 transform hover:scale-105" style={{
+                background: 'linear-gradient(to-r, rgba(217, 119, 6, 0.2), rgba(180, 83, 9, 0.2)), linear-gradient(to-r, rgba(0, 0, 0, 0.1), rgba(0, 0, 0, 0.1))',
+                backdropFilter: 'blur(8px)'
+              }}>
+                <h3 className="text-xl font-semibold mb-2 text-yellow-400">Community</h3>
+                <p className="text-gray-200">Building stronger bonds and fostering understanding among diverse communities.</p>
+              </div>
+              
+              <div className="rounded-xl p-6 shadow-lg border border-yellow-400/30 hover:shadow-yellow-400/25 transition-all duration-300 transform hover:scale-105" style={{
+                background: 'linear-gradient(to-r, rgba(217, 119, 6, 0.2), rgba(180, 83, 9, 0.2)), linear-gradient(to-r, rgba(0, 0, 0, 0.1), rgba(0, 0, 0, 0.1))',
+                backdropFilter: 'blur(8px)'
+              }}>
+                <h3 className="text-xl font-semibold mb-2 text-yellow-400">Performance</h3>
+                <p className="text-gray-200">Empowering young people to embrace and celebrate their cultural heritage.</p>
+              </div>
             </div>
-            <div className="absolute bottom-6 left-0 right-0 flex justify-center space-x-2">
-              {videos.map((_, index) => (
-                <button
-                  key={index}
-                  onClick={() => setCurrentVideoIndex(index)}
-                  className={`w-3 h-3 rounded-full transition-all ${currentVideoIndex === index ? 'bg-yellow-400 w-6' : 'bg-gray-400/70'}`}
-                  aria-label={`Go to video ${index + 1}`}
-                />
-              ))}
             </div>
           </div>
         </div>
       </div>
 
-      {/* Image/Video Modal */}
-      {isModalOpen && selectedIndex !== null && mediaType && (
-        <div className="fixed inset-0 bg-black/90 backdrop-blur-sm flex items-center justify-center z-50 p-4">
-          <div className="relative max-w-5xl w-full max-h-[90vh]">
+      {/* Image Modal */}
+      {isModalOpen && selectedImage && (
+        <div className="fixed inset-0 bg-black bg-opacity-75 flex items-center justify-center z-50 p-4 overflow-y-auto">
+          <div className="relative max-w-4xl w-full my-8">
             <button
               onClick={closeModal}
-              className="absolute -top-12 right-0 text-white hover:text-yellow-400 transition-colors z-10"
+              className="absolute top-4 right-4 text-white text-2xl hover:text-gray-300 z-10 bg-black bg-opacity-50 rounded-full w-10 h-10 flex items-center justify-center"
             >
-              <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                <line x1="18" y1="6" x2="6" y2="18"></line>
-                <line x1="6" y1="6" x2="18" y2="18"></line>
-              </svg>
+              ×
             </button>
-            
-            <button
-              onClick={handlePrev}
-              className="absolute left-0 -translate-x-12 top-1/2 -translate-y-1/2 text-white hover:text-yellow-400 transition-colors z-10"
-            >
-              <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                <polyline points="15 18 9 12 15 6"></polyline>
-              </svg>
-            </button>
-            <button
-              onClick={handleNext}
-              className="absolute right-0 translate-x-12 top-1/2 -translate-y-1/2 text-white hover:text-yellow-400 transition-colors z-10"
-            >
-              <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                <polyline points="9 18 15 12 9 6"></polyline>
-              </svg>
-            </button>
-            
-            <div className="w-full h-full flex items-center justify-center">
-              {mediaType === 'photo' ? (
-                <Image
-                  src={photos[selectedIndex].image}
-                  alt="Gallery Image"
-                  width={1200}
-                  height={800}
-                  className="max-w-full max-h-full object-contain rounded-lg"
-                />
-              ) : (
-                <video 
-                  controls 
-                  autoPlay={isPlaying}
-                  muted={!isPlaying}
-                  className="max-w-full max-h-full rounded-lg"
-                  onPlay={() => setIsPlaying(true)}
-                  onPause={() => setIsPlaying(false)}
-                >
-                  <source src={videos[selectedIndex].image} type="video/mp4" />
-                  Your browser does not support the video tag.
-                </video>
-              )}
-            </div>
+            <Image
+              src={selectedImage}
+              alt="Gallery Image"
+              width={800}
+              height={600}
+              className="rounded-lg w-full h-auto max-h-[80vh] object-contain"
+            />
           </div>
         </div>
       )}
     </div>
   );
-}
+} 
