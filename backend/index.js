@@ -1,5 +1,7 @@
 'use client';
 import { useState } from 'react';
+import { toast, ToastContainer } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 
 export default function LoginForm() {
   const [formData, setFormData] = useState({ email: '', phone: '' });
@@ -13,7 +15,7 @@ export default function LoginForm() {
     e.preventDefault();
 
     try {
-      const response = await fetch('http://localhost/your-project-folder/login.php', {
+      const response = await fetch('http://localhost:5000/api/newsletter/subscribe', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json'
@@ -41,3 +43,32 @@ export default function LoginForm() {
     </div>
   );
 }
+
+// Server Code (if needed in a separate file)
+const express = require('express');
+const cors = require('cors');
+const nodemailer = require('nodemailer');
+const PDFDocument = require('pdfkit');
+const fs = require('fs');
+const path = require('path');
+
+const app = express();
+const PORT = 5000;
+
+app.use(cors());
+app.use(express.json());
+
+const registeredUsers = [];
+
+const transporter = nodemailer.createTransport({
+  service: 'gmail',
+  auth: {
+    user: 'puagmaeteampuagmae@gmail.com',
+    pass: 'your-email-password', // Replace with your actual password
+  },
+});
+
+// Other server code...
+app.listen(PORT, () => {
+  console.log(`Server running on port ${PORT}`);
+});
