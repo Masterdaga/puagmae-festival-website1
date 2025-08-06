@@ -1,5 +1,5 @@
-'use client';
-
+"use client";
+import Link from 'next/link';
 import { useState } from 'react';
 import { toast, ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
@@ -10,7 +10,7 @@ export default function Footer() {
   const [email, setEmail] = useState('');
   const [isSubscribing, setIsSubscribing] = useState(false);
 
-  const handleSubscribe = async () => {
+    const handleSubscribe = async () => {
     if (!email || !email.includes('@')) {
       toast.error('Please enter a valid email address');
       return;
@@ -47,118 +47,119 @@ export default function Footer() {
   return (
     <footer className="bg-gradient-to-b from-black to-gray-900 w-full overflow-x-hidden backdrop-blur-md">
       {/* Newsletter Section */}
-      <div className="bg-gradient-to-r from-yellow-600/10 to-yellow-700/10 backdrop-blur-sm py-8 px-4 border-t border-yellow-400/20">
-        <div className="max-w-5xl mx-auto">
-          <div className="text-center mb-4">
-            <h2 className="text-4xl md:text-5xl font-extrabold bg-gradient-to-r from-yellow-300 to-yellow-400 bg-clip-text text-transparent mb-3 tracking-wide drop-shadow-lg">
-              LET'S STAY IN TOUCH
-            </h2>
-            <p className="text-yellow-200/90 text-lg">
-              Be the first to know about updates and festival announcements.
-            </p>
-          </div>
+      
+<div className="bg-gradient-to-r from-yellow-600/10 to-yellow-700/10 backdrop-blur-sm py-8 px-4 border-t border-yellow-400/20">
+  <div className="max-w-5xl mx-auto">
+    <div className="text-center mb-4">
+      <h2 className="text-4xl md:text-5xl font-extrabold bg-gradient-to-r from-yellow-300 to-yellow-400 bg-clip-text text-transparent mb-3 tracking-wide drop-shadow-lg">
+        LET'S STAY IN TOUCH
+      </h2>
+      <p className="text-yellow-200/90 text-lg">
+        Be the first to know about updates and festival announcements.
+      </p>
+    </div>
 
-          {/* Email Input Section */}
-          <div className="max-w-lg mx-auto">
-            <div className="flex gap-3">
-              <input
-                type="email"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                placeholder="Enter your email address"
-                className="flex-1 bg-black/40 backdrop-blur-sm border-2 border-yellow-400/30 text-yellow-200 placeholder-yellow-300/60 px-5 py-4 rounded-full focus:outline-none focus:border-yellow-400 transition-colors text-lg"
-                onKeyPress={(e) => e.key === 'Enter' && handleSubscribe()}
-              />
-              <button 
-                onClick={handleSubscribe}
-                disabled={isSubscribing || !email}
-                className={`px-6 py-4 rounded-full font-bold text-lg transition-all duration-300 transform flex items-center justify-center gap-2 shadow-lg ${
-                  isSubscribing || !email
-                    ? 'bg-gray-600 text-gray-400 cursor-not-allowed'
-                    : 'bg-gradient-to-r from-yellow-500 to-yellow-600 text-black hover:from-yellow-600 hover:to-yellow-700 hover:scale-105'
-                }`}
-              >
-                {isSubscribing ? (
-                  <>
-                    <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-black"></div>
-                    <span>Subscribing...</span>
-                  </>
-                ) : (
-                  <>
-                    <span>Subscribe</span>
-                    <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
-                      <path fillRule="evenodd" d="M10.293 3.293a1 1 0 011.414 0l6 6a1 1 0 010 1.414l-6 6a1 1 0 01-1.414-1.414L14.586 11H3a1 1 0 110-2h11.586l-4.293-4.293a1 1 0 010-1.414z" clipRule="evenodd" />
-                    </svg>
-                  </>
-                )}
-              </button>
-            </div>
-            <p className="text-sm text-yellow-200/70 text-center mt-3">
-              We respect your privacy. 
-              <button
-                onClick={async () => {
-                  const email = prompt('Enter your email to unsubscribe:');
-                  if (email) {
-                    try {
-                      const response = await fetch('http://localhost:5000/api/newsletter/unsubscribe', {
-                        method: 'POST',
-                        headers: {
-                          'Content-Type': 'application/json',
-                        },
-                        body: JSON.stringify({ email })
-                      });
-
-                      const data = await response.json();
-
-                      if (data.success) {
-                        toast.success(data.message);
-                      } else {
-                        toast.warning(data.message);
-                      }
-                    } catch (error) {
-                      console.error('Unsubscribe error:', error);
-                      toast.error('❌ Failed to unsubscribe. Please try again.');
-                    }
-                  }
-                }}
-                className="text-yellow-400 hover:text-yellow-300 underline transition-colors ml-1"
-              >
-                Unsubscribe
-              </button>
-              {' '}at any time.
-            </p>
-          </div>
-        </div>
+    {/* Email Input Section */}
+    <div className="max-w-lg mx-auto">
+      <div className="flex gap-3">
+        <input
+          type="email"
+          value={email}
+          onChange={(e) => setEmail(e.target.value)}
+          placeholder="Enter your email address"
+          className="flex-1 bg-black/40 backdrop-blur-sm border-2 border-yellow-400/30 text-yellow-200 placeholder-yellow-300/60 px-5 py-4 rounded-full focus:outline-none focus:border-yellow-400 transition-colors text-lg"
+          onKeyPress={(e) => e.key === 'Enter' && handleSubscribe()}
+        />
+        <button 
+          onClick={handleSubscribe}
+          disabled={isSubscribing || !email}
+          className={`px-6 py-4 rounded-full font-bold text-lg transition-all duration-300 transform flex items-center justify-center gap-2 shadow-lg ${
+            isSubscribing || !email
+              ? 'bg-gray-600 text-gray-400 cursor-not-allowed'
+              : 'bg-gradient-to-r from-yellow-500 to-yellow-600 text-black hover:from-yellow-600 hover:to-yellow-700 hover:scale-105'
+          }`}
+        >
+          {isSubscribing ? (
+            <>
+              <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-black"></div>
+              <span>Subscribing...</span>
+            </>
+          ) : (
+            <>
+              <span>Subscribe</span>
+              <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
+                <path fillRule="evenodd" d="M10.293 3.293a1 1 0 011.414 0l6 6a1 1 0 010 1.414l-6 6a1 1 0 01-1.414-1.414L14.586 11H3a1 1 0 110-2h11.586l-4.293-4.293a1 1 0 010-1.414z" clipRule="evenodd" />
+              </svg>
+            </>
+          )}
+        </button>
       </div>
+             <p className="text-sm text-yellow-200/70 text-center mt-3">
+         We respect your privacy. 
+                   <button 
+            onClick={async () => {
+              const email = prompt('Enter your email to unsubscribe:');
+              if (email) {
+                try {
+                  const response = await fetch('http://localhost:5000/api/newsletter/unsubscribe', {
+                    method: 'POST',
+                    headers: {
+                      'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ email })
+                  });
+
+                  const data = await response.json();
+
+                  if (data.success) {
+                    toast.success(data.message);
+                  } else {
+                    toast.warning(data.message);
+                  }
+                } catch (error) {
+                  console.error('Unsubscribe error:', error);
+                  toast.error('❌ Failed to unsubscribe. Please try again.');
+                }
+              }
+            }}
+            className="text-yellow-400 hover:text-yellow-300 underline transition-colors ml-1"
+          >
+            Unsubscribe
+          </button>
+          {' '}at any time.
+       </p>
+    </div>
+  </div>
+</div>
 
       {/* Main Footer Content */}
       <div className="bg-black/60 backdrop-blur-md">
         <div className="max-w-6xl mx-auto px-4 py-12">
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-            {/* Quick Links */}
-            <div className="text-yellow-200">
-              <h3 className="text-xl font-bold mb-4 text-yellow-400 border-b border-yellow-400/30 pb-2">Quick Links</h3>
-              <div className="space-y-2">
-                <ul className="space-y-2">
-                  <li><a href="/about" className="hover:text-yellow-300 transition-colors flex items-center">
-                    <span className="w-2 h-2 bg-yellow-400 rounded-full mr-3"></span>
-                    About
-                  </a></li>
-                  <li><a href="/schedule" className="hover:text-yellow-300 transition-colors flex items-center">
-                    <span className="w-2 h-2 bg-yellow-400 rounded-full mr-3"></span>
-                    Schedule
-                  </a></li>
-                  <li><a href="/gallery" className="hover:text-yellow-300 transition-colors flex items-center">
-                    <span className="w-2 h-2 bg-yellow-400 rounded-full mr-3"></span>
-                    Gallery
-                  </a></li>
-                  <li><a href="/testimonials" className="hover:text-yellow-300 transition-colors flex items-center">
-                    <span className="w-2 h-2 bg-yellow-400 rounded-full mr-3"></span>
-                    Testimonials
-                  </a></li>
-                </ul>
-              </div>
-            </div>
+                         {/* Quick Links */}
+             <div className="text-yellow-200">
+               <h3 className="text-xl font-bold mb-4 text-yellow-400 border-b border-yellow-400/30 pb-2">Quick Links</h3>
+               <div className="space-y-2">
+                 <ul className="space-y-2">
+                   <li><Link href="/about" className="hover:text-yellow-300 transition-colors flex items-center">
+                     <span className="w-2 h-2 bg-yellow-400 rounded-full mr-3"></span>
+                     About
+                   </Link></li>
+                   <li><Link href="/schedule" className="hover:text-yellow-300 transition-colors flex items-center">
+                     <span className="w-2 h-2 bg-yellow-400 rounded-full mr-3"></span>
+                     Schedule
+                   </Link></li>
+                   <li><Link href="/gallery" className="hover:text-yellow-300 transition-colors flex items-center">
+                     <span className="w-2 h-2 bg-yellow-400 rounded-full mr-3"></span>
+                     Gallery
+                   </Link></li>
+                   <li><Link href="/testimonials" className="hover:text-yellow-300 transition-colors flex items-center">
+                     <span className="w-2 h-2 bg-yellow-400 rounded-full mr-3"></span>
+                     Testimonials
+                   </Link></li>
+                 </ul>
+               </div>
+             </div>
 
             {/* Social Media */}
             <div className="text-yellow-200">
@@ -172,7 +173,7 @@ export default function Footer() {
                   </div>
                   <span>Facebook</span>
                 </a>
-                <a href="https://www.instagram.com/puagmae_fest?igsh=Z2d1NzhyNDduN3hw&utm_source=qr" target="_blank" rel="noopener noreferrer" className="flex items-center space-x-3 hover:text-yellow-300 transition-colors group">
+                <a href="https://instagram.com/puagmaefestival" target="_blank" rel="noopener noreferrer" className="flex items-center space-x-3 hover:text-yellow-300 transition-colors group">
                   <div className="w-8 h-8 bg-gradient-to-br from-yellow-600 to-yellow-700 rounded-full flex items-center justify-center group-hover:scale-110 transition-transform">
                     <svg className="w-4 h-4 text-white" fill="currentColor" viewBox="0 0 24 24">
                       <path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zM12 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z"/>
@@ -234,17 +235,17 @@ export default function Footer() {
                 </div>
               </div>
               
-              {/* Contact Us Button */}
+              {/* Contact Us Button - Enhanced pill-shaped design */}
               <div className="mt-6">
-                <a 
-                  href="/contact" 
-                  className="block w-full bg-gradient-to-br from-yellow-400 via-yellow-500 to-yellow-600 hover:from-yellow-500 hover:via-yellow-600 hover:to-yellow-700 text-black px-6 py-2 rounded-full border-2 border-yellow-300/30 hover:border-yellow-300/60 transition-all duration-300 transform hover:scale-105 shadow-lg hover:shadow-2xl text-center group"
-                >
+                                 <Link 
+                   href="/contact" 
+                   className="block w-full bg-gradient-to-br from-yellow-400 via-yellow-500 to-yellow-600 hover:from-yellow-500 hover:via-yellow-600 hover:to-yellow-700 text-black px-6 py-2 rounded-full border-2 border-yellow-300/30 hover:border-yellow-300/60 transition-all duration-300 transform hover:scale-105 shadow-lg hover:shadow-2xl text-center group"
+                 >
                   <div className="text-center">
                     <div className="text-xs font-bold mb-0.5 tracking-wider uppercase">GET IN TOUCH</div>
                     <div className="text-sm font-semibold">Contact us</div>
                   </div>
-                </a>
+                </Link>
               </div>
             </div>
           </div>
@@ -259,9 +260,9 @@ export default function Footer() {
               © 2025 Puagmae Festival. All rights reserved.
             </div>
             <div className="flex items-center space-x-4">
-              <span className="text-yellow-200/60">Privacy Policy</span>
-              <span className="text-yellow-200/60">Terms of Service</span>
-              <span className="text-yellow-200/60">Cookie Policy</span>
+              <Link href="/privacy" className="hover:text-yellow-300 transition-colors">Privacy Policy</Link>
+              <Link href="/terms" className="hover:text-yellow-300 transition-colors">Terms of Service</Link>
+              <Link href="/cookies" className="hover:text-yellow-300 transition-colors">Cookie Policy</Link>
             </div>
           </div>
         </div>
@@ -338,21 +339,21 @@ export default function Footer() {
         }
       `}</style>
       
-      {/* Toast Container for notifications */}
-      <div className="fixed bottom-4 right-4 z-50">
-        <ToastContainer 
-          position="bottom-right"
-          autoClose={3000}
-          hideProgressBar={false}
-          newestOnTop={false}
-          closeOnClick
-          rtl={false}
-          pauseOnFocusLoss
-          draggable
-          pauseOnHover
-          theme="dark"
-        />
-      </div>
+             {/* Toast Container for notifications */}
+       <div className="fixed bottom-4 right-4 z-50">
+         <ToastContainer 
+           position="bottom-right"
+           autoClose={3000}
+           hideProgressBar={false}
+           newestOnTop={false}
+           closeOnClick
+           rtl={false}
+           pauseOnFocusLoss
+           draggable
+           pauseOnHover
+           theme="dark"
+         />
+       </div>
     </footer>
   );
-}
+} 

@@ -1,28 +1,33 @@
-
 export default function GalleryLoading() {
   return (
-    <div className="min-h-screen pt-24 bg-gradient-to-b from-[#3b2f23] to-black">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 text-center">
-        <h1 className="text-4xl font-bold text-yellow-400 mb-4 animate-pulse">
-          <div className="h-10 bg-gray-200 rounded-lg mb-2 animate-pulse"></div>
-        </h1>
-        <p className="text-xl text-yellow-200/80 mb-4 animate-pulse">
-          <div className="h-6 bg-gray-200 rounded-lg max-w-3xl mx-auto animate-pulse"></div>
-        </p>
+    <div className="min-h-screen pt-24" style={{
+      backgroundImage: 'url(/pattern.jpg)',
+      backgroundSize: 'cover',
+      backgroundPosition: 'center',
+      backgroundRepeat: 'no-repeat',
+      backgroundAttachment: 'fixed'
+    }}>
+      {/* Header Skeleton */}
+      <div className="bg-white shadow-lg">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+          <div className="text-center">
+            <div className="h-10 bg-gray-200 rounded-lg mb-4 animate-pulse"></div>
+            <div className="h-6 bg-gray-200 rounded-lg max-w-3xl mx-auto animate-pulse"></div>
+          </div>
+        </div>
       </div>
 
+      {/* Gallery Grid Skeleton */}
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-        <h2 className="text-2xl font-bold text-yellow-400 mb-4 animate-pulse">Photos</h2>
-        <div className="flex flex-wrap justify-center">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
           {[...Array(6)].map((_, index) => (
-            <div key={index} className="relative h-64 w-1/4 cursor-pointer transition-transform duration-300 hover:scale-105 m-2 bg-gray-200 rounded-lg animate-pulse"></div>
-          ))}
-        </div>
-
-        <h2 className="text-2xl font-bold text-yellow-400 mb-4 mt-12 animate-pulse">Videos</h2>
-        <div className="flex flex-wrap justify-center">
-          {[...Array(3)].map((_, index) => (
-            <div key={index} className="relative h-64 w-1/4 cursor-pointer transition-transform duration-300 hover:scale-105 m-2 bg-gray-200 rounded-lg animate-pulse"></div>
+            <div key={index} className="bg-white rounded-xl shadow-lg overflow-hidden">
+              <div className="h-64 bg-gray-200 animate-pulse"></div>
+              <div className="p-6">
+                <div className="h-6 bg-gray-200 rounded mb-2 animate-pulse"></div>
+                <div className="h-4 bg-gray-200 rounded animate-pulse"></div>
+              </div>
+            </div>
           ))}
         </div>
       </div>
@@ -44,5 +49,4 @@ export default function GalleryLoading() {
       </div>
     </div>
   );
-}
-
+} 

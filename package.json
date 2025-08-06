@@ -11,9 +11,7 @@
   "dependencies": {
     "@tailwindcss/postcss": "^4.1.11",
     "@types/nodemailer": "^6.4.17",
-    "bcrypt": "^6.0.0",
     "cors": "^2.8.5",
-    "mysql2": "^3.14.3",
     "next": "15.4.4",
     "nodemailer": "^7.0.5",
     "postcss": "^8.5.6",
