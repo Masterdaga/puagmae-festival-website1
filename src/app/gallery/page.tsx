@@ -1,234 +1,273 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect, useCallback, useRef } from 'react';
 import Image from 'next/image';
-import Link from 'next/link';
-import { FaCalendarAlt, FaImages, FaPlay, FaExpand } from 'react-icons/fa';
 
 interface GalleryItem {
-  year: string;
-  title: string;
   image: string;
   type: 'photo' | 'video';
 }
 
 const galleryData: GalleryItem[] = [
-  {
-    year: '2016',
-    title: 'PUAGMAE 2016 - Cultural Unity',
-    image: '/PUAGMAE 2016/cultural-unity.png',
-    type: 'photo'
-  },
-  {
-    year: '2015',
-    title: 'PUAGMAE 2015',
-    image: '/PUAGMAE 2015/',
-    type: 'photo'
-  },
-  {
-    year: '2014',
-    title: 'PUAGMAE 2014',
-    image: '/PUAGMAE 2014/',
-    type: 'photo'
-  },
-  {
-    year: '2013',
-    title: 'PUAGMAE 2013',
-    image: '/PUAGMAE 2013/',
-    type: 'photo'
-  },
-  {
-    year: '2012',
-    title: 'PUAGMAE 2012',
-    image: '/PUAGMAE 2012/',
-    type: 'photo'
-  },
-  {
-    year: '2011',
-    title: 'PUAGMAE 2011',
-    image: '/PUAGMAE 2011/',
-    type: 'photo'
-  }
+  { image: '/photos/img1.jpg', type: 'photo' },
+  { image: '/photos/img3.jpg', type: 'photo' },
+  { image: '/photos/img5.jpg', type: 'photo' },
+  { image: '/photos/img6.jpg', type: 'photo' },
+  { image: '/photos/img7.jpg', type: 'photo' },
+  { image: '/photos/img8.jpg', type: 'photo' },
+  { image: '/photos/img9.jpg', type: 'photo' },
+  { image: '/photos/img10.jpg', type: 'photo' },
+  { image: '/photos/img11.jpg', type: 'photo' },
+  { image: '/photos/img12.jpg', type: 'photo' },
+  { image: '/photos/img13.jpg', type: 'photo' },
+  { image: '/photos/img14.jpg', type: 'photo' },
+  { image: '/photos/img15.jpg', type: 'photo' },
+  { image: '/photos/img16.jpg', type: 'photo' },
+  { image: '/photos/img17.jpg', type: 'photo' },
+  { image: '/photos/img18.jpg', type: 'photo' },
+  { image: '/photos/img19.jpg', type: 'photo' },
+  { image: '/photos/img20.jpg', type: 'photo' },
+  { image: '/photos/img21.jpg', type: 'photo' },
+  { image: '/photos/img22.jpg', type: 'photo' },
+  { image: '/photos/img23.jpg', type: 'photo' },
+  { image: '/photos/img24.jpg', type: 'photo' },
+  { image: '/photos/img25.jpg', type: 'photo' },
+  { image: '/photos/img26.jpg', type: 'photo' },
+  { image: '/photos/img28.jpg', type: 'photo' },
+  { image: '/videos/vid1.mp4', type: 'video' },
+  { image: '/videos/vid2.mp4', type: 'video' },
 ];
 
 export default function GalleryPage() {
-  const [selectedYear, setSelectedYear] = useState<string | null>(null);
-  const [selectedImage, setSelectedImage] = useState<string | null>(null);
+  const [selectedIndex, setSelectedIndex] = useState<number | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [mediaType, setMediaType] = useState<'photo' | 'video' | null>(null);
+  const [currentVideoIndex, setCurrentVideoIndex] = useState(0);
+  const [isPlaying, setIsPlaying] = useState(false);
+  const [userMutedStates, setUserMutedStates] = useState<boolean[]>([]);
+  const videoRefs = useRef<(HTMLVideoElement | null)[]>([]);
 
-  const openModal = (image: string) => {
-    setSelectedImage(image);
+  const photos = [...galleryData.filter(item => item.type === 'photo')].reverse();
+  const videos = galleryData.filter(item => item.type === 'video');
+
+  useEffect(() => {
+    videoRefs.current = videoRefs.current.slice(0, videos.length);
+    setUserMutedStates(Array(videos.length).fill(true));
+  }, [videos.length]);
+
+  useEffect(() => {
+    const videoInterval = setInterval(() => {
+      setCurrentVideoIndex(prev => (prev + 1) % videos.length);
+    }, 30000);
+
+    return () => clearInterval(videoInterval);
+  }, [videos.length]);
+
+  useEffect(() => {
+    videoRefs.current.forEach((video, index) => {
+      if (!video) return;
+      
+      if (index === currentVideoIndex) {
+        video.muted = userMutedStates[index];
+        video.play().catch(e => console.log("Autoplay prevented:", e));
+      } else {
+        video.pause();
+        video.currentTime = 0;
+        video.muted = true;
+      }
+    });
+  }, [currentVideoIndex, userMutedStates]);
+
+  const handleMuteChange = (index: number, isMuted: boolean) => {
+    setUserMutedStates(prev => {
+      const newStates = [...prev];
+      newStates[index] = isMuted;
+      return newStates;
+    });
+  };
+
+  const openModal = (index: number, type: 'photo' | 'video') => {
+    setSelectedIndex(index);
+    setMediaType(type);
     setIsModalOpen(true);
+    if (type === 'video') {
+      setIsPlaying(true);
+    }
   };
 
   const closeModal = () => {
     setIsModalOpen(false);
-    setSelectedImage(null);
+    setSelectedIndex(null);
+    setIsPlaying(false);
   };
 
+  const handleNext = useCallback(() => {
+    if (selectedIndex !== null && mediaType) {
+      const items = mediaType === 'photo' ? photos : videos;
+      const newIndex = (selectedIndex + 1) % items.length;
+      setSelectedIndex(newIndex);
+      if (mediaType === 'video') {
+        setIsPlaying(true);
+      }
+    }
+  }, [selectedIndex, mediaType, photos, videos]);
+
+  const handlePrev = useCallback(() => {
+    if (selectedIndex !== null && mediaType) {
+      const items = mediaType === 'photo' ? photos : videos;
+      const newIndex = (selectedIndex - 1 + items.length) % items.length;
+      setSelectedIndex(newIndex);
+      if (mediaType === 'video') {
+        setIsPlaying(true);
+      }
+    }
+  }, [selectedIndex, mediaType, photos, videos]);
+
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (!isModalOpen) return;
+      
+      if (e.key === 'Escape') {
+        closeModal();
+      } else if (e.key === 'ArrowRight') {
+        handleNext();
+      } else if (e.key === 'ArrowLeft') {
+        handlePrev();
+      }
+    };
+
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [isModalOpen, handleNext, handlePrev]);
+
   return (
-    <div className="min-h-screen pt-24 relative overflow-hidden">
-      <div
-        className="fixed inset-0 bg-cover bg-center -z-10"
-        style={{ backgroundImage: "url('/new-adeyababa.jpg')" }}
-      />
-      <div className="absolute inset-0 bg-gradient-to-br from-black via-[#3b2f23] to-black opacity-80 -z-10" />
-      {/* Header */}
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        <div className="shadow-lg rounded-xl p-6" style={{
-          background: 'linear-gradient(to-r, rgba(217, 119, 6, 0.3), rgba(180, 83, 9, 0.3)), linear-gradient(to-r, rgba(0, 0, 0, 0.2), rgba(0, 0, 0, 0.2))',
-          backdropFilter: 'blur(8px)'
-        }}>
-          <div className="text-center">
-            <h1 className="text-4xl font-bold text-yellow-400 mb-4">
-              PUAGMAE Gallery
-            </h1>
-            <p className="text-xl text-yellow-200/80 max-w-3xl mx-auto">
-              Explore the rich history and memorable moments from PUAGMAE events through the years. 
-              Each year brings unique experiences and cultural celebrations.
-            </p>
-          </div>
+    <div className="min-h-screen pt-24 bg-gradient-to-b from-[#3b2f23] to-black">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 text-center">
+        <h1 className="text-4xl font-bold text-yellow-400 mb-4">PUAGMAE Gallery</h1>
+        <div className="text-xl text-yellow-200/80">
+          Explore the rich history and memorable moments from PUAGMAE events.
         </div>
       </div>
 
-      {/* Gallery Grid */}
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-          {galleryData.map((item) => (
-            <div
-              key={item.year}
-              className="bg-gradient-to-r from-yellow-400 to-yellow-600 rounded-xl shadow-lg overflow-hidden hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-2 cursor-pointer"
-              onClick={() => setSelectedYear(selectedYear === item.year ? null : item.year)}
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pb-12">
+        {/* Photos Section */}
+        <div className="mb-16">
+          <h2 className="text-2xl font-bold text-yellow-400 mb-6 pb-2 border-b border-yellow-400/30">Photos</h2>
+          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4">
+            {photos.map((item, index) => (
+              <div 
+                key={index} 
+                className="relative aspect-square w-full cursor-pointer group"
+                onClick={() => openModal(index, 'photo')}
+              >
+                <Image
+                  src={item.image}
+                  alt={`Gallery Image ${photos.length - index}`}
+                  fill
+                  className="object-cover rounded-lg shadow-lg transition-transform duration-300 group-hover:scale-105"
+                />
+                <div className="absolute inset-0 bg-black/20 opacity-0 group-hover:opacity-100 transition-opacity duration-300 rounded-lg" />
+              </div>
+            ))}
+          </div>
+        </div>
+
+        {/* Videos Section */}
+        <div>
+          <h2 className="text-2xl font-bold text-yellow-400 mb-6 pb-2 border-b border-yellow-400/30">Videos</h2>
+          <div className="relative aspect-video w-full overflow-hidden rounded-xl shadow-2xl bg-black/50">
+            <div 
+              className="absolute inset-0 flex transition-transform duration-1000 ease-in-out"
+              style={{ transform: `translateX(-${currentVideoIndex * 100}%)` }}
             >
-              <div className="relative h-64 bg-gradient-to-br from-blue-500 to-purple-600">
-                <div className="absolute inset-0 flex items-center justify-center">
-                  <div className="text-center text-white">
-                    <FaImages className="text-6xl mb-4 opacity-80" />
-                    <h3 className="text-2xl font-bold">{item.title}</h3>
-                    <div className="flex items-center justify-center mt-2">
-                      <FaCalendarAlt className="mr-2" />
-                      <span className="text-lg">{item.year}</span>
-                    </div>
-                  </div>
+              {videos.map((item, index) => (
+                <div key={index} className="relative min-w-full h-full">
+                  <video
+                    ref={el => { videoRefs.current[index] = el }}
+                    src={item.image}
+                    className="w-full h-full object-cover"
+                    controls
+                    autoPlay={currentVideoIndex === index}
+                    muted={currentVideoIndex !== index || userMutedStates[index]}
+                    loop
+                    onVolumeChange={(e) => 
+                      handleMuteChange(index, e.currentTarget.muted)
+                    }
+                  />
                 </div>
-                
-                {/* Overlay for actual images when available */}
-                {item.image && item.image !== '/' && (
-                  <div className="absolute inset-0">
-                    <Image
-                      src={item.image}
-                      alt={item.title}
-                      fill
-                      className="object-cover"
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        openModal(item.image);
-                      }}
-                    />
-                    <div className="absolute inset-0 bg-black bg-opacity-0 hover:bg-opacity-30 transition-all duration-300 flex items-center justify-center">
-                      <FaExpand className="text-white text-3xl opacity-0 hover:opacity-100 transition-opacity duration-300" />
-                    </div>
-                  </div>
-                )}
-              </div>
-              
-              <div className="p-6">
-                <div className="flex items-center justify-between">
-                  <div>
-                    <h3 className="text-xl font-semibold text-black">{item.title}</h3>
-                    <p className="text-black/80 mt-1">Click to explore {item.year} gallery</p>
-                  </div>
-                  <div className="flex space-x-2">
-                    {item.type === 'video' && <FaPlay className="text-black" />}
-                    <FaImages className="text-black" />
-                  </div>
-                </div>
-                
-                {selectedYear === item.year && (
-                  <div className="mt-4 p-4 bg-black/20 rounded-lg">
-                    <p className="text-sm text-black/90">
-                      {item.year} was a remarkable year for PUAGMAE. 
-                      The event brought together communities and celebrated our shared heritage.
-                    </p>
-                    <div className="flex space-x-3 mt-3">
-                      <Link 
-                        href={`/gallery/${item.year}`}
-                        className="text-black font-medium hover:text-black/80"
-                      >
-                        View Photos →
-                      </Link>
-                      <Link 
-                        href={`/gallery/${item.year}/videos`}
-                        className="text-black font-medium hover:text-black/80"
-                      >
-                        Watch Videos →
-                      </Link>
-                    </div>
-                  </div>
-                )}
-              </div>
+              ))}
             </div>
-          ))}
-        </div>
-      </div>
-
-      {/* Featured Section */}
-      <div className="py-16">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="shadow-lg rounded-xl p-6" style={{
-            background: 'linear-gradient(to-r, rgba(217, 119, 6, 0.3), rgba(180, 83, 9, 0.3)), linear-gradient(to-r, rgba(0, 0, 0, 0.2), rgba(0, 0, 0, 0.2))',
-            backdropFilter: 'blur(8px)'
-          }}>
-            <div className="text-center mb-12">
-              <h2 className="text-3xl font-bold text-yellow-400 mb-4">
-                Featured Moments
-              </h2>
-              <p className="text-lg text-yellow-200/80">
-                Some of the most memorable highlights from our events
-              </p>
+            <div className="absolute bottom-6 left-0 right-0 flex justify-center space-x-2">
+              {videos.map((_, index) => (
+                <button
+                  key={index}
+                  onClick={() => setCurrentVideoIndex(index)}
+                  className={`w-3 h-3 rounded-full transition-all ${currentVideoIndex === index ? 'bg-yellow-400 w-6' : 'bg-gray-400/70'}`}
+                  aria-label={`Go to video ${index + 1}`}
+                />
+              ))}
             </div>
-          
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-            {/* Featured items would go here */}
-            <div className="bg-gradient-to-br from-yellow-400 to-orange-500 rounded-xl p-6 text-white">
-              <h3 className="text-xl font-semibold mb-2">Cultural Performances</h3>
-              <p className="text-yellow-100">Traditional dances and music that bring our heritage to life</p>
-            </div>
-            
-            <div className="bg-gradient-to-br from-green-400 to-blue-500 rounded-xl p-6 text-white">
-              <h3 className="text-xl font-semibold mb-2">Community Unity</h3>
-              <p className="text-green-100">Bringing together people from all walks of life</p>
-            </div>
-            
-            <div className="bg-gradient-to-br from-purple-400 to-pink-500 rounded-xl p-6 text-white">
-              <h3 className="text-xl font-semibold mb-2">Youth Engagement</h3>
-              <p className="text-purple-100">Empowering the next generation through cultural education</p>
-            </div>
-          </div>
           </div>
         </div>
       </div>
 
-      {/* Image Modal */}
-      {isModalOpen && selectedImage && (
-        <div className="fixed inset-0 bg-black bg-opacity-75 flex items-center justify-center z-50 p-4">
-          <div className="relative max-w-4xl max-h-full">
+      {/* Image/Video Modal */}
+      {isModalOpen && selectedIndex !== null && mediaType && (
+        <div className="fixed inset-0 bg-black/90 backdrop-blur-sm flex items-center justify-center z-50 p-4">
+          <div className="relative max-w-5xl w-full max-h-[90vh]">
             <button
               onClick={closeModal}
-              className="absolute top-4 right-4 text-white text-2xl hover:text-gray-300 z-10"
+              className="absolute -top-12 right-0 text-white hover:text-yellow-400 transition-colors z-10"
             >
-              ×
+              <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <line x1="18" y1="6" x2="6" y2="18"></line>
+                <line x1="6" y1="6" x2="18" y2="18"></line>
+              </svg>
             </button>
-            <Image
-              src={selectedImage}
-              alt="Gallery Image"
-              width={800}
-              height={600}
-              className="rounded-lg"
-            />
+            
+            <button
+              onClick={handlePrev}
+              className="absolute left-0 -translate-x-12 top-1/2 -translate-y-1/2 text-white hover:text-yellow-400 transition-colors z-10"
+            >
+              <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <polyline points="15 18 9 12 15 6"></polyline>
+              </svg>
+            </button>
+            <button
+              onClick={handleNext}
+              className="absolute right-0 translate-x-12 top-1/2 -translate-y-1/2 text-white hover:text-yellow-400 transition-colors z-10"
+            >
+              <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <polyline points="9 18 15 12 9 6"></polyline>
+              </svg>
+            </button>
+            
+            <div className="w-full h-full flex items-center justify-center">
+              {mediaType === 'photo' ? (
+                <Image
+                  src={photos[selectedIndex].image}
+                  alt="Gallery Image"
+                  width={1200}
+                  height={800}
+                  className="max-w-full max-h-full object-contain rounded-lg"
+                />
+              ) : (
+                <video 
+                  controls 
+                  autoPlay={isPlaying}
+                  muted={!isPlaying}
+                  className="max-w-full max-h-full rounded-lg"
+                  onPlay={() => setIsPlaying(true)}
+                  onPause={() => setIsPlaying(false)}
+                >
+                  <source src={videos[selectedIndex].image} type="video/mp4" />
+                  Your browser does not support the video tag.
+                </video>
+              )}
+            </div>
           </div>
         </div>
       )}
     </div>
   );
-} 
+}
