@@ -204,7 +204,7 @@ export default function GalleryPage() {
                   onClick={() => setCurrentVideoIndex(index)}
                   className={`w-3 h-3 rounded-full transition-all ${currentVideoIndex === index ? 'bg-yellow-400 w-6' : 'bg-gray-400/70'}`}
                   aria-label={`Go to video ${index + 1}`}
-                />
+                ></button>
               ))}
             </div>
           </div>
