@@ -10,11 +10,11 @@ export default function RegisterPage() {
 
   const [submitted, setSubmitted] = useState(false);
   const [loading, setLoading] = useState(false);
-  const [errorMessage, setErrorMessage] = useState(''); 
+  const [errorMessage, setErrorMessage] = useState('');
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
-    setErrorMessage(''); 
+    setErrorMessage('');
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -23,7 +23,7 @@ export default function RegisterPage() {
     setErrorMessage('');
 
     try {
-      const response = await fetch('http://localhost:5000/register', {
+      const response = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/register`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(formData),
@@ -32,14 +32,15 @@ export default function RegisterPage() {
       if (response.status === 409) {
         setErrorMessage('This email is already registered.');
       } else if (!response.ok) {
-        setErrorMessage('Something went wrong. Please try again.');
+        const data = await response.json();
+        setErrorMessage(data?.message || 'Something went wrong. Please try again.');
       } else {
         setSubmitted(true);
-        setFormData({ name: '', email: '', phone: '' }); 
+        setFormData({ name: '', email: '', phone: '' });
       }
     } catch (error) {
       console.error('Submission error:', error);
-      setErrorMessage('Something went wrong. Please try again.');
+      setErrorMessage('Failed to connect to server. Is it running?');
     } finally {
       setLoading(false);
     }
@@ -55,7 +56,7 @@ export default function RegisterPage() {
         style={{ backgroundImage: "url('/new-adeyababa.jpg')" }}
       />
       <div className="absolute inset-0 bg-gradient-to-br from-black via-[#3b2f23] to-black opacity-80 -z-10" />
-      
+
       <div className="absolute inset-0 opacity-10">
         <div className="absolute top-20 left-10 w-32 h-32 bg-yellow-400 rounded-full blur-3xl"></div>
         <div className="absolute top-40 right-20 w-48 h-48 bg-amber-400 rounded-full blur-3xl"></div>
@@ -64,7 +65,6 @@ export default function RegisterPage() {
         <div className="absolute top-1/2 left-1/2 w-64 h-64 bg-amber-300 rounded-full blur-3xl transform -translate-x-1/2 -translate-y-1/2"></div>
       </div>
 
-      
       <div className="relative bg-white/90 backdrop-blur-sm shadow-md border border-[#c8b580] rounded-xl p-8 w-full max-w-lg mt-20">
         <h1 className="text-3xl font-bold text-yellow-700 mb-6 text-center">
           Register for PUAGME Festival
@@ -140,9 +140,10 @@ export default function RegisterPage() {
               </button>
             </form>
 
-           
             {errorMessage && (
-              <p className="mt-4 text-center text-red-600 font-semibold">{errorMessage}</p>
+              <p className="mt-4 text-center text-red-600 font-semibold">
+                {errorMessage}
+              </p>
             )}
           </>
         )}
