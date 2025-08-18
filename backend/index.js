@@ -50,10 +50,12 @@ function generatePDF({ name, email, phone }) {
     const stream = fs.createWriteStream(filePath);
     doc.pipe(stream);
 
-    // Add logo if exists
+    // Add logo at the very top center
     const logoPath = path.join(__dirname, 'public', 'logo.png');
     if (fs.existsSync(logoPath)) {
-      doc.image(logoPath, { fit: [100, 100], align: 'center' }).moveDown(1);
+      const pageWidth = doc.page.width;
+      doc.image(logoPath, (pageWidth - 100) / 2, 40, { width: 100 });
+      doc.moveDown(4); // add spacing after logo
     }
 
     doc
