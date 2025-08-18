@@ -6,7 +6,7 @@ const landingSlides = [
   {
     id: 1,
     title: 'PUAGMAE FESTIVAL',
-    subtitle: 'Experience the Magic'
+            subtitle: 'A vibrant and immersive celebration of the African Golden 13th Month.'
   }
 ];
 
