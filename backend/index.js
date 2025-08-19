@@ -7,12 +7,10 @@ const fs = require('fs');
 const path = require('path');
 const os = require('os');
 const mongoose = require('mongoose');
-const bcrypt = require('bcryptjs');
 const validator = require('validator');
 const basicAuth = require('express-basic-auth');
 
 // Database Connection with error handling
-// Database Connection (UPDATED)
 mongoose.connect(process.env.MONGODB_URI)
 .then(() => console.log('✅ Connected to MongoDB'))
 .catch(err => {
@@ -45,17 +43,25 @@ const userSchema = new mongoose.Schema({
       message: 'Please provide a valid phone number'
     }
   },
+  emailSent: {
+    type: Boolean,
+    default: false
+  },
+  emailError: {
+    type: String,
+    default: null
+  },
   registeredAt: { 
     type: Date, 
     default: Date.now 
   }
 }, {
-  timestamps: true // Adds createdAt and updatedAt automatically
+  timestamps: true
 });
 
 const User = mongoose.model('User', userSchema);
 
-// Admin credentials (store securely in production)
+// Admin credentials
 const adminUsers = {
   [process.env.ADMIN_USER || 'admin']: process.env.ADMIN_PASS || 'puagme2023'
 };
@@ -64,11 +70,17 @@ const adminUsers = {
 const app = express();
 const PORT = process.env.PORT || 5000;
 
-// Middleware
+// Middleware - Enhanced CORS
 app.use(cors({
   origin: process.env.FRONTEND_URL || 'http://localhost:3000',
-  credentials: true
+  credentials: true,
+  methods: ['GET', 'POST', 'OPTIONS'],
+  allowedHeaders: ['Content-Type', 'Authorization']
 }));
+
+// Handle preflight requests
+app.options('*', cors());
+
 app.use(express.json());
 app.use('/public', express.static(path.join(__dirname, 'public')));
 
@@ -81,13 +93,20 @@ const transporter = nodemailer.createTransport({
     pass: process.env.EMAIL_PASS
   },
   tls: {
-    rejectUnauthorized: false // For local testing only
+    rejectUnauthorized: false
   }
 });
 
+// Verify email configuration
+transporter.verify((error) => {
+  if (error) {
+    console.warn('⚠️ Email service not fully configured:', error.message);
+  } else {
+    console.log('✅ Email service ready');
+  }
+});
 
-
-// PDF generation function (FIXED VERSION)
+// PDF generation function
 async function generatePDF(user) {
   return new Promise((resolve, reject) => {
     const doc = new PDFDocument({ margin: 50 });
@@ -118,13 +137,6 @@ async function generatePDF(user) {
       .text(`Name: ${user.name}`)
       .text(`Email: ${user.email}`)
       .text(`Phone: ${user.phone}`)
-      .moveDown(2);
-
-    doc
-      .fontSize(14)
-      .text(`Dear ${user.name},\n\nThank you for registering for the PUAGME Festival. We're excited to welcome you to this inspiring event that celebrates unity, culture, and empowerment.`)
-      .moveDown(1)
-      .text(`The festival kicks off on September 6 and will span 5 unforgettable days.`)
       .moveDown(2);
 
     const schedule = [
@@ -158,12 +170,6 @@ async function generatePDF(user) {
   });
 }
 
-
-
-
-
-
-
 // 🔒 Admin Routes
 app.use('/admin', basicAuth({
   users: adminUsers,
@@ -180,9 +186,11 @@ app.get('/admin/registrations', async (req, res) => {
   }
 });
 
-// Enhanced registration endpoint
+// ✅ Enhanced registration endpoint - SUCCEEDS EVEN IF EMAIL FAILS
 app.post('/register', async (req, res) => {
   try {
+    console.log('📨 Received registration attempt:', req.body);
+    
     const { name, email, phone } = req.body;
     
     // Validation
@@ -200,49 +208,48 @@ app.post('/register', async (req, res) => {
       });
     }
 
-    // Create user in database
-    const newUser = await User.create({ name, email, phone });
+    // Check for existing user
+    const existingUser = await User.findOne({ 
+      $or: [{ email: email.toLowerCase() }, { phone: phone.trim() }] 
+    });
+    
+    if (existingUser) {
+      return res.status(409).json({
+        error: 'DuplicateError',
+        message: 'Email or phone number already registered'
+      });
+    }
 
-    // Generate and send confirmation
-    const pdfPath = await generatePDF(newUser);
-    await transporter.sendMail({
-      from: `"PUAGME Festival" <${process.env.EMAIL_USER}>`,
-      to: email,
-      subject: 'Your Registration Confirmation',
-      html: `
-        <h1>Welcome to PUAGME Festival!</h1>
-        <p>Dear ${name},</p>
-        <p>Thank you for registering. Your details:</p>
-        <ul>
-          <li>Email: ${email}</li>
-          <li>Phone: ${phone}</li>
-        </ul>
-        <p>See attachment for official confirmation.</p>
-      `,
-      attachments: [{
-        filename: 'PUAGME_Confirmation.pdf',
-        path: pdfPath
-      }]
+    // Create user in database FIRST (registration always succeeds)
+    const newUser = await User.create({ 
+      name: name.trim(), 
+      email: email.toLowerCase().trim(), 
+      phone: phone.trim(),
+      emailSent: false
     });
 
-    // Cleanup temp file
-    fs.unlink(pdfPath, (err) => {
-      if (err) console.error('Error deleting temp PDF:', err);
-    });
+    console.log('✅ User registered successfully:', newUser.email);
 
+    // Send immediate response - registration is successful
     res.status(201).json({
       success: true,
-      message: 'Registration complete! Check your email.',
-      userId: newUser._id
+      message: 'Registration complete!',
+      userId: newUser._id,
+      emailSent: false // Will be updated async
+    });
+
+    // ✅ Handle email in BACKGROUND (non-blocking)
+    sendConfirmationEmail(newUser).catch(emailError => {
+      console.warn('⚠️ Email sending failed (non-critical):', emailError.message);
     });
 
   } catch (error) {
-    console.error('Registration Error:', error);
+    console.error('❌ Registration Error:', error);
     
     if (error.code === 11000) {
       return res.status(409).json({
         error: 'DuplicateError',
-        message: 'Email already registered'
+        message: 'Email or phone number already registered'
       });
     }
     
@@ -253,21 +260,77 @@ app.post('/register', async (req, res) => {
   }
 });
 
+// ✅ Async function to send confirmation email (non-blocking)
+async function sendConfirmationEmail(user) {
+  try {
+    const pdfPath = await generatePDF(user);
+    
+    await transporter.sendMail({
+      from: `"PUAGME Festival" <${process.env.EMAIL_USER}>`,
+      to: user.email,
+      subject: 'Your PUAGME Festival Registration Confirmation',
+      html: `
+        <h1>Welcome to PUAGME Festival!</h1>
+        <p>Dear ${user.name},</p>
+        <p>Thank you for registering for the PUAGME Festival. We're excited to have you join us!</p>
+        <p><strong>Your registration details:</strong></p>
+        <ul>
+          <li><strong>Name:</strong> ${user.name}</li>
+          <li><strong>Email:</strong> ${user.email}</li>
+          <li><strong>Phone:</strong> ${user.phone}</li>
+        </ul>
+        <p>Please find your official confirmation attached to this email.</p>
+        <p>We look forward to celebrating with you!</p>
+        <br>
+        <p><em>— The PUAGME Festival Team</em></p>
+      `,
+      attachments: [{
+        filename: 'PUAGME_Confirmation.pdf',
+        path: pdfPath
+      }]
+    });
+
+    // Update user record to indicate email was sent
+    await User.findByIdAndUpdate(user._id, { 
+      emailSent: true,
+      emailError: null 
+    });
+
+    console.log('✅ Confirmation email sent to:', user.email);
+
+    // Cleanup temp file
+    fs.unlink(pdfPath, (err) => {
+      if (err) console.warn('⚠️ Could not delete temp PDF:', err.message);
+    });
+
+  } catch (emailError) {
+    console.error('❌ Email sending failed for:', user.email, emailError.message);
+    
+    // Update user record with error (but registration still succeeded)
+    await User.findByIdAndUpdate(user._id, { 
+      emailSent: false,
+      emailError: emailError.message 
+    });
+  }
+}
+
 // Health check endpoint
 app.get('/', (req, res) => {
   res.json({
     status: 'healthy',
     server: 'PUAGME Festival Backend',
     version: '1.0.0',
-    database: mongoose.connection.readyState === 1 ? 'connected' : 'disconnected'
+    database: mongoose.connection.readyState === 1 ? 'connected' : 'disconnected',
+    email: process.env.EMAIL_USER ? 'configured' : 'not configured'
   });
 });
 
 // Start server
 app.listen(PORT, () => {
   console.log(`\n🚀 Server running on port ${PORT}`);
-  console.log(`📧 Email service: ${process.env.EMAIL_USER ? 'Configured' : 'Disabled'}`);
+  console.log(`📧 Email service: ${process.env.EMAIL_USER ? 'Configured' : 'Not configured'}`);
   console.log(`🌐 CORS allowed: ${process.env.FRONTEND_URL || 'http://localhost:3000'}`);
   console.log(`🔐 Admin panel: http://localhost:${PORT}/admin/registrations`);
   console.log(`🛡️  Admin username: ${Object.keys(adminUsers)[0]}`);
+  console.log(`💡 Registration will succeed even if email fails`);
 });

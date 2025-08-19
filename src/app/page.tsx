@@ -145,10 +145,10 @@ export default function Home() {
             <div className="flex flex-col sm:flex-row items-center justify-center gap-6">
               
               <Link href="/Registration">
-                <a className="group relative px-10 py-5 bg-gradient-to-r from-yellow-400 via-yellow-500 to-yellow-600 text-black font-bold rounded-full text-xl shadow-xl hover:from-yellow-500 hover:to-yellow-700 transition-all duration-300 transform hover:scale-105 hover:shadow-yellow-400/40">
+                <button className="group relative px-10 py-5 bg-gradient-to-r from-yellow-400 via-yellow-500 to-yellow-600 text-black font-bold rounded-full text-xl shadow-xl hover:from-yellow-500 hover:to-yellow-700 transition-all duration-300 transform hover:scale-105 hover:shadow-yellow-400/40">
                   <span className="relative z-10">Register Now</span>
                   <span className="absolute inset-0 rounded-full border-2 border-yellow-400 opacity-30 group-hover:opacity-60 transition-all duration-300 pointer-events-none"></span>
-                </a>
+                </button>
               </Link>
               <Link href="/about">
                <button className="px-10 py-5 border-2 border-yellow-400 text-yellow-200 font-semibold rounded-full text-xl bg-black/40 hover:bg-yellow-400/10 hover:border-yellow-400 transition-all duration-300 shadow-lg hover:shadow-yellow-400/30">
