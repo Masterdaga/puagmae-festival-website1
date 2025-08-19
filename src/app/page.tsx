@@ -24,19 +24,11 @@ export default function Home() {
       <div className="relative z-10">
         <LandingCarousel />
 
-        {/* Countdown Section */}
-        <section className="py-24 px-4">
+        
+
+                 {/* Countdown Section */}
+         <section className="py-16 px-4">
           <div className="container mx-auto max-w-6xl">
-            <div className="text-center mb-16">
-              <h2 className="text-4xl md:text-6xl font-bold text-white mb-6">
-                <span className="text-yellow-400">Countdown to</span>
-                <br />
-                <span className="text-white">The Festival</span>
-              </h2>
-              <p className="text-xl text-yellow-100/70 max-w-2xl mx-auto">
-                Don't miss out on the most anticipated cultural event of the year
-              </p>
-            </div>
             <CountdownTimer />
           </div>
         </section>

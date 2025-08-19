@@ -1,6 +1,7 @@
 'use client';
 
 import { useState } from 'react';
+import Link from 'next/link';
 import { toast, ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 
@@ -257,9 +258,9 @@ export default function Footer() {
               © 2025 Puagmae Festival. All rights reserved.
             </div>
             <div className="flex items-center space-x-4">
-              <span className="text-yellow-200/60">Privacy Policy</span>
-              <span className="text-yellow-200/60">Terms of Service</span>
-              <span className="text-yellow-200/60">Cookie Policy</span>
+              <Link href="/privacy-policy" className="text-yellow-200/60 hover:text-yellow-300 transition-colors">Privacy Policy</Link>
+              <Link href="/terms-of-service" className="text-yellow-200/60 hover:text-yellow-300 transition-colors">Terms of Service</Link>
+              <Link href="/cookie-policy" className="text-yellow-200/60 hover:text-yellow-300 transition-colors">Cookie Policy</Link>
             </div>
           </div>
         </div>

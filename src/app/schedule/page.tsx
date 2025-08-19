@@ -79,7 +79,19 @@ export default function FestivalSchedule() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-950 via-amber-900 to-yellow-700 relative overflow-hidden pt-24 pb-12">
+    <div className="min-h-screen relative overflow-x-hidden pt-24 pb-12">
+      {/* Background Image */}
+      <div
+        className="fixed inset-0 bg-cover bg-center -z-10"
+        style={{ backgroundImage: "url('/new-adeyababa.jpg')" }}
+      />
+      <div className="absolute inset-0 bg-gradient-to-br from-black via-[#3b2f23] to-black opacity-80 -z-10" />
+      
+      {/* Subtle gold accent */}
+      <div className="pointer-events-none fixed top-0 left-0 z-0">
+        <div className="w-40 h-40 bg-yellow-500 opacity-20 rounded-full blur-2xl" />
+      </div>
+
       {/* Background and main content */}
       <div className="relative z-10 max-w-6xl mx-auto px-4 sm:px-6 py-8">
         {/* Header */}

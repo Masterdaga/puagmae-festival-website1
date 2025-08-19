@@ -97,15 +97,71 @@ async function generatePDF(user) {
     const stream = fs.createWriteStream(tempPath);
     
     doc.pipe(stream);
-    
-    // Add your PDF content here (logo, text, etc.)
-    doc.fontSize(20).text('PUAGME Festival Registration', { align: 'center' });
-    doc.moveDown();
-    doc.fontSize(14).text(`Name: ${user.name}`);
-    doc.text(`Email: ${user.email}`);
-    doc.text(`Phone: ${user.phone}`);
-    
-    doc.end();
+
+// Add logo at the very top center
+const logoPath = path.join(__dirname, 'public', 'logo.png');
+if (fs.existsSync(logoPath)) {
+  const pageWidth = doc.page.width;
+  doc.image(logoPath, (pageWidth - 100) / 2, 40, { width: 100 });
+  doc.moveDown(4); // add spacing after logo
+}
+
+doc
+  .fontSize(24)
+  .fillColor('#1F4E79')
+  .text('PUAGME Festival Registration Confirmation', { align: 'center', underline: true })
+  .moveDown(2);
+
+doc
+  .fontSize(16)
+  .fillColor('#000')
+  .text('Registrant Details', { underline: true })
+  .moveDown(0.5)
+  .fontSize(14)
+  .text(`Name: ${name}`)
+  .text(`Email: ${email}`)
+  .text(`Phone: ${phone}`)
+  .moveDown(2);
+
+doc
+  .fontSize(14)
+  .text(
+    `Dear ${name},\n\nThank you for registering for the PUAGME Festival. We're excited to welcome you to this inspiring event that celebrates unity, culture, and empowerment.`
+  )
+  .moveDown(1)
+  .text(`The festival kicks off on September 6 and will span 5 unforgettable days. Below is your full event schedule.`)
+  .moveDown(2);
+
+const schedule = [
+  { date: 'September 6', event: 'Peace and Love Day' },
+  { date: 'September 7', event: 'Pan-Africanism Day' },
+  { date: 'September 8', event: 'The Great Run on the Rain Day' },
+  { date: 'September 9', event: 'Trade Day' },
+  { date: 'September 10', event: 'Beauty Pageant & Live Concert' },
+];
+
+doc.fontSize(16).fillColor('#000').text('Festival Schedule', { underline: true }).moveDown(1);
+
+schedule.forEach(({ date, event }) => {
+  doc.fontSize(13).text(`${date}: ${event}`, { indent: 20 });
+});
+
+doc.moveDown(2);
+
+doc
+  .fontSize(14)
+  .fillColor('#333')
+  .text(
+    `Please keep this confirmation for your records. We look forward to celebrating with you at the PUAGME Festival.`,
+    { align: 'left' }
+  )
+  .moveDown(2)
+  .fontSize(12)
+  .fillColor('#888')
+  .text('— PUAGME Festival Team', { align: 'right', italic: true });
+
+doc.end();
+
     
     stream.on('finish', () => resolve(tempPath));
     stream.on('error', reject);

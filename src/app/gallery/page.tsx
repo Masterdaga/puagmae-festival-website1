@@ -141,8 +141,20 @@ export default function GalleryPage() {
   }, [isModalOpen, handleNext, handlePrev]);
 
   return (
-    <div className="min-h-screen pt-24 bg-gradient-to-b from-[#3b2f23] to-black">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 text-center">
+    <div className="min-h-screen pt-24 relative overflow-x-hidden">
+      {/* Background Image */}
+      <div
+        className="fixed inset-0 bg-cover bg-center -z-10"
+        style={{ backgroundImage: "url('/new-adeyababa.jpg')" }}
+      />
+      <div className="absolute inset-0 bg-gradient-to-br from-black via-[#3b2f23] to-black opacity-80 -z-10" />
+      
+      {/* Subtle gold accent */}
+      <div className="pointer-events-none fixed top-0 left-0 z-0">
+        <div className="w-40 h-40 bg-yellow-500 opacity-20 rounded-full blur-2xl" />
+      </div>
+
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 text-center relative z-10">
         <h1 className="text-4xl font-bold text-yellow-400 mb-4">PUAGMAE Gallery</h1>
         <div className="text-xl text-yellow-200/80">
           Explore the rich history and memorable moments from PUAGMAE events.
