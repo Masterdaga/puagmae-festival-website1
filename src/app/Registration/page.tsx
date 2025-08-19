@@ -1,6 +1,10 @@
 'use client';
 import { useState } from 'react';
 
+// Add this right after your useState hooks
+console.log('API URL:', process.env.NEXT_PUBLIC_API_BASE_URL);
+
+
 export default function RegisterPage() {
   const [formData, setFormData] = useState({
     name: '',
@@ -46,6 +50,13 @@ export default function RegisterPage() {
       });
 
       clearTimeout(timeoutId);
+      
+      // Check if response is JSON
+      const contentType = response.headers.get('content-type');
+      if (!contentType || !contentType.includes('application/json')) {
+        throw new Error('Server returned invalid response');
+      }
+      
       const data = await response.json();
 
       if (!response.ok) {
@@ -78,6 +89,8 @@ export default function RegisterPage() {
       
       if (err.name === 'AbortError') {
         setError('Request timeout. Please check your connection and try again.');
+      } else if (err.message === 'Server returned invalid response') {
+        setError('Server error. Please try again later.');
       } else {
         setError(
           err.message || 'Failed to connect to server. Please try again.'

@@ -6,60 +6,33 @@ const PDFDocument = require('pdfkit');
 const fs = require('fs');
 const path = require('path');
 const os = require('os');
-const mongoose = require('mongoose');
+const sqlite3 = require('sqlite3').verbose();
 const validator = require('validator');
 const basicAuth = require('express-basic-auth');
 
-// Database Connection with error handling
-mongoose.connect(process.env.MONGODB_URI)
-.then(() => console.log('✅ Connected to MongoDB'))
-.catch(err => {
-  console.error('❌ MongoDB connection error:', err.message);
-  process.exit(1);
-});
+// SQLite Database Setup
+const dbPath = path.join(__dirname, 'registrations.db');
+const db = new sqlite3.Database(dbPath);
 
-// Enhanced User Schema with validation
-const userSchema = new mongoose.Schema({
-  name: { 
-    type: String, 
-    required: [true, 'Name is required'],
-    trim: true,
-    maxlength: [100, 'Name cannot exceed 100 characters']
-  },
-  email: { 
-    type: String, 
-    required: [true, 'Email is required'],
-    unique: true,
-    lowercase: true,
-    validate: [validator.isEmail, 'Please provide a valid email']
-  },
-  phone: {
-    type: String,
-    required: [true, 'Phone number is required'],
-    validate: {
-      validator: function(v) {
-        return /^[+]?[\d\s\-()]{10,20}$/.test(v);
-      },
-      message: 'Please provide a valid phone number'
-    }
-  },
-  emailSent: {
-    type: Boolean,
-    default: false
-  },
-  emailError: {
-    type: String,
-    default: null
-  },
-  registeredAt: { 
-    type: Date, 
-    default: Date.now 
-  }
-}, {
-  timestamps: true
+// Create users table if it doesn't exist
+db.serialize(() => {
+  db.run(`
+    CREATE TABLE IF NOT EXISTS users (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      name TEXT NOT NULL,
+      email TEXT UNIQUE NOT NULL,
+      phone TEXT NOT NULL,
+      emailSent INTEGER DEFAULT 0,
+      emailError TEXT DEFAULT NULL,
+      registeredAt DATETIME DEFAULT CURRENT_TIMESTAMP,
+      createdAt DATETIME DEFAULT CURRENT_TIMESTAMP,
+      updatedAt DATETIME DEFAULT CURRENT_TIMESTAMP
+    )
+  `);
+  
+  db.run('CREATE INDEX IF NOT EXISTS idx_email ON users (email)');
+  db.run('CREATE INDEX IF NOT EXISTS idx_phone ON users (phone)');
 });
-
-const User = mongoose.model('User', userSchema);
 
 // Admin credentials
 const adminUsers = {
@@ -67,8 +40,8 @@ const adminUsers = {
 };
 
 // Express setup
-const app = express();
 const PORT = process.env.PORT || 5000;
+const app = express();
 
 // Middleware - Enhanced CORS
 app.use(cors({
@@ -80,7 +53,6 @@ app.use(cors({
 
 // Handle preflight requests
 app.options('*', cors());
-
 app.use(express.json());
 app.use('/public', express.static(path.join(__dirname, 'public')));
 
@@ -177,13 +149,14 @@ app.use('/admin', basicAuth({
   unauthorizedResponse: 'Unauthorized access'
 }));
 
-app.get('/admin/registrations', async (req, res) => {
-  try {
-    const users = await User.find().sort({ registeredAt: -1 });
-    res.json(users);
-  } catch (error) {
-    res.status(500).json({ error: 'Failed to fetch registrations' });
-  }
+app.get('/admin/registrations', (req, res) => {
+  db.all('SELECT * FROM users ORDER BY registeredAt DESC', (err, rows) => {
+    if (err) {
+      console.error('Database error:', err);
+      return res.status(500).json({ error: 'Failed to fetch registrations' });
+    }
+    res.json(rows);
+  });
 });
 
 // ✅ Enhanced registration endpoint - SUCCEEDS EVEN IF EMAIL FAILS
@@ -209,50 +182,67 @@ app.post('/register', async (req, res) => {
     }
 
     // Check for existing user
-    const existingUser = await User.findOne({ 
-      $or: [{ email: email.toLowerCase() }, { phone: phone.trim() }] 
-    });
-    
-    if (existingUser) {
-      return res.status(409).json({
-        error: 'DuplicateError',
-        message: 'Email or phone number already registered'
-      });
-    }
+    db.get(
+      'SELECT * FROM users WHERE email = ? OR phone = ?',
+      [email.toLowerCase(), phone.trim()],
+      (err, existingUser) => {
+        if (err) {
+          console.error('Database error:', err);
+          return res.status(500).json({
+            error: 'InternalError',
+            message: 'Registration failed. Please try again.'
+          });
+        }
 
-    // Create user in database FIRST (registration always succeeds)
-    const newUser = await User.create({ 
-      name: name.trim(), 
-      email: email.toLowerCase().trim(), 
-      phone: phone.trim(),
-      emailSent: false
-    });
+        if (existingUser) {
+          return res.status(409).json({
+            error: 'DuplicateError',
+            message: 'Email or phone number already registered'
+          });
+        }
 
-    console.log('✅ User registered successfully:', newUser.email);
+        // Create user in database
+        db.run(
+          'INSERT INTO users (name, email, phone, emailSent) VALUES (?, ?, ?, ?)',
+          [name.trim(), email.toLowerCase().trim(), phone.trim(), 0],
+          function (err) {
+            if (err) {
+              console.error('Database error:', err);
+              return res.status(500).json({
+                error: 'InternalError',
+                message: 'Registration failed. Please try again.'
+              });
+            }
 
-    // Send immediate response - registration is successful
-    res.status(201).json({
-      success: true,
-      message: 'Registration complete!',
-      userId: newUser._id,
-      emailSent: false // Will be updated async
-    });
+            const newUser = {
+              id: this.lastID,
+              name: name.trim(),
+              email: email.toLowerCase().trim(),
+              phone: phone.trim(),
+              emailSent: false
+            };
 
-    // ✅ Handle email in BACKGROUND (non-blocking)
-    sendConfirmationEmail(newUser).catch(emailError => {
-      console.warn('⚠️ Email sending failed (non-critical):', emailError.message);
-    });
+            console.log('✅ User registered successfully:', newUser.email);
+
+            // Send immediate response - registration is successful
+            res.status(201).json({
+              success: true,
+              message: 'Registration complete!',
+              userId: newUser.id,
+              emailSent: false // Will be updated async
+            });
+
+            // ✅ Handle email in BACKGROUND (non-blocking)
+            sendConfirmationEmail(newUser).catch(emailError => {
+              console.warn('⚠️ Email sending failed (non-critical):', emailError.message);
+            });
+          }
+        );
+      }
+    );
 
   } catch (error) {
     console.error('❌ Registration Error:', error);
-    
-    if (error.code === 11000) {
-      return res.status(409).json({
-        error: 'DuplicateError',
-        message: 'Email or phone number already registered'
-      });
-    }
-    
     res.status(500).json({
       error: 'InternalError',
       message: 'Registration failed. Please try again.'
@@ -291,10 +281,10 @@ async function sendConfirmationEmail(user) {
     });
 
     // Update user record to indicate email was sent
-    await User.findByIdAndUpdate(user._id, { 
-      emailSent: true,
-      emailError: null 
-    });
+    db.run(
+      'UPDATE users SET emailSent = 1, emailError = NULL, updatedAt = CURRENT_TIMESTAMP WHERE id = ?',
+      [user.id]
+    );
 
     console.log('✅ Confirmation email sent to:', user.email);
 
@@ -307,21 +297,34 @@ async function sendConfirmationEmail(user) {
     console.error('❌ Email sending failed for:', user.email, emailError.message);
     
     // Update user record with error (but registration still succeeded)
-    await User.findByIdAndUpdate(user._id, { 
-      emailSent: false,
-      emailError: emailError.message 
-    });
+    db.run(
+      'UPDATE users SET emailSent = 0, emailError = ?, updatedAt = CURRENT_TIMESTAMP WHERE id = ?',
+      [emailError.message, user.id]
+    );
   }
 }
 
 // Health check endpoint
 app.get('/', (req, res) => {
-  res.json({
-    status: 'healthy',
-    server: 'PUAGME Festival Backend',
-    version: '1.0.0',
-    database: mongoose.connection.readyState === 1 ? 'connected' : 'disconnected',
-    email: process.env.EMAIL_USER ? 'configured' : 'not configured'
+  db.get('SELECT COUNT(*) as count FROM users', (err, row) => {
+    if (err) {
+      return res.json({
+        status: 'healthy',
+        server: 'PUAGME Festival Backend',
+        version: '1.0.0',
+        database: 'connected',
+        totalRegistrations: 'error'
+      });
+    }
+    
+    res.json({
+      status: 'healthy',
+      server: 'PUAGME Festival Backend',
+      version: '1.0.0',
+      database: 'connected',
+      totalRegistrations: row.count,
+      email: process.env.EMAIL_USER ? 'configured' : 'not configured'
+    });
   });
 });
 
@@ -332,5 +335,19 @@ app.listen(PORT, () => {
   console.log(`🌐 CORS allowed: ${process.env.FRONTEND_URL || 'http://localhost:3000'}`);
   console.log(`🔐 Admin panel: http://localhost:${PORT}/admin/registrations`);
   console.log(`🛡️  Admin username: ${Object.keys(adminUsers)[0]}`);
+  console.log(`💾 Using SQLite database: registrations.db`);
   console.log(`💡 Registration will succeed even if email fails`);
+});
+
+// Graceful shutdown
+process.on('SIGINT', () => {
+  console.log('\n🛑 Shutting down server...');
+  db.close((err) => {
+    if (err) {
+      console.error('Error closing database:', err);
+    } else {
+      console.log('✅ Database connection closed');
+    }
+    process.exit(0);
+  });
 });
