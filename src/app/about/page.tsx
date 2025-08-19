@@ -31,18 +31,35 @@ export default function AboutPage() {
           {/* Main Content */}
           <div className="flex flex-col md:flex-row gap-10 items-start">
             {/* Info Card */}
-            <div className="flex-1 bg-black/70 rounded-2xl border border-yellow-500 shadow-xl px-12 py-8 space-y-4 min-w-[320px] max-w-4xl mx-auto">
-  <p className="text-lg leading-relaxed text-yellow-200">
-    The Puagmae Festival is a grand celebration of the African Golden 13th Month, a unique cultural event that brings together people from all walks of life to celebrate our rich heritage and traditions. From vibrant performances and cultural displays to delicious food and lively music, this festival is a true reflection of our diverse and colorful culture. Like the Egyptian Coptic calendar, the Ethiopian calendar has a year of 13 months. The first 12 months have 30 days each, and the last 13th month has 5 days and 6 days in a leap year. The name of the 13th month is in Ge'ez and is known as PAGUMIENE. This uniquely short but sweet month of PAGUMIENE just started here in Ethiopia and is going to last for the next six days or five days.
-  </p>
-</div>
+            <div className="flex-1 bg-black/70 rounded-2xl border border-yellow-500 shadow-xl px-8 py-8 space-y-4 min-w-[280px] max-w-4xl mx-auto">
+              <p className="text-lg leading-relaxed text-yellow-200">
+                The Puagmae Festival is a grand celebration of the African Golden 13th Month, a unique cultural event that brings together people from all walks of life to celebrate our rich heritage and traditions. From vibrant performances and cultural displays to delicious food and lively music, this festival is a true reflection of our diverse and colorful culture. Like the Egyptian Coptic calendar, the Ethiopian calendar has a year of 13 months. The first 12 months have 30 days each, and the last 13th month has 5 days and 6 days in a leap year. The name of the 13th month is in Ge'ez and is known as PAGUMIENE. This uniquely short but sweet month of PAGUMIENE just started here in Ethiopia and is going to last for the next six days or five days.
+              </p>
 
-            {/* Festival Card - smaller box */}
+              {/* Small image inside info card */}
+              <div className="mt-4">
+                <img
+                  src="photos/img4.jpg"
+                  alt="Puagmae celebration"
+                  className="w-full h-48 object-cover rounded-lg border border-yellow-600 shadow-md"
+                />
+                <p className="text-sm text-yellow-300 mt-2">Traditional gathering during Puagmae</p>
+              </div>
+            </div>
+
+            {/* Festival Card - shows illustrative image with overlay */}
             <div className="flex items-center justify-center mt-8 md:mt-0">
-  <div className="w-96 h-52 rounded-2xl shadow-2xl flex flex-col items-center justify-center border border-yellow-500 bg-gradient-to-br from-yellow-400 via-yellow-300 to-yellow-600">
-    <span className="text-yellow-900 text-3xl font-extrabold drop-shadow-lg tracking-wide">PUAGMAE FESTIVAL</span>
-  </div>
-</div>
+              <div className="w-96 h-56 rounded-2xl shadow-2xl flex items-end justify-start border border-yellow-500 overflow-hidden relative">
+                <img
+                  src="photos/img22.jpg"
+                  alt="Puagmae festival"
+                  className="absolute inset-0 w-full h-full object-cover"
+                />
+                <div className="relative z-10 p-4 bg-black/40 w-full">
+                  <span className="text-yellow-100 text-2xl font-extrabold drop-shadow-lg tracking-wide">PUAGMAE FESTIVAL</span>
+                </div>
+              </div>
+            </div>
           </div>
 
           {/* Learn More Button */}
@@ -66,11 +83,32 @@ export default function AboutPage() {
                 <p className="text-lg leading-relaxed text-yellow-200">
                   The Puagmae Festival is an opportunity for people to come together and share their stories, traditions, and customs. The festival features a variety of events including traditional dance performances, music concerts, art exhibitions, and food fairs. These events provide a platform for artists and performers to showcase their talents and for attendees to immerse themselves in the rich cultural tapestry of Ethiopia.
                 </p>
+
+                {/* Gallery */}
+                <div>
+                  <h4 className="text-yellow-300 font-semibold mb-4">Festival gallery</h4>
+                  <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                    <img
+                      src="videos/children_on_rain.jpg"
+                      alt="Dancers at Puagmae"
+                      className="w-full h-36 object-cover rounded-lg border border-yellow-600 hover:scale-105 transition-transform"
+                    />
+                    <img
+                      src="videos/a_runway_scene_fea_image_.jpg"
+                      alt="Coffee ceremony"
+                      className="w-full h-36 object-cover rounded-lg border border-yellow-600 hover:scale-105 transition-transform"
+                    />
+                    <img
+                      src="videos/new-adeyababa.jpg"
+                      alt="Artisans and crafts"
+                      className="w-full h-36 object-cover rounded-lg border border-yellow-600 hover:scale-105 transition-transform"
+                    />
+                  </div>
+                  <p className="text-sm text-yellow-300 mt-3">Images are illustrative — add your own photos to /public to replace them.</p>
+                </div>
+
                 <p className="text-lg leading-relaxed text-yellow-200">
                   One of the highlights of the festival is the traditional coffee ceremony, which is an integral part of Ethiopian culture. The ceremony involves roasting coffee beans, grinding them, and brewing the coffee in a special pot called a jebena. This ritual is a symbol of hospitality and community, bringing people together to enjoy the rich flavors and aromas of Ethiopian coffee.
-                </p>
-                <p className="text-lg leading-relaxed text-yellow-200">
-                  The festival also includes cultural sharing from all over African countries, where participants can learn about different customs, languages, and traditions. There are also lively music performances featuring traditional and contemporary African music, fashion shows showcasing vibrant African attire, and cultural trade where artisans and traders display their unique crafts and goods.
                 </p>
                 <p className="text-lg leading-relaxed text-yellow-200">
                   The Puagmae Festival is not just a celebration of the past but also a time to look forward to the future. It provides a space for dialogue and exchange, fostering a sense of unity and shared identity among participants. Whether you are a local resident or a visitor, the Puagmae Festival offers a unique and enriching experience that will leave you with lasting memories.
@@ -111,7 +149,7 @@ export default function AboutPage() {
           </div>
         </div>
       </section>
-
     </div>
   );
 }
+// ...existing code...
