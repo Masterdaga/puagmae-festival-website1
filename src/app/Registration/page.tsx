@@ -5,44 +5,56 @@ export default function RegisterPage() {
   const [formData, setFormData] = useState({
     name: '',
     email: '',
-    phone: '',
+    phone: ''
   });
 
-  const [submitted, setSubmitted] = useState(false);
-  const [loading, setLoading] = useState(false);
-  const [errorMessage, setErrorMessage] = useState('');
+  const [status, setStatus] = useState<'idle'|'loading'|'success'|'error'>('idle');
+  const [error, setError] = useState('');
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
-    setErrorMessage('');
+    if (status === 'error') setStatus('idle');
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    setLoading(true);
-    setErrorMessage('');
+    setStatus('loading');
+    setError('');
 
     try {
-      const response = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/register`, {
+      const apiUrl = process.env.NEXT_PUBLIC_API_BASE_URL || 'http://localhost:5000';
+      
+      const response = await fetch(`${apiUrl}/register`, {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(formData),
+        headers: { 
+          'Content-Type': 'application/json',
+          'Accept': 'application/json'
+        },
+        body: JSON.stringify({
+          name: formData.name.trim(),
+          email: formData.email.trim(),
+          phone: formData.phone.trim()
+        }),
       });
 
-      if (response.status === 409) {
-        setErrorMessage('This email is already registered.');
-      } else if (!response.ok) {
-        const data = await response.json();
-        setErrorMessage(data?.message || 'Something went wrong. Please try again.');
-      } else {
-        setSubmitted(true);
-        setFormData({ name: '', email: '', phone: '' });
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(data?.error || data?.message || 'Registration failed');
       }
-    } catch (error) {
-      console.error('Submission error:', error);
-      setErrorMessage('Failed to connect to server. Is it running?');
-    } finally {
-      setLoading(false);
+
+      setStatus('success');
+      setFormData({ name: '', email: '', phone: '' });
+
+      // Auto-reset success message after 5 seconds
+      setTimeout(() => setStatus('idle'), 5000);
+      
+    } catch (err: any) {
+      console.error('Registration error:', err);
+      setStatus('error');
+      setError(
+        err.message || 'Failed to complete registration. Please try again.'
+      );
     }
   };
 
@@ -70,9 +82,9 @@ export default function RegisterPage() {
           Register for PUAGME Festival
         </h1>
 
-        {submitted ? (
-          <div className="text-center text-green-600 font-semibold">
-            ✅ Thank you! You're registered.
+        {status === 'success' ? (
+          <div className="text-center text-green-600 font-semibold animate-fade-in">
+            ✅ Registration successful! Check your email for confirmation.
           </div>
         ) : (
           <>
@@ -89,9 +101,12 @@ export default function RegisterPage() {
                   name="name"
                   type="text"
                   required
+                  minLength={2}
+                  maxLength={100}
                   value={formData.name}
                   onChange={handleChange}
                   className="w-full px-4 py-2 border border-yellow-600 rounded-md focus:outline-none focus:ring-2 focus:ring-yellow-400"
+                  placeholder="Enter your full name"
                 />
               </div>
 
@@ -110,6 +125,7 @@ export default function RegisterPage() {
                   value={formData.email}
                   onChange={handleChange}
                   className="w-full px-4 py-2 border border-yellow-600 rounded-md focus:outline-none focus:ring-2 focus:ring-yellow-400"
+                  placeholder="Enter your email address"
                 />
               </div>
 
@@ -125,25 +141,40 @@ export default function RegisterPage() {
                   name="phone"
                   type="tel"
                   required
+                  minLength={10}
+                  maxLength={15}
                   value={formData.phone}
                   onChange={handleChange}
                   className="w-full px-4 py-2 border border-yellow-600 rounded-md focus:outline-none focus:ring-2 focus:ring-yellow-400"
+                  placeholder="Enter your phone number"
                 />
               </div>
 
               <button
                 type="submit"
-                disabled={loading}
-                className="w-full bg-yellow-600 hover:bg-yellow-700 text-white font-semibold py-2 rounded-md transition-all duration-300"
+                disabled={status === 'loading'}
+                className={`w-full bg-yellow-600 hover:bg-yellow-700 text-white font-semibold py-2 rounded-md transition-all duration-300 ${
+                  status === 'loading' ? 'opacity-70 cursor-not-allowed' : ''
+                }`}
               >
-                {loading ? 'Submitting...' : 'Submit'}
+                {status === 'loading' ? (
+                  <span className="flex items-center justify-center">
+                    <svg className="animate-spin -ml-1 mr-2 h-4 w-4 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                      <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                      <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                    </svg>
+                    Processing...
+                  </span>
+                ) : (
+                  'Submit'
+                )}
               </button>
             </form>
 
-            {errorMessage && (
-              <p className="mt-4 text-center text-red-600 font-semibold">
-                {errorMessage}
-              </p>
+            {status === 'error' && (
+              <div className="mt-4 p-3 bg-red-50 border border-red-200 text-red-600 rounded-md text-center animate-fade-in">
+                {error || 'Registration failed. Please try again.'}
+              </div>
             )}
           </>
         )}
