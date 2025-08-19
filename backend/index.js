@@ -12,12 +12,8 @@ const validator = require('validator');
 const basicAuth = require('express-basic-auth');
 
 // Database Connection with error handling
-mongoose.connect(process.env.MONGODB_URI, {
-  useNewUrlParser: true,
-  useUnifiedTopology: true,
-  retryWrites: true,
-  w: 'majority'
-})
+// Database Connection (UPDATED)
+mongoose.connect(process.env.MONGODB_URI)
 .then(() => console.log('✅ Connected to MongoDB'))
 .catch(err => {
   console.error('❌ MongoDB connection error:', err.message);
@@ -89,84 +85,84 @@ const transporter = nodemailer.createTransport({
   }
 });
 
-// PDF generation function
+
+
+// PDF generation function (FIXED VERSION)
 async function generatePDF(user) {
   return new Promise((resolve, reject) => {
-    const doc = new PDFDocument();
-    const tempPath = path.join(os.tmpdir(), `puagme-confirmation-${Date.now()}.pdf`);
-    const stream = fs.createWriteStream(tempPath);
+    const doc = new PDFDocument({ margin: 50 });
+    const tempDir = os.tmpdir();
+    const filePath = path.join(tempDir, `confirmation-${Date.now()}.pdf`);
+    const stream = fs.createWriteStream(filePath);
     
     doc.pipe(stream);
 
-// Add logo at the very top center
-const logoPath = path.join(__dirname, 'public', 'logo.png');
-if (fs.existsSync(logoPath)) {
-  const pageWidth = doc.page.width;
-  doc.image(logoPath, (pageWidth - 100) / 2, 40, { width: 100 });
-  doc.moveDown(4); // add spacing after logo
-}
+    // Add logo if exists
+    const logoPath = path.join(__dirname, 'public', 'logo.png');
+    if (fs.existsSync(logoPath)) {
+      doc.image(logoPath, { fit: [100, 100], align: 'center' }).moveDown(1);
+    }
 
-doc
-  .fontSize(24)
-  .fillColor('#1F4E79')
-  .text('PUAGME Festival Registration Confirmation', { align: 'center', underline: true })
-  .moveDown(2);
+    doc
+      .fontSize(24)
+      .fillColor('#1F4E79')
+      .text('PUAGME Festival Registration Confirmation', { align: 'center', underline: true })
+      .moveDown(2);
 
-doc
-  .fontSize(16)
-  .fillColor('#000')
-  .text('Registrant Details', { underline: true })
-  .moveDown(0.5)
-  .fontSize(14)
-  .text(`Name: ${name}`)
-  .text(`Email: ${email}`)
-  .text(`Phone: ${phone}`)
-  .moveDown(2);
+    doc
+      .fontSize(16)
+      .fillColor('#000')
+      .text('Registrant Details', { underline: true })
+      .moveDown(0.5)
+      .fontSize(14)
+      .text(`Name: ${user.name}`)
+      .text(`Email: ${user.email}`)
+      .text(`Phone: ${user.phone}`)
+      .moveDown(2);
 
-doc
-  .fontSize(14)
-  .text(
-    `Dear ${name},\n\nThank you for registering for the PUAGME Festival. We're excited to welcome you to this inspiring event that celebrates unity, culture, and empowerment.`
-  )
-  .moveDown(1)
-  .text(`The festival kicks off on September 6 and will span 5 unforgettable days. Below is your full event schedule.`)
-  .moveDown(2);
+    doc
+      .fontSize(14)
+      .text(`Dear ${user.name},\n\nThank you for registering for the PUAGME Festival. We're excited to welcome you to this inspiring event that celebrates unity, culture, and empowerment.`)
+      .moveDown(1)
+      .text(`The festival kicks off on September 6 and will span 5 unforgettable days.`)
+      .moveDown(2);
 
-const schedule = [
-  { date: 'September 6', event: 'Peace and Love Day' },
-  { date: 'September 7', event: 'Pan-Africanism Day' },
-  { date: 'September 8', event: 'The Great Run on the Rain Day' },
-  { date: 'September 9', event: 'Trade Day' },
-  { date: 'September 10', event: 'Beauty Pageant & Live Concert' },
-];
+    const schedule = [
+      { date: 'September 6', event: 'Peace and Love Day' },
+      { date: 'September 7', event: 'Pan-Africanism Day' },
+      { date: 'September 8', event: 'The Great Run on the Rain Day' },
+      { date: 'September 9', event: 'Trade Day' },
+      { date: 'September 10', event: 'Beauty Pageant & Live Concert' },
+    ];
 
-doc.fontSize(16).fillColor('#000').text('Festival Schedule', { underline: true }).moveDown(1);
+    doc.fontSize(16).fillColor('#000').text('Festival Schedule', { underline: true }).moveDown(1);
 
-schedule.forEach(({ date, event }) => {
-  doc.fontSize(13).text(`${date}: ${event}`, { indent: 20 });
-});
+    schedule.forEach(({ date, event }) => {
+      doc.fontSize(13).text(`${date}: ${event}`, { indent: 20 });
+    });
 
-doc.moveDown(2);
+    doc.moveDown(2);
+    doc
+      .fontSize(14)
+      .fillColor('#333')
+      .text(`Please keep this confirmation for your records. We look forward to celebrating with you at the PUAGME Festival.`)
+      .moveDown(2)
+      .fontSize(12)
+      .fillColor('#888')
+      .text('— PUAGME Festival Team', { align: 'right', italic: true });
 
-doc
-  .fontSize(14)
-  .fillColor('#333')
-  .text(
-    `Please keep this confirmation for your records. We look forward to celebrating with you at the PUAGME Festival.`,
-    { align: 'left' }
-  )
-  .moveDown(2)
-  .fontSize(12)
-  .fillColor('#888')
-  .text('— PUAGME Festival Team', { align: 'right', italic: true });
+    doc.end();
 
-doc.end();
-
-    
-    stream.on('finish', () => resolve(tempPath));
+    stream.on('finish', () => resolve(filePath));
     stream.on('error', reject);
   });
 }
+
+
+
+
+
+
 
 // 🔒 Admin Routes
 app.use('/admin', basicAuth({
