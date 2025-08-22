@@ -18,32 +18,44 @@ export default function ContactPage() {
     });
   };
 
-  const handleEmailClick = () => {
-    const subject = encodeURIComponent(formData.subject || 'PUAGMAE Festival Inquiry');
-    const body = encodeURIComponent(`Hello PUAGMAE Festival Team,
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [resultMessage, setResultMessage] = useState<string | null>(null);
+  const [resultType, setResultType] = useState<'success' | 'error' | null>(null);
 
-I would like to get in touch regarding the festival.
+  const handleSubmit = async () => {
+    setIsSubmitting(true);
+    setResultMessage(null);
+    setResultType(null);
 
-From: ${formData.name} (${formData.email})
-Category: ${selectedCategory || 'General Inquiry'}
+    try {
+      const response = await fetch('http://localhost:5000/api/contact', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          name: formData.name,
+          email: formData.email,
+          subject: formData.subject,
+          message: formData.message,
+          category: selectedCategory || 'general',
+        }),
+      });
 
-Message:
-${formData.message}
-
-Best regards,
-${formData.name}
-${formData.email}`);
-    
-    // Direct web email links with fallback
-    const primaryEmail = 'puagmaef@gmail.com';
-    const fallbackEmail = 'pjafrica.2020@gmail.com';
-    
-    const gmailLink = `https://mail.google.com/mail/?view=cm&fs=1&to=${primaryEmail}&su=${subject}&body=${body}`;
-    const outlookLink = `https://outlook.live.com/mail/0/deeplink/compose?to=${primaryEmail}&subject=${subject}&body=${body}`;
-    const yahooLink = `https://compose.mail.yahoo.com/?to=${primaryEmail}&subject=${subject}&body=${body}`;
-    
-    // Open Gmail by default (most popular)
-    window.open(gmailLink, '_blank');
+      const data = await response.json();
+      if (response.ok && data.success) {
+        setResultType('success');
+        setResultMessage('Your message has been sent successfully. We will get back to you soon.');
+        setFormData({ name: '', email: '', subject: '', message: '' });
+        setSelectedCategory('');
+      } else {
+        setResultType('error');
+        setResultMessage(data.message || 'Failed to send your message. Please try again later.');
+      }
+    } catch (error) {
+      setResultType('error');
+      setResultMessage('Failed to send your message. Please check your internet connection and try again.');
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   const categories = [
@@ -89,7 +101,7 @@ ${formData.email}`);
             </p>
             <div className="space-y-2">
               <h3 className="text-xl font-bold text-yellow-400">PUAGMAE FESTIVAL</h3>
-              <p className="text-lg text-yellow-300">ENTOTO PARK, ADDIS ABABA, ETHIOPIA</p>
+              <p className="text-lg text-yellow-300">Haven Hotel, Ledeta Kefleketema, ADDIS ABABA, ETHIOPIA</p>
             </div>
           </div>
         </div>
@@ -198,26 +210,25 @@ ${formData.email}`);
                 />
               </div>
 
-              {/* Email Button */}
+              {/* Submit Button */}
               <button
-                onClick={handleEmailClick}
-                disabled={!selectedCategory || !formData.name || !formData.email || !formData.subject || !formData.message}
+                onClick={handleSubmit}
+                disabled={isSubmitting || !selectedCategory || !formData.name || !formData.email || !formData.subject || !formData.message}
                 className={`w-full py-4 font-bold text-lg rounded-lg transition-all duration-300 transform ${
-                  !selectedCategory || !formData.name || !formData.email || !formData.subject || !formData.message
+                  isSubmitting || !selectedCategory || !formData.name || !formData.email || !formData.subject || !formData.message
                     ? 'bg-gray-600 text-gray-400 cursor-not-allowed'
                     : 'bg-gradient-to-r from-yellow-400 to-yellow-500 text-black hover:from-yellow-500 hover:to-yellow-600 hover:scale-105 shadow-lg hover:shadow-xl'
                 }`}
               >
-                Send Email
+                {isSubmitting ? 'Sending…' : 'Send Message'}
               </button>
 
-
-
-              {/* Form Tips */}
-              <div className="text-sm text-gray-400 text-center mt-4">
-                <p>💡 <strong>Tip:</strong> Fill out all fields, then click "Send Email" to open Gmail!</p>
-                <p>📧 Opens Gmail.com with pre-filled message to our festival team.</p>
-              </div>
+              {/* Result Message */}
+              {resultMessage && (
+                <div className={`text-sm text-center mt-4 ${resultType === 'success' ? 'text-green-400' : 'text-red-400'}`}>
+                  {resultMessage}
+                </div>
+              )}
             </div>
           </div>
                 </div>

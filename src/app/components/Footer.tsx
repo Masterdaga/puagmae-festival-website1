@@ -10,6 +10,9 @@ export default function Footer() {
   const [isMapPermanent, setIsMapPermanent] = useState(false);
   const [email, setEmail] = useState('');
   const [isSubscribing, setIsSubscribing] = useState(false);
+  const [showUnsub, setShowUnsub] = useState(false);
+  const [unsubEmail, setUnsubEmail] = useState('');
+  const [isUnsubmitting, setIsUnsubmitting] = useState(false);
 
   const handleSubscribe = async () => {
     if (!email || !email.includes('@')) {
@@ -97,31 +100,7 @@ export default function Footer() {
             <p className="text-sm text-yellow-200/70 text-center mt-3">
               We respect your privacy. 
               <button
-                onClick={async () => {
-                  const email = prompt('Enter your email to unsubscribe:');
-                  if (email) {
-                    try {
-                      const response = await fetch('http://localhost:5000/api/newsletter/unsubscribe', {
-                        method: 'POST',
-                        headers: {
-                          'Content-Type': 'application/json',
-                        },
-                        body: JSON.stringify({ email })
-                      });
-
-                      const data = await response.json();
-
-                      if (data.success) {
-                        toast.success(data.message);
-                      } else {
-                        toast.warning(data.message);
-                      }
-                    } catch (error) {
-                      console.error('Unsubscribe error:', error);
-                      toast.error('❌ Failed to unsubscribe. Please try again.');
-                    }
-                  }
-                }}
+                onClick={() => setShowUnsub(true)}
                 className="text-yellow-400 hover:text-yellow-300 underline transition-colors ml-1"
               >
                 Unsubscribe
@@ -268,6 +247,64 @@ export default function Footer() {
 
       {/* Golden accent line */}
       <div className="h-1 bg-gradient-to-r from-yellow-400 via-yellow-500 to-yellow-400"></div>
+
+      {/* Unsubscribe Modal */}
+      {showUnsub && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center">
+          <div className="absolute inset-0 bg-black/80" onClick={() => setShowUnsub(false)}></div>
+          <div className="relative bg-black/90 border border-yellow-500 rounded-2xl shadow-2xl w-full max-w-md mx-4 animate-fade-in">
+            <div className="px-6 py-4 border-b border-yellow-500/40 bg-gradient-to-r from-yellow-500 to-yellow-600 text-black rounded-t-2xl">
+              <h3 className="text-lg font-bold">Manage Newsletter</h3>
+            </div>
+            <div className="p-6">
+              <label className="block text-sm text-yellow-200/80 mb-2">Enter your email to unsubscribe</label>
+              <input
+                type="email"
+                value={unsubEmail}
+                onChange={(e) => setUnsubEmail(e.target.value)}
+                placeholder="you@example.com"
+                className="w-full bg-black/40 border-2 border-yellow-400/30 text-yellow-200 placeholder-yellow-300/60 px-4 py-3 rounded-xl focus:outline-none focus:border-yellow-400"
+              />
+              <div className="mt-4 flex justify-end gap-3">
+                <button onClick={() => setShowUnsub(false)} className="px-4 py-2 rounded-full bg-gray-700 text-gray-200 hover:bg-gray-600">Cancel</button>
+                <button
+                  onClick={async () => {
+                    if (!unsubEmail || !unsubEmail.includes('@')) {
+                      toast.error('Please enter a valid email address');
+                      return;
+                    }
+                    setIsUnsubmitting(true);
+                    try {
+                      const response = await fetch('http://localhost:5000/api/newsletter/unsubscribe', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ email: unsubEmail })
+                      });
+                      const data = await response.json();
+                      if (data.success) {
+                        toast.success(data.message);
+                        setShowUnsub(false);
+                        setUnsubEmail('');
+                      } else {
+                        toast.warning(data.message);
+                      }
+                    } catch (error) {
+                      console.error('Unsubscribe error:', error);
+                      toast.error('❌ Failed to unsubscribe. Please try again.');
+                    } finally {
+                      setIsUnsubmitting(false);
+                    }
+                  }}
+                  className={`px-5 py-2 rounded-full font-bold text-black shadow-lg transition-all ${isUnsubmitting ? 'bg-gray-500 cursor-not-allowed' : 'bg-gradient-to-r from-yellow-500 to-yellow-600 hover:from-yellow-600 hover:to-yellow-700'}`}
+                  disabled={isUnsubmitting}
+                >
+                  {isUnsubmitting ? 'Processing...' : 'Unsubscribe'}
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* Full Screen Map Modal */}
       {showMap && (

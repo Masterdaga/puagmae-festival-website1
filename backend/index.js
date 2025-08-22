@@ -2,17 +2,21 @@ require('dotenv').config();
 const express = require('express');
 const cors = require('cors');
 const nodemailer = require('nodemailer');
+const newsletterRouter = require('./routes/newsletter');
 const PDFDocument = require('pdfkit');
 const fs = require('fs');
 const path = require('path');
 const os = require('os');
 const sqlite3 = require('sqlite3').verbose();
 const validator = require('validator');
-const basicAuth = require('express-basic-auth');
+const bcrypt = require('bcryptjs');
+const { adminAuth, readAdminStore, ADMIN_STORE } = require('./middleware/auth');
 
 // SQLite Database Setup
 const dbPath = path.join(__dirname, 'registrations.db');
 const db = new sqlite3.Database(dbPath);
+// Newsletter DB (for admin subscribers view)
+const newsletterDb = new sqlite3.Database(path.join(__dirname, 'newsletter.db'));
 
 // Create users table if it doesn't exist
 db.serialize(() => {
@@ -34,10 +38,14 @@ db.serialize(() => {
   db.run('CREATE INDEX IF NOT EXISTS idx_phone ON users (phone)');
 });
 
-// Admin credentials
-const adminUsers = {
-  [process.env.ADMIN_USER || 'admin']: process.env.ADMIN_PASS || 'puagme2023'
-};
+// Ensure admin store exists with a default account if missing
+if (!fs.existsSync(ADMIN_STORE)) {
+  const defaultUser = process.env.ADMIN_USER || 'admin';
+  const defaultPass = process.env.ADMIN_PASS || 'puagme2023';
+  const passwordHash = bcrypt.hashSync(defaultPass, 10);
+  fs.mkdirSync(require('path').dirname(ADMIN_STORE), { recursive: true });
+  fs.writeFileSync(ADMIN_STORE, JSON.stringify({ username: defaultUser, passwordHash }, null, 2));
+}
 
 // Express setup
 const PORT = process.env.PORT || 5000;
@@ -47,7 +55,7 @@ const app = express();
 app.use(cors({
   origin: process.env.FRONTEND_URL || 'http://localhost:3000',
   credentials: true,
-  methods: ['GET', 'POST', 'OPTIONS'],
+  methods: ['GET', 'POST', 'DELETE', 'OPTIONS'],
   allowedHeaders: ['Content-Type', 'Authorization']
 }));
 
@@ -55,6 +63,9 @@ app.use(cors({
 app.options('*', cors());
 app.use(express.json());
 app.use('/public', express.static(path.join(__dirname, 'public')));
+
+// Mount newsletter routes
+app.use('/api/newsletter', newsletterRouter);
 
 // Email transporter setup
 const transporter = nodemailer.createTransport({
@@ -143,11 +154,7 @@ async function generatePDF(user) {
 }
 
 // 🔒 Admin Routes
-app.use('/admin', basicAuth({
-  users: adminUsers,
-  challenge: true,
-  unauthorizedResponse: 'Unauthorized access'
-}));
+app.use('/admin', adminAuth);
 
 app.get('/admin/registrations', (req, res) => {
   db.all('SELECT * FROM users ORDER BY registeredAt DESC', (err, rows) => {
@@ -157,6 +164,156 @@ app.get('/admin/registrations', (req, res) => {
     }
     res.json(rows);
   });
+});
+
+// List newsletter subscribers (all statuses) - admin only
+app.get('/admin/newsletter/subscribers', (req, res) => {
+  newsletterDb.all(
+    'SELECT email, status, isActive, subscribedAt, source, createdAt, updatedAt FROM newsletter_subscribers ORDER BY COALESCE(subscribedAt, createdAt) DESC',
+    (err, rows) => {
+      if (err) {
+        console.error('Newsletter DB error:', err);
+        return res.status(500).json({ success: false, message: 'Failed to fetch subscribers' });
+      }
+      res.json({ success: true, count: rows.length, subscribers: rows });
+    }
+  );
+});
+
+// Delete a registration (admin only)
+app.delete('/admin/registrations/:id', (req, res) => {
+  const { id } = req.params;
+  if (!id) return res.status(400).json({ success: false, message: 'Missing registration id' });
+
+  // Look up user first
+  db.get('SELECT * FROM users WHERE id = ?', [id], (findErr, user) => {
+    if (findErr) {
+      console.error('Database error:', findErr);
+      return res.status(500).json({ success: false, message: 'Failed to fetch registration' });
+    }
+    if (!user) {
+      return res.status(404).json({ success: false, message: 'Registration not found' });
+    }
+
+    // Delete
+    db.run('DELETE FROM users WHERE id = ?', [id], function (delErr) {
+      if (delErr) {
+        console.error('Database error:', delErr);
+        return res.status(500).json({ success: false, message: 'Failed to delete registration' });
+      }
+
+      // Try to send an email notification (non-blocking)
+      if (process.env.EMAIL_USER && process.env.EMAIL_PASS && user.email) {
+        transporter.sendMail({
+          from: `PUAGMAE Festival <${process.env.EMAIL_USER}>`,
+          to: user.email,
+          subject: 'Your PUAGMAE Festival Registration Has Been Cancelled',
+          html: `
+            <div style="font-family:Arial,sans-serif;max-width:640px;margin:0 auto">
+              <div style="background:#fbbf24;padding:16px 20px;color:#111827;font-weight:700">Registration Update</div>
+              <div style="padding:20px;background:#f9fafb;color:#111827">
+                <p>Dear ${user.name || 'Participant'},</p>
+                <p>Your PUAGMAE Festival registration has been cancelled as requested. If this was a mistake, you can register again on our website.</p>
+                <p style="margin-top:16px">We hope to see you at the festival in the future.</p>
+                <p style="margin-top:24px">— PUAGMAE Festival Team</p>
+              </div>
+            </div>
+          `
+        }).catch(err => console.warn('Unregister email failed:', err.message));
+      }
+
+      return res.json({ success: true });
+    });
+  });
+});
+
+// 🔧 Admin settings - update username/password
+app.post('/admin/settings', adminAuth, async (req, res) => {
+  try {
+    const { username, password } = req.body || {};
+    if (!username || !password) {
+      return res.status(400).json({ success: false, message: 'Username and password are required' });
+    }
+    const passwordHash = await bcrypt.hash(password, 10);
+    fs.writeFileSync(ADMIN_STORE, JSON.stringify({ username, passwordHash }, null, 2));
+    res.json({ success: true });
+  } catch (e) {
+    console.error('Admin settings update error:', e);
+    res.status(500).json({ success: false, message: 'Failed to update settings' });
+  }
+});
+
+// 📫 Contact endpoint - send message to festival team without opening email client
+app.post('/api/contact', async (req, res) => {
+  try {
+    const { name, email, subject, message, category } = req.body || {};
+
+    // Basic validation
+    if (!name || !email || !subject || !message) {
+      return res.status(400).json({
+        success: false,
+        error: 'ValidationError',
+        message: 'Name, email, subject and message are required.'
+      });
+    }
+
+    if (!validator.isEmail(email)) {
+      return res.status(400).json({
+        success: false,
+        error: 'ValidationError',
+        message: 'Invalid email address.'
+      });
+    }
+
+    // Ensure email service configured
+    if (!process.env.EMAIL_USER || !process.env.EMAIL_PASS) {
+      return res.status(503).json({
+        success: false,
+        error: 'EmailNotConfigured',
+        message: 'Email service is not configured on the server.'
+      });
+    }
+
+    // Compose email to admins
+    // Recipient for contact messages (configurable via .env)
+    // If CONTACT_TO is provided, supports comma-separated list. Otherwise, send to company emails only.
+    const adminTo = process.env.CONTACT_TO
+      ? process.env.CONTACT_TO.split(',').map(e => e.trim()).filter(Boolean)
+      : ['puagmaef@gmail.com', 'pjafrica.2020@gmail.com'];
+
+    const html = `
+      <div style="font-family: Arial, sans-serif; max-width: 640px; margin: 0 auto;">
+        <div style="background:#fbbf24;padding:16px 20px;color:#111827;font-weight:700">PUAGMAE Festival – New Contact Message</div>
+        <div style="padding:20px;background:#f9fafb">
+          <p style="margin:0 0 10px 0;color:#111827"><strong>From:</strong> ${name} &lt;${email}&gt;</p>
+          <p style="margin:0 0 10px 0;color:#111827"><strong>Category:</strong> ${category || 'General Inquiry'}</p>
+          <p style="margin:0 0 10px 0;color:#111827"><strong>Subject:</strong> ${subject}</p>
+          <div style="margin-top:16px;padding:12px;background:#fff;border:1px solid #e5e7eb;border-radius:8px;white-space:pre-wrap;color:#111827">${message}</div>
+        </div>
+        <div style="font-size:12px;color:#6b7280;text-align:center;padding:16px;background:#111827">© ${new Date().getFullYear()} PUAGMAE Festival</div>
+      </div>`;
+
+    const mailOptions = {
+      from: `PUAGMAE Festival <${process.env.EMAIL_USER}>`,
+      to: adminTo,
+      replyTo: email,
+      subject: `[Contact] ${category ? `[${category}] ` : ''}${subject}`,
+      html
+    };
+
+    await transporter.sendMail(mailOptions);
+
+    return res.status(200).json({ success: true, message: 'Message sent successfully.' });
+  } catch (err) {
+    console.error('Contact email error:', err);
+    return res.status(500).json({ 
+      success: false, 
+      error: 'InternalError', 
+      message: 'Failed to send message.',
+      // Expose minimal debug info in development to help diagnose
+      debug: process.env.NODE_ENV !== 'production' ? err.message : undefined
+    });
+  }
 });
 
 // ✅ Enhanced registration endpoint - SUCCEEDS EVEN IF EMAIL FAILS
@@ -334,7 +491,8 @@ app.listen(PORT, () => {
   console.log(`📧 Email service: ${process.env.EMAIL_USER ? 'Configured' : 'Not configured'}`);
   console.log(`🌐 CORS allowed: ${process.env.FRONTEND_URL || 'http://localhost:3000'}`);
   console.log(`🔐 Admin panel: http://localhost:${PORT}/admin/registrations`);
-  console.log(`🛡️  Admin username: ${Object.keys(adminUsers)[0]}`);
+  const store = readAdminStore();
+  console.log(`🛡️  Admin username: ${store?.username}`);
   console.log(`💾 Using SQLite database: registrations.db`);
   console.log(`💡 Registration will succeed even if email fails`);
 });

@@ -1,8 +1,11 @@
 const nodemailer = require('nodemailer');
 
+// Base URLs for links in emails
+const BACKEND_BASE_URL = process.env.BACKEND_URL || 'http://localhost:5000';
+
 // Create transporter for sending emails
 const createTransporter = () => {
-  return nodemailer.createTransporter({
+  return nodemailer.createTransport({
     service: 'gmail',
     auth: {
       user: process.env.EMAIL_USER || 'puagmaef@gmail.com',
@@ -10,6 +13,10 @@ const createTransporter = () => {
     }
   });
 };
+
+// Helpers to generate action links
+const generateConfirmLink = (token) => `${BACKEND_BASE_URL}/api/newsletter/confirm/${token}`;
+const generateUnsubscribeLink = (token) => `${BACKEND_BASE_URL}/api/newsletter/unsubscribe/${token}`;
 
 // Email templates
 const emailTemplates = {
@@ -100,5 +107,7 @@ const emailTemplates = {
 
 module.exports = {
   createTransporter,
-  emailTemplates
+  emailTemplates,
+  generateConfirmLink,
+  generateUnsubscribeLink
 }; 

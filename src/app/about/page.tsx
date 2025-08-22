@@ -84,35 +84,39 @@ export default function AboutPage() {
                   The Puagmae Festival is an opportunity for people to come together and share their stories, traditions, and customs. The festival features a variety of events including traditional dance performances, music concerts, art exhibitions, and food fairs. These events provide a platform for artists and performers to showcase their talents and for attendees to immerse themselves in the rich cultural tapestry of Ethiopia.
                 </p>
 
-                {/* Gallery */}
-                <div>
-                  <h4 className="text-yellow-300 font-semibold mb-4">Festival gallery</h4>
-                  <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-                    <img
-                      src="videos/children_on_rain.jpg"
-                      alt="Dancers at Puagmae"
-                      className="w-full h-36 object-cover rounded-lg border border-yellow-600 hover:scale-105 transition-transform"
-                    />
-                    <img
-                      src="videos/a_runway_scene_fea_image_.jpg"
-                      alt="Coffee ceremony"
-                      className="w-full h-36 object-cover rounded-lg border border-yellow-600 hover:scale-105 transition-transform"
-                    />
-                    <img
-                      src="videos/new-adeyababa.jpg"
-                      alt="Artisans and crafts"
-                      className="w-full h-36 object-cover rounded-lg border border-yellow-600 hover:scale-105 transition-transform"
-                    />
+                {/* Narrative additions */}
+                <div className="space-y-6">
+                  <div>
+                    <h4 className="text-yellow-300 font-semibold">Our Story</h4>
+                    <p className="text-lg leading-relaxed text-yellow-200 mt-2">
+                      Founded in 2016 by Puagmae AB Festival PLC, Ethiopia’s premier cultural and event management company, the Puagmae Festival was born from a vision to uplift African identity, foster community, and drive social impact through immersive cultural experiences. Our flagship celebration brings together music, dance, culinary artistry, fashion, trade, and storytelling to honor Africa’s heritage and inspire a shared future.
+                    </p>
                   </div>
-                  <p className="text-sm text-yellow-300 mt-3">Images are illustrative — add your own photos to /public to replace them.</p>
-                </div>
 
-                <p className="text-lg leading-relaxed text-yellow-200">
-                  One of the highlights of the festival is the traditional coffee ceremony, which is an integral part of Ethiopian culture. The ceremony involves roasting coffee beans, grinding them, and brewing the coffee in a special pot called a jebena. This ritual is a symbol of hospitality and community, bringing people together to enjoy the rich flavors and aromas of Ethiopian coffee.
-                </p>
-                <p className="text-lg leading-relaxed text-yellow-200">
-                  The Puagmae Festival is not just a celebration of the past but also a time to look forward to the future. It provides a space for dialogue and exchange, fostering a sense of unity and shared identity among participants. Whether you are a local resident or a visitor, the Puagmae Festival offers a unique and enriching experience that will leave you with lasting memories.
-                </p>
+                  <div>
+                    <h4 className="text-yellow-300 font-semibold">What to Expect</h4>
+                    <p className="text-lg leading-relaxed text-yellow-200 mt-2">
+                      From September 6–10, 2025, Addis Ababa becomes the heartbeat of Africa. Each day offers a focused experience—see highlights below, and the full program on our schedule page.
+                    </p>
+                    <div className="mt-4 space-y-3">
+                      <p className="text-yellow-200/90"><span className="text-yellow-200 font-semibold">September 6 — Peace and Love Day:</span> Opening parade, dialogue circles, cultural exchange, candlelight ceremony for unity.</p>
+                      <p className="text-yellow-200/90"><span className="text-yellow-200 font-semibold">September 7 — Pan‑Africanism Day:</span> Keynotes and workshops on unity, traditional music and dance, shared history panel, flag procession.</p>
+                      <p className="text-yellow-200/90"><span className="text-yellow-200 font-semibold">September 8 — Run on Rain Day:</span> Community fun run, outdoor games, rain dance performance, community picnic.</p>
+                      <p className="text-yellow-200/90"><span className="text-yellow-200 font-semibold">September 9 — Trade Day:</span> Artisan market, craft workshops, food tastings, business networking forum.</p>
+                      <p className="text-yellow-200/90"><span className="text-yellow-200 font-semibold">September 10 — Beauty Day:</span> Fashion showcase and runway, art exhibition, cultural performances, grand pageant and awards.</p>
+                    </div>
+                    <div className="mt-4">
+                      <a href="/schedule" className="inline-block text-yellow-300 hover:text-yellow-200 underline">See full schedule</a>
+                    </div>
+                  </div>
+
+                  <div>
+                    <h4 className="text-yellow-300 font-semibold">Our Vision</h4>
+                    <p className="text-lg leading-relaxed text-yellow-200 mt-2">
+                      At the heart of Puagmae is a grassroots approach that honors collective cultural knowledge. We invite tradition bearers, artists, and communities to shape the festival’s evolution—creating spaces where Africans at home and abroad can gather, express, and elevate their shared identity. Whether you are a local resident or a global visitor, the Puagmae Festival offers a transformative experience that celebrates the past, energizes the present, and inspires the future.
+                    </p>
+                  </div>
+                </div>
               </div>
             </div>
           )}
