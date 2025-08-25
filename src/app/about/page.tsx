@@ -33,7 +33,7 @@ export default function AboutPage() {
             {/* Info Card */}
             <div className="flex-1 bg-black/70 rounded-2xl border border-yellow-500 shadow-xl px-8 py-8 space-y-4 min-w-[280px] max-w-4xl mx-auto">
               <p className="text-lg leading-relaxed text-yellow-200">
-                The Puagmae Festival is a grand celebration of the African Golden 13th Month, a unique cultural event that brings together people from all walks of life to celebrate our rich heritage and traditions. From vibrant performances and cultural displays to delicious food and lively music, this festival is a true reflection of our diverse and colorful culture. Like the Egyptian Coptic calendar, the Ethiopian calendar has a year of 13 months. The first 12 months have 30 days each, and the last 13th month has 5 days and 6 days in a leap year. The name of the 13th month is in Ge'ez and is known as PAGUMIENE. This uniquely short but sweet month of PAGUMIENE just started here in Ethiopia and is going to last for the next six days or five days.
+                The Puagmae Festival is a grand celebration of the African Golden 13th Month, a unique cultural event that brings together people from all walks of life to celebrate our rich heritage and traditions. From vibrant performances and cultural displays to delicious food and lively music, this festival is a true reflection of our diverse and colorful culture. Like the Egyptian Coptic calendar, the Ethiopian calendar has a year of 13 months. The first 12 months have 30 days each, and the last 13th month has 5 days and 6 days in a leap year. The name of the 13th month is in Ge&apos;ez and is known as PAGUMIENE. This uniquely short but sweet month of PAGUMIENE just started here in Ethiopia and is going to last for the next six days or five days.
               </p>
 
               {/* Small image inside info card */}
@@ -78,7 +78,7 @@ export default function AboutPage() {
             <div className="mt-12 flex justify-center">
               <div className="bg-black/80 rounded-2xl border border-yellow-500 max-w-4xl w-full shadow-xl p-12 space-y-8">
                 <p className="text-lg leading-relaxed text-yellow-200">
-                  At the heart of the Puagmae Festival is the aspiration to represent collective cultural knowledge in a grassroots way. This approach encourages the free and informed participation of tradition bearers who it is hoped will play a central role in the shape of the festival's development and overall outcome.
+                  At the heart of the Puagmae Festival is the aspiration to represent collective cultural knowledge in a grassroots way. This approach encourages the free and informed participation of tradition bearers who it is hoped will play a central role in the shape of the festival&apos;s development and overall outcome.
                 </p>
                 <p className="text-lg leading-relaxed text-yellow-200">
                   The Puagmae Festival is an opportunity for people to come together and share their stories, traditions, and customs. The festival features a variety of events including traditional dance performances, music concerts, art exhibitions, and food fairs. These events provide a platform for artists and performers to showcase their talents and for attendees to immerse themselves in the rich cultural tapestry of Ethiopia.

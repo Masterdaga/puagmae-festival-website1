@@ -1,5 +1,4 @@
 "use client";
-import { useState } from 'react';
 import Link from 'next/link';
 
 const landingSlides = [
@@ -11,7 +10,7 @@ const landingSlides = [
 ];
 
 export default function LandingCarousel() {
-  const [currentIndex, setCurrentIndex] = useState(0);
+  const currentIndex = 0;
 
   return (
     <div className="relative h-screen w-full overflow-hidden">

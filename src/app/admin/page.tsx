@@ -95,8 +95,9 @@ export default function AdminDashboard() {
         localStorage.setItem("adminUser", username);
         localStorage.setItem("adminPass", password);
       }
-    } catch (e: any) {
-      setError(e?.message || "Failed to load admin data");
+    } catch (e: unknown) {
+      const errorMessage = e instanceof Error ? e.message : "Failed to load admin data";
+      setError(errorMessage);
       setIsAuthed(false);
     } finally {
       setLoading(false);
@@ -113,14 +114,15 @@ export default function AdminDashboard() {
       const json = await res.json();
       if (!json?.success) throw new Error(json?.message || 'Failed to delete');
       setRegistrations((prev) => prev.filter(r => r.id !== id));
-    } catch (e:any) {
-      setError(e?.message || 'Delete failed');
+    } catch (e: unknown) {
+      const errorMessage = e instanceof Error ? e.message : 'Delete failed';
+      setError(errorMessage);
     }
   };
 
-  type ColumnDef = { key: string; title: string; mapper?: (v:any,row?:any)=>string };
+  type ColumnDef = { key: string; title: string; mapper?: (v: unknown, row?: Record<string, unknown>) => string };
 
-  const exportCsv = (rows: any[], filename: string, columns: ColumnDef[]) => {
+  const exportCsv = (rows: Record<string, unknown>[], filename: string, columns: ColumnDef[]) => {
     if (!rows || rows.length === 0) return;
     const header = columns.map(c => c.title).join(',');
     const lines = rows.map(row => {
@@ -366,8 +368,9 @@ export default function AdminDashboard() {
                           window.location.reload();
                         }
                       }, 500);
-                    } catch (e:any) {
-                      setSettingsError(e?.message || 'Failed to update settings');
+                    } catch (e: unknown) {
+                      const errorMessage = e instanceof Error ? e.message : 'Failed to update settings';
+                      setSettingsError(errorMessage);
                     }
                   }}
                   className="w-full px-5 py-3 rounded-full font-bold text-black bg-gradient-to-r from-yellow-500 to-yellow-600 hover:from-yellow-600 hover:to-yellow-700 shadow-lg"
@@ -392,7 +395,7 @@ export default function AdminDashboard() {
                 <h3 className="text-lg font-bold">Confirm Cancellation</h3>
               </div>
               <div className="p-6 text-yellow-100/90">
-                <p>Cancel registration for "{confirmTarget.name}" ({confirmTarget.email})?</p>
+                <p>Cancel registration for &quot;{confirmTarget.name}&quot; ({confirmTarget.email})?</p>
                 <div className="mt-6 flex justify-end gap-3">
                   <button className="px-4 py-2 rounded-full bg-gray-700 text-gray-200 hover:bg-gray-600" onClick={() => setConfirmOpen(false)}>Cancel</button>
                   <button

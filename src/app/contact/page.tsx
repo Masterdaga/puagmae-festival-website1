@@ -50,7 +50,7 @@ export default function ContactPage() {
         setResultType('error');
         setResultMessage(data.message || 'Failed to send your message. Please try again later.');
       }
-    } catch (error) {
+    } catch {
       setResultType('error');
       setResultMessage('Failed to send your message. Please check your internet connection and try again.');
     } finally {
@@ -86,7 +86,7 @@ export default function ContactPage() {
           </h1>
           <div className="w-32 h-1 mx-auto rounded bg-gradient-to-r from-yellow-400 to-yellow-600 mt-4" />
           <p className="text-yellow-200/90 text-lg max-w-2xl mx-auto mt-6">
-            Have questions about the festival? Want to collaborate? We'd love to hear from you!
+            Have questions about the festival? Want to collaborate? We&apos;d love to hear from you!
           </p>
         </div>
 
@@ -113,7 +113,7 @@ export default function ContactPage() {
               {/* Simple Instructions */}
               <div className="text-center mb-6">
                 <p className="text-yellow-200 text-lg">
-                  Fill out the form below, then click "Send Email" to contact our festival team!
+                  Fill out the form below, then click &quot;Send Email&quot; to contact our festival team!
                 </p>
               </div>
 

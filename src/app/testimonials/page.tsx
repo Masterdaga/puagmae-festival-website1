@@ -62,7 +62,7 @@ const Testimonials = () => {
                             >
                                 <FaQuoteLeft className="text-2xl md:text-3xl text-yellow-400 mb-4 mx-auto" />
                                 <p className="text-lg md:text-2xl text-gray-100 italic max-w-3xl mx-auto leading-relaxed px-4">
-                                    "{testimonial.quote}"
+                                    &quot;{testimonial.quote}&quot;
                                 </p>
                                 <div className="flex flex-col md:flex-row justify-center items-center gap-6 mt-8">
                                     <img

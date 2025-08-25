@@ -55,7 +55,7 @@ export default function Footer() {
         <div className="max-w-5xl mx-auto">
           <div className="text-center mb-4">
             <h2 className="text-4xl md:text-5xl font-extrabold bg-gradient-to-r from-yellow-300 to-yellow-400 bg-clip-text text-transparent mb-3 tracking-wide drop-shadow-lg">
-              LET'S STAY IN TOUCH
+              LET&apos;S STAY IN TOUCH
             </h2>
             <p className="text-yellow-200/90 text-lg">
               Be the first to know about updates and festival announcements.
