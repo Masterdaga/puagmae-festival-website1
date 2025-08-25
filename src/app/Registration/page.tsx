@@ -1,10 +1,6 @@
 'use client';
 import { useState } from 'react';
 
-// Add this right after your useState hooks
-console.log('API URL:', process.env.NEXT_PUBLIC_API_BASE_URL);
-
-
 export default function RegisterPage() {
   const [formData, setFormData] = useState({
     name: '',
@@ -12,7 +8,7 @@ export default function RegisterPage() {
     phone: ''
   });
 
-  const [status, setStatus] = useState<'idle'|'loading'|'success'|'error'>('idle');
+  const [status, setStatus] = useState<'idle' | 'loading' | 'success' | 'error'>('idle');
   const [error, setError] = useState('');
   const [emailWarning, setEmailWarning] = useState(false);
 
@@ -30,7 +26,7 @@ export default function RegisterPage() {
 
     try {
       const apiUrl = process.env.NEXT_PUBLIC_API_BASE_URL || 'http://localhost:5000';
-      
+
       // Add timeout to prevent hanging requests
       const controller = new AbortController();
       const timeoutId = setTimeout(() => controller.abort(), 15000); // 15 second timeout
@@ -50,28 +46,34 @@ export default function RegisterPage() {
       });
 
       clearTimeout(timeoutId);
-      
+
       // Check if response is JSON
       const contentType = response.headers.get('content-type');
       if (!contentType || !contentType.includes('application/json')) {
         throw new Error('Server returned invalid response');
       }
-      
+
       const data = await response.json();
 
       if (!response.ok) {
         if (data?.error === 'DuplicateError') {
-          throw new Error(data?.message || "This email or phone number is already registered.");
+          setError(data.message || "This email or phone number is already registered.");
+          setStatus('error'); // Update status to show error state
+          return; // Exit early
         }
         if (data?.error === 'ValidationError') {
-          throw new Error(data?.message || "Please check your input fields.");
+          setError(data.message || "Please check your input fields.");
+          setStatus('error'); // Update status to show error state
+          return; // Exit early
         }
-        throw new Error(data?.message || data?.error || 'Registration failed. Please try again.');
+        setError(data.message || data.error || 'Registration failed. Please try again.');
+        setStatus('error'); // Update status to show error state
+        return; // Exit early
       }
 
       setStatus('success');
       setFormData({ name: '', email: '', phone: '' });
-      
+
       // Show email warning if email might not have been sent
       if (data.emailSent === false) {
         setEmailWarning(true);
@@ -82,19 +84,17 @@ export default function RegisterPage() {
         setStatus('idle');
         setEmailWarning(false);
       }, 8000);
-      
+
     } catch (err: any) {
       console.error('Registration error:', err);
       setStatus('error');
-      
+
       if (err.name === 'AbortError') {
         setError('Request timeout. Please check your connection and try again.');
       } else if (err.message === 'Server returned invalid response') {
         setError('Server error. Please try again later.');
       } else {
-        setError(
-          err.message || 'Failed to connect to server. Please try again.'
-        );
+        setError(err.message || 'Failed to connect to server. Please try again.');
       }
     }
   };
@@ -111,6 +111,7 @@ export default function RegisterPage() {
       <div className="absolute inset-0 bg-gradient-to-br from-black via-[#3b2f23] to-black opacity-80 -z-10" />
 
       <div className="absolute inset-0 opacity-10">
+        {/* Background Circles */}
         <div className="absolute top-20 left-10 w-32 h-32 bg-yellow-400 rounded-full blur-3xl"></div>
         <div className="absolute top-40 right-20 w-48 h-48 bg-amber-400 rounded-full blur-3xl"></div>
         <div className="absolute bottom-32 left-1/4 w-40 h-40 bg-orange-400 rounded-full blur-3xl"></div>
@@ -128,13 +129,11 @@ export default function RegisterPage() {
             <div className="text-center text-green-600 font-semibold animate-fade-in">
               ✅ Registration successful! You are now registered for the festival.
             </div>
-            
             {emailWarning && (
               <div className="text-center text-amber-600 bg-amber-50 p-3 rounded-md border border-amber-200 animate-fade-in">
                 ⚠️ Note: Confirmation email may be delayed. Your registration is complete.
               </div>
             )}
-            
             {!emailWarning && (
               <div className="text-center text-blue-600 text-sm mt-2">
                 Check your email for confirmation details.
