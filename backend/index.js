@@ -55,7 +55,7 @@ async function initializeDatabase() {
 initializeDatabase();
 
 // Initialize admin credentials if not exists
-function initializeAdmin() {
+async function initializeAdmin() {
   try {
     const store = readAdminStore();
     if (!store) {
@@ -63,13 +63,12 @@ function initializeAdmin() {
       const defaultUsername = process.env.ADMIN_USER || 'admin';
       const defaultPassword = process.env.ADMIN_PASS || 'puagme2023';
       
-      bcrypt.hash(defaultPassword, 10).then(passwordHash => {
-        fs.writeFileSync(ADMIN_STORE, JSON.stringify({ 
-          username: defaultUsername, 
-          passwordHash 
-        }, null, 2));
-        console.log('✅ Admin credentials initialized');
-      });
+      const passwordHash = await bcrypt.hash(defaultPassword, 10);
+      fs.writeFileSync(ADMIN_STORE, JSON.stringify({ 
+        username: defaultUsername, 
+        passwordHash 
+      }, null, 2));
+      console.log('✅ Admin credentials initialized');
     } else {
       console.log('✅ Admin credentials already exist');
     }
@@ -78,7 +77,10 @@ function initializeAdmin() {
   }
 }
 
-initializeAdmin();
+// Initialize admin credentials
+initializeAdmin().catch(error => {
+  console.error('❌ Failed to initialize admin:', error);
+});
 
 // Express setup
 const PORT = process.env.PORT || 5000;
@@ -496,6 +498,33 @@ app.get('/', async (req, res) => {
       version: '1.0.0',
       database: 'connected',
       totalRegistrations: 'error'
+    });
+  }
+});
+
+// Admin reset endpoint (for debugging)
+app.post('/admin/reset', async (req, res) => {
+  try {
+    const defaultUsername = 'admin';
+    const defaultPassword = 'puagme2023';
+    
+    const passwordHash = await bcrypt.hash(defaultPassword, 10);
+    fs.writeFileSync(ADMIN_STORE, JSON.stringify({ 
+      username: defaultUsername, 
+      passwordHash 
+    }, null, 2));
+    
+    res.json({ 
+      success: true, 
+      message: 'Admin credentials reset successfully',
+      username: defaultUsername,
+      password: defaultPassword
+    });
+  } catch (error) {
+    console.error('Admin reset error:', error);
+    res.status(500).json({ 
+      success: false, 
+      message: 'Failed to reset admin credentials' 
     });
   }
 });
