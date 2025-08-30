@@ -1,7 +1,7 @@
 const nodemailer = require('nodemailer');
 
 // Base URLs for links in emails
-const BACKEND_BASE_URL = process.env.BACKEND_URL || 'http://localhost:5000';
+const BACKEND_BASE_URL = process.env.FRONTEND_URL || 'https://puagmae-festival-e6ql.onrender.com';
 
 // Create transporter for sending emails
 const createTransporter = () => {
@@ -15,8 +15,8 @@ const createTransporter = () => {
 };
 
 // Helpers to generate action links
-const generateConfirmLink = (token) => `${BACKEND_BASE_URL}/api/newsletter/confirm/${token}`;
-const generateUnsubscribeLink = (token) => `${BACKEND_BASE_URL}/api/newsletter/unsubscribe/${token}`;
+const generateConfirmLink = (token) => `${process.env.FRONTEND_URL || 'https://puagmae-festival-e6ql.onrender.com'}/api/newsletter/confirm/${token}`;
+const generateUnsubscribeLink = (token) => `${process.env.FRONTEND_URL || 'https://puagmae-festival-e6ql.onrender.com'}/api/newsletter/unsubscribe/${token}`;
 
 // Email templates
 const emailTemplates = {
@@ -44,7 +44,7 @@ const emailTemplates = {
             We're excited to share the magic of African culture and unity with you!
           </p>
           <div style="text-align: center; margin-top: 30px;">
-            <a href="${process.env.WEBSITE_URL || 'http://localhost:3000'}" 
+            <a href="${process.env.FRONTEND_URL || 'https://puagmae-festival-e6ql.onrender.com'}" 
                style="background: linear-gradient(135deg, #fbbf24, #f59e0b); color: #1f2937; padding: 12px 24px; text-decoration: none; border-radius: 25px; font-weight: bold;">
               Visit Our Website
             </a>
