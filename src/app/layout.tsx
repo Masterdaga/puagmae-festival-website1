@@ -4,8 +4,8 @@ import Navbar from "./components/Navbar";
 import Footer from "./components/Footer";
 
 export const metadata: Metadata = {
-  title: "Puagmae Festival - Celebrating Ethiopian Culture & Unity",
-  description: "Join us for the 7th Puagmae Festival at Adwa Museum. Experience vibrant performances, art, and community spirit celebrating Ethiopian culture and unity.",
+  title: "PUAGME Festival - African Golden 13th Month Celebration",
+  description: "Join us for the PUAGME Street Festival in Addis Ababa. Experience 5 days of peace, love, pan-Africanism, community activities, and cultural celebration from September 6-10, 2025 at Entoto Park.",
 };
 
 export default function RootLayout({
