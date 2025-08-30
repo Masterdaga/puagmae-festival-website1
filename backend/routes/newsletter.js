@@ -59,11 +59,19 @@ router.post('/subscribe', async (req, res) => {
       
       const subscriber = result.rows[0];
 
-      // If already active
+      // If already active - prevent double subscription
       if (subscriber && subscriber.status === 'active') {
-        return res.status(200).json({
-          success: true,
-          message: 'You are already subscribed.'
+        return res.status(409).json({
+          success: false,
+          message: 'This email is already subscribed to our newsletter.'
+        });
+      }
+
+      // If pending but not expired, don't send another email
+      if (subscriber && subscriber.status === 'pending' && subscriber.confirm_token_expires > new Date()) {
+        return res.status(409).json({
+          success: false,
+          message: 'Please check your email for the confirmation link. If you didn\'t receive it, please check your spam folder.'
         });
       }
 
