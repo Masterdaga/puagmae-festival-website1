@@ -24,7 +24,7 @@ export default function Footer() {
 
     try {
       // Send to backend API
-      const response = await fetch('http://localhost:5000/api/newsletter/subscribe', {
+      const response = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/api/newsletter/subscribe`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -281,7 +281,7 @@ export default function Footer() {
                     }
                     setIsUnsubmitting(true);
                     try {
-                      const response = await fetch('http://localhost:5000/api/newsletter/unsubscribe', {
+                      const response = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/api/newsletter/unsubscribe`, {
                         method: 'POST',
                         headers: { 'Content-Type': 'application/json' },
                         body: JSON.stringify({ email: unsubEmail })
