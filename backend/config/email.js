@@ -15,8 +15,8 @@ const createTransporter = () => {
 };
 
 // Helpers to generate action links
-const generateConfirmLink = (token) => `${process.env.FRONTEND_URL || 'https://puagmae-festival-e6ql.onrender.com'}/api/newsletter/confirm/${token}`;
-const generateUnsubscribeLink = (token) => `${process.env.FRONTEND_URL || 'https://puagmae-festival-e6ql.onrender.com'}/api/newsletter/unsubscribe/${token}`;
+const generateConfirmLink = (token) => `${process.env.BACKEND_URL || 'https://puagmae-festival-backend.onrender.com'}/api/newsletter/confirm/${token}`;
+const generateUnsubscribeLink = (token) => `${process.env.BACKEND_URL || 'https://puagmae-festival-backend.onrender.com'}/api/newsletter/unsubscribe/${token}`;
 
 // Email templates
 const emailTemplates = {
