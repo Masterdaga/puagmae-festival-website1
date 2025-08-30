@@ -170,7 +170,9 @@ router.get('/unsubscribe/:token', async (req, res) => {
       return res.status(400).send('Invalid unsubscribe link.');
     }
 
-    res.send('You have been unsubscribed successfully.');
+    // Redirect to frontend with success message
+    const frontendUrl = process.env.FRONTEND_URL || 'https://puagmae-festival-e6ql.onrender.com';
+    res.redirect(`${frontendUrl}?newsletter=unsubscribed`);
   } catch (error) {
     console.error('Unsubscribe token error:', error);
     res.status(500).send('Failed to unsubscribe.');
@@ -193,7 +195,9 @@ router.get('/confirm/:token', async (req, res) => {
       return res.status(400).send('Invalid or expired confirmation link.');
     }
 
-    res.send('Subscription confirmed! Welcome to the PUAGMAE Festival newsletter.');
+    // Redirect to frontend with success message
+    const frontendUrl = process.env.FRONTEND_URL || 'https://puagmae-festival-e6ql.onrender.com';
+    res.redirect(`${frontendUrl}?newsletter=confirmed`);
   } catch (error) {
     console.error('Confirm subscription error:', error);
     res.status(500).send('Failed to confirm subscription.');
