@@ -177,6 +177,9 @@ export default function GalleryPage() {
                   alt={`Gallery Image ${photos.length - index}`}
                   fill
                   className="object-cover rounded-lg shadow-lg transition-transform duration-300 group-hover:scale-105"
+                  loading="lazy"
+                  sizes="(max-width: 640px) 50vw, (max-width: 768px) 33vw, 25vw"
+                  quality={75}
                 />
                 <div className="absolute inset-0 bg-black/20 opacity-0 group-hover:opacity-100 transition-opacity duration-300 rounded-lg" />
               </div>
@@ -262,6 +265,8 @@ export default function GalleryPage() {
                   width={1200}
                   height={800}
                   className="max-w-full max-h-full object-contain rounded-lg"
+                  priority
+                  quality={85}
                 />
               ) : (
                 <video 
