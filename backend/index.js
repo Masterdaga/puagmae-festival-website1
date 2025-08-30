@@ -54,6 +54,32 @@ async function initializeDatabase() {
 // Initialize database on startup
 initializeDatabase();
 
+// Initialize admin credentials if not exists
+function initializeAdmin() {
+  try {
+    const store = readAdminStore();
+    if (!store) {
+      // Create default admin credentials
+      const defaultUsername = process.env.ADMIN_USER || 'admin';
+      const defaultPassword = process.env.ADMIN_PASS || 'puagme2023';
+      
+      bcrypt.hash(defaultPassword, 10).then(passwordHash => {
+        fs.writeFileSync(ADMIN_STORE, JSON.stringify({ 
+          username: defaultUsername, 
+          passwordHash 
+        }, null, 2));
+        console.log('✅ Admin credentials initialized');
+      });
+    } else {
+      console.log('✅ Admin credentials already exist');
+    }
+  } catch (error) {
+    console.error('❌ Error initializing admin:', error);
+  }
+}
+
+initializeAdmin();
+
 // Express setup
 const PORT = process.env.PORT || 5000;
 const app = express();
