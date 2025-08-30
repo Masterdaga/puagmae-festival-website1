@@ -39,9 +39,9 @@ export default function Navbar() {
                 alt="PUAGMAE STREET FESTIVAL" 
                 width={80} 
                 height={80} 
-                className="w-20 h-20 object-contain"
+                className="w-16 h-16 sm:w-20 sm:h-20 object-contain"
               />
-              <span className="text-2xl font-black text-yellow-400 tracking-widest bg-gradient-to-r from-yellow-400 to-yellow-600 bg-clip-text text-transparent drop-shadow-lg hidden sm:block" style={{ fontFamily: 'Caveat, cursive' }}>
+              <span className="text-xl sm:text-2xl font-black text-yellow-400 tracking-widest bg-gradient-to-r from-yellow-400 to-yellow-600 bg-clip-text text-transparent drop-shadow-lg hidden xs:block" style={{ fontFamily: 'Caveat, cursive' }}>
                 PUAGMAE
               </span>
             </Link>
@@ -95,10 +95,10 @@ export default function Navbar() {
       {/* Mobile Menu Overlay */}
       <div className={`fixed inset-0 z-50 md:hidden transition-all duration-300 ${isMenuOpen ? 'opacity-100 visible' : 'opacity-0 invisible pointer-events-none'}`}>
         <div className="absolute inset-0 bg-black/80 backdrop-blur-sm" onClick={() => setIsMenuOpen(false)}></div>
-        <div className={`absolute top-0 right-0 h-full w-64 bg-black/95 backdrop-blur-md border-l border-yellow-400/20 p-8 transition-transform duration-300 ${isMenuOpen ? 'translate-x-0' : 'translate-x-full'}`}>
-          <div className="flex flex-col h-full">
+        <div className={`absolute top-0 right-0 h-full w-64 bg-black/95 backdrop-blur-md border-l border-yellow-400/20 transition-transform duration-300 ${isMenuOpen ? 'translate-x-0' : 'translate-x-full'}`}>
+          <div className="flex flex-col h-full overflow-y-auto">
             {/* Close Button */}
-            <div className="flex justify-end mb-8">
+            <div className="flex justify-end mb-8 p-8 pb-4">
               <button onClick={() => setIsMenuOpen(false)} className="text-yellow-400 hover:text-yellow-300 transition-colors">
                 <svg className="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
@@ -106,7 +106,7 @@ export default function Navbar() {
               </button>
             </div>
             {/* Logo in mobile menu */}
-            <div className="flex items-center mb-6">
+            <div className="flex items-center mb-6 px-8">
               <Image 
                 src="/logo.png" 
                 alt="PUAGMAE STREET FESTIVAL" 
@@ -119,19 +119,24 @@ export default function Navbar() {
               </span>
             </div>
             {/* Menu Links */}
-            <nav className="flex flex-col space-y-6 text-lg font-medium">
+            <nav className="flex flex-col space-y-6 text-lg font-medium px-8 flex-1">
               <Link href="/" className="text-yellow-200 hover:text-yellow-400 transition-colors hover:scale-105 transform duration-300" onClick={() => setIsMenuOpen(false)}>Home</Link>
               <Link href="/about" className="text-yellow-200 hover:text-yellow-400 transition-colors hover:scale-105 transform duration-300" onClick={() => setIsMenuOpen(false)}>About</Link>
               <Link href="/schedule" className="text-yellow-200 hover:text-yellow-400 transition-colors hover:scale-105 transform duration-300" onClick={() => setIsMenuOpen(false)}>Schedule</Link>
               <Link href="/gallery" className="text-yellow-200 hover:text-yellow-400 transition-colors hover:scale-105 transform duration-300" onClick={() => setIsMenuOpen(false)}>Gallery</Link>
               <Link href="/testimonials" className="text-yellow-200 hover:text-yellow-400 transition-colors hover:scale-105 transform duration-300" onClick={() => setIsMenuOpen(false)}>Testimonials</Link>
-              <Link href="/Registration#register" scroll={true} className="bg-gradient-to-r from-yellow-500 to-yellow-600 text-black px-6 py-2 rounded-full font-bold hover:from-yellow-600 hover:to-yellow-700 hover:scale-105 transition-all duration-200 flex items-center shadow-lg">
+              <Link 
+                href="/Registration#register" 
+                scroll={true} 
+                className="bg-gradient-to-r from-yellow-500 to-yellow-600 text-black px-6 py-2 rounded-full font-bold hover:from-yellow-600 hover:to-yellow-700 hover:scale-105 transition-all duration-200 flex items-center shadow-lg mt-4"
+                onClick={() => setIsMenuOpen(false)}
+              >
                 Register now
                 <FaArrowRight className="ml-2 text-lg" />
               </Link>
             </nav>
             {/* Social Media Section */}
-            <div className="mt-auto pt-8 border-t border-yellow-400/20">
+            <div className="mt-auto pt-8 border-t border-yellow-400/20 px-8 pb-8">
               <h3 className="text-yellow-400 font-semibold mb-4">Follow Us</h3>
               <div className="flex space-x-4">
                 <a href="#" className="text-yellow-200 hover:text-yellow-400 transition-colors hover:scale-110 transform duration-300">

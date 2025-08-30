@@ -1,38 +1,42 @@
 const crypto = require('crypto');
 const express = require('express');
 const router = express.Router();
-const sqlite3 = require('sqlite3').verbose();
-const path = require('path');
+const pool = require('../config/database');
 const { createTransporter, emailTemplates, generateConfirmLink, generateUnsubscribeLink } = require('../config/email');
 
-// SQLite Database Setup for newsletters
-const dbPath = path.join(__dirname, '..', 'newsletter.db');
-const newsletterDb = new sqlite3.Database(dbPath);
+// PostgreSQL Database Setup for newsletters
+async function initializeNewsletterTable() {
+  try {
+    await pool.query(`
+      CREATE TABLE IF NOT EXISTS newsletter_subscribers (
+        id SERIAL PRIMARY KEY,
+        email VARCHAR(255) UNIQUE NOT NULL,
+        status VARCHAR(50) DEFAULT 'pending' CHECK(status IN ('pending', 'active', 'unsubscribed')),
+        is_active BOOLEAN DEFAULT FALSE,
+        subscribed_at TIMESTAMP,
+        source VARCHAR(100) DEFAULT 'website',
+        confirm_token VARCHAR(255),
+        confirm_token_expires TIMESTAMP,
+        unsubscribe_token VARCHAR(255),
+        last_email_sent TIMESTAMP,
+        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+        updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+      )
+    `);
+    
+    await pool.query('CREATE INDEX IF NOT EXISTS idx_newsletter_email ON newsletter_subscribers (email)');
+    await pool.query('CREATE INDEX IF NOT EXISTS idx_newsletter_status ON newsletter_subscribers (status)');
+    await pool.query('CREATE INDEX IF NOT EXISTS idx_newsletter_confirm_token ON newsletter_subscribers (confirm_token)');
+    await pool.query('CREATE INDEX IF NOT EXISTS idx_newsletter_unsubscribe_token ON newsletter_subscribers (unsubscribe_token)');
+    
+    console.log('✅ Newsletter table initialized successfully');
+  } catch (error) {
+    console.error('❌ Error initializing newsletter table:', error);
+  }
+}
 
-// Create newsletter subscribers table if it doesn't exist
-newsletterDb.serialize(() => {
-  newsletterDb.run(`
-    CREATE TABLE IF NOT EXISTS newsletter_subscribers (
-      id INTEGER PRIMARY KEY AUTOINCREMENT,
-      email TEXT UNIQUE NOT NULL,
-      status TEXT DEFAULT 'pending' CHECK(status IN ('pending', 'active', 'unsubscribed')),
-      isActive INTEGER DEFAULT 0,
-      subscribedAt DATETIME,
-      source TEXT DEFAULT 'website',
-      confirmToken TEXT,
-      confirmTokenExpires DATETIME,
-      unsubscribeToken TEXT,
-      lastEmailSent DATETIME,
-      createdAt DATETIME DEFAULT CURRENT_TIMESTAMP,
-      updatedAt DATETIME DEFAULT CURRENT_TIMESTAMP
-    )
-  `);
-  
-  newsletterDb.run('CREATE INDEX IF NOT EXISTS idx_newsletter_email ON newsletter_subscribers (email)');
-  newsletterDb.run('CREATE INDEX IF NOT EXISTS idx_newsletter_status ON newsletter_subscribers (status)');
-  newsletterDb.run('CREATE INDEX IF NOT EXISTS idx_newsletter_confirm_token ON newsletter_subscribers (confirmToken)');
-  newsletterDb.run('CREATE INDEX IF NOT EXISTS idx_newsletter_unsubscribe_token ON newsletter_subscribers (unsubscribeToken)');
-});
+// Initialize newsletter table on startup
+initializeNewsletterTable();
 
 // Subscribe to newsletter (double opt-in)
 router.post('/subscribe', async (req, res) => {
@@ -46,81 +50,64 @@ router.post('/subscribe', async (req, res) => {
       });
     }
 
-    // Look up existing record
-    newsletterDb.get(
-      'SELECT * FROM newsletter_subscribers WHERE email = ?',
-      [email.toLowerCase()],
-      async (err, subscriber) => {
-        if (err) {
-          console.error('Database error:', err);
-          return res.status(500).json({
-            success: false,
-            message: 'Database error occurred'
-          });
-        }
+    try {
+      // Look up existing record
+      const result = await pool.query(
+        'SELECT * FROM newsletter_subscribers WHERE email = $1',
+        [email.toLowerCase()]
+      );
+      
+      const subscriber = result.rows[0];
 
-        // If already active
-        if (subscriber && subscriber.status === 'active') {
-          return res.status(200).json({
-            success: true,
-            message: 'You are already subscribed.'
-          });
-        }
-
-        // Create or reset pending record
-        const confirmToken = crypto.randomBytes(24).toString('hex');
-        const unsubscribeToken = crypto.randomBytes(24).toString('hex');
-        const confirmTokenExpires = new Date(Date.now() + 1000 * 60 * 60 * 24 * 2); // 48h
-
-        if (!subscriber) {
-          // Insert new subscriber
-          newsletterDb.run(
-            `INSERT INTO newsletter_subscribers 
-             (email, status, isActive, confirmToken, confirmTokenExpires, unsubscribeToken, source) 
-             VALUES (?, ?, ?, ?, ?, ?, ?)`,
-            [email.toLowerCase(), 'pending', 0, confirmToken, confirmTokenExpires.toISOString(), unsubscribeToken, req.body.source || 'website'],
-            async function (err) {
-              if (err) {
-                console.error('Database error:', err);
-                return res.status(500).json({
-                  success: false,
-                  message: 'Failed to create subscription'
-                });
-              }
-
-              await sendConfirmationEmail(email, confirmToken, unsubscribeToken);
-              res.status(201).json({
-                success: true,
-                message: 'Please check your email to confirm your subscription.'
-              });
-            }
-          );
-        } else {
-          // Update existing subscriber
-          newsletterDb.run(
-            `UPDATE newsletter_subscribers 
-             SET status = ?, isActive = ?, confirmToken = ?, confirmTokenExpires = ?, unsubscribeToken = ?, updatedAt = CURRENT_TIMESTAMP 
-             WHERE email = ?`,
-            ['pending', 0, confirmToken, confirmTokenExpires.toISOString(), unsubscribeToken, email.toLowerCase()],
-            async function (err) {
-              if (err) {
-                console.error('Database error:', err);
-                return res.status(500).json({
-                  success: false,
-                  message: 'Failed to update subscription'
-                });
-              }
-
-              await sendConfirmationEmail(email, confirmToken, unsubscribeToken);
-              res.status(200).json({
-                success: true,
-                message: 'Please check your email to confirm your subscription.'
-              });
-            }
-          );
-        }
+      // If already active
+      if (subscriber && subscriber.status === 'active') {
+        return res.status(200).json({
+          success: true,
+          message: 'You are already subscribed.'
+        });
       }
-    );
+
+      // Create or reset pending record
+      const confirmToken = crypto.randomBytes(24).toString('hex');
+      const unsubscribeToken = crypto.randomBytes(24).toString('hex');
+      const confirmTokenExpires = new Date(Date.now() + 1000 * 60 * 60 * 24 * 2); // 48h
+
+      if (!subscriber) {
+        // Insert new subscriber
+        const insertResult = await pool.query(
+          `INSERT INTO newsletter_subscribers 
+           (email, status, is_active, confirm_token, confirm_token_expires, unsubscribe_token, source) 
+           VALUES ($1, $2, $3, $4, $5, $6, $7) RETURNING *`,
+          [email.toLowerCase(), 'pending', false, confirmToken, confirmTokenExpires.toISOString(), unsubscribeToken, req.body.source || 'website']
+        );
+
+        await sendConfirmationEmail(email, confirmToken, unsubscribeToken);
+        res.status(201).json({
+          success: true,
+          message: 'Please check your email to confirm your subscription.'
+        });
+      } else {
+        // Update existing subscriber
+        await pool.query(
+          `UPDATE newsletter_subscribers 
+           SET status = $1, is_active = $2, confirm_token = $3, confirm_token_expires = $4, unsubscribe_token = $5, updated_at = CURRENT_TIMESTAMP 
+           WHERE email = $6`,
+          ['pending', false, confirmToken, confirmTokenExpires.toISOString(), unsubscribeToken, email.toLowerCase()]
+        );
+
+        await sendConfirmationEmail(email, confirmToken, unsubscribeToken);
+        res.status(200).json({
+          success: true,
+          message: 'Please check your email to confirm your subscription.'
+        });
+      }
+    } catch (error) {
+      console.error('Subscription error:', error);
+      res.status(500).json({
+        success: false,
+        message: 'Failed to subscribe. Please try again.'
+      });
+    }
 
   } catch (error) {
     console.error('Subscription error:', error);
@@ -143,31 +130,22 @@ router.post('/unsubscribe', async (req, res) => {
       });
     }
 
-    newsletterDb.run(
-      'UPDATE newsletter_subscribers SET status = ?, isActive = ?, updatedAt = CURRENT_TIMESTAMP WHERE email = ?',
-      ['unsubscribed', 0, email.toLowerCase()],
-      function (err) {
-        if (err) {
-          console.error('Database error:', err);
-          return res.status(500).json({
-            success: false,
-            message: 'Database error occurred'
-          });
-        }
-
-        if (this.changes === 0) {
-          return res.status(404).json({
-            success: false,
-            message: 'Email not found in subscribers list.'
-          });
-        }
-
-        res.json({
-          success: true,
-          message: 'Successfully unsubscribed!'
-        });
-      }
+    const result = await pool.query(
+      'UPDATE newsletter_subscribers SET status = $1, is_active = $2, updated_at = CURRENT_TIMESTAMP WHERE email = $3',
+      ['unsubscribed', false, email.toLowerCase()]
     );
+
+    if (result.rowCount === 0) {
+      return res.status(404).json({
+        success: false,
+        message: 'Email not found in subscribers list.'
+      });
+    }
+
+    res.json({
+      success: true,
+      message: 'Successfully unsubscribed!'
+    });
 
   } catch (error) {
     console.error('Unsubscribe error:', error);
@@ -183,22 +161,16 @@ router.get('/unsubscribe/:token', async (req, res) => {
   try {
     const { token } = req.params;
     
-    newsletterDb.run(
-      'UPDATE newsletter_subscribers SET status = ?, isActive = ?, updatedAt = CURRENT_TIMESTAMP WHERE unsubscribeToken = ?',
-      ['unsubscribed', 0, token],
-      function (err) {
-        if (err) {
-          console.error('Database error:', err);
-          return res.status(500).send('Database error occurred.');
-        }
-
-        if (this.changes === 0) {
-          return res.status(400).send('Invalid unsubscribe link.');
-        }
-
-        res.send('You have been unsubscribed successfully.');
-      }
+    const result = await pool.query(
+      'UPDATE newsletter_subscribers SET status = $1, is_active = $2, updated_at = CURRENT_TIMESTAMP WHERE unsubscribe_token = $3',
+      ['unsubscribed', false, token]
     );
+
+    if (result.rowCount === 0) {
+      return res.status(400).send('Invalid unsubscribe link.');
+    }
+
+    res.send('You have been unsubscribed successfully.');
   } catch (error) {
     console.error('Unsubscribe token error:', error);
     res.status(500).send('Failed to unsubscribe.');
@@ -210,24 +182,18 @@ router.get('/confirm/:token', async (req, res) => {
   try {
     const { token } = req.params;
     
-    newsletterDb.run(
+    const result = await pool.query(
       `UPDATE newsletter_subscribers 
-       SET status = ?, isActive = ?, subscribedAt = CURRENT_TIMESTAMP, confirmToken = NULL, confirmTokenExpires = NULL, updatedAt = CURRENT_TIMESTAMP 
-       WHERE confirmToken = ? AND confirmTokenExpires > datetime('now')`,
-      ['active', 1, token],
-      function (err) {
-        if (err) {
-          console.error('Database error:', err);
-          return res.status(500).send('Database error occurred.');
-        }
-
-        if (this.changes === 0) {
-          return res.status(400).send('Invalid or expired confirmation link.');
-        }
-
-        res.send('Subscription confirmed! Welcome to the PUAGMAE Festival newsletter.');
-      }
+       SET status = $1, is_active = $2, subscribed_at = CURRENT_TIMESTAMP, confirm_token = NULL, confirm_token_expires = NULL, updated_at = CURRENT_TIMESTAMP 
+       WHERE confirm_token = $3 AND confirm_token_expires > NOW()`,
+      ['active', true, token]
     );
+
+    if (result.rowCount === 0) {
+      return res.status(400).send('Invalid or expired confirmation link.');
+    }
+
+    res.send('Subscription confirmed! Welcome to the PUAGMAE Festival newsletter.');
   } catch (error) {
     console.error('Confirm subscription error:', error);
     res.status(500).send('Failed to confirm subscription.');
@@ -237,25 +203,16 @@ router.get('/confirm/:token', async (req, res) => {
 // Get all subscribers (admin only)
 router.get('/subscribers', async (req, res) => {
   try {
-    newsletterDb.all(
-      'SELECT email, subscribedAt, source FROM newsletter_subscribers WHERE status = ? AND isActive = ? ORDER BY subscribedAt DESC',
-      ['active', 1],
-      (err, rows) => {
-        if (err) {
-          console.error('Database error:', err);
-          return res.status(500).json({
-            success: false,
-            message: 'Failed to fetch subscribers.'
-          });
-        }
-
-        res.json({
-          success: true,
-          count: rows.length,
-          subscribers: rows
-        });
-      }
+    const result = await pool.query(
+      'SELECT email, subscribed_at, source FROM newsletter_subscribers WHERE status = $1 AND is_active = $2 ORDER BY subscribed_at DESC',
+      ['active', true]
     );
+
+    res.json({
+      success: true,
+      count: result.rows.length,
+      subscribers: result.rows
+    });
   } catch (error) {
     console.error('Get subscribers error:', error);
     res.status(500).json({
@@ -277,17 +234,10 @@ router.post('/send-newsletter', async (req, res) => {
       });
     }
 
-    newsletterDb.all(
-      'SELECT email FROM newsletter_subscribers WHERE status = ? AND isActive = ?',
-      ['active', 1],
-      async (err, rows) => {
-        if (err) {
-          console.error('Database error:', err);
-          return res.status(500).json({
-            success: false,
-            message: 'Database error occurred'
-          });
-        }
+    const result = await pool.query(
+      'SELECT email FROM newsletter_subscribers WHERE status = $1 AND is_active = $2',
+      ['active', true]
+    );
 
         if (rows.length === 0) {
           return res.status(400).json({
@@ -301,7 +251,7 @@ router.post('/send-newsletter', async (req, res) => {
           const newsletterEmail = emailTemplates.newsletter(subject, content);
 
           // Send to all subscribers
-          const emailPromises = rows.map(subscriber => {
+          const emailPromises = result.rows.map(subscriber => {
             return transporter.sendMail({
               from: process.env.EMAIL_USER || 'puagmaef@gmail.com',
               to: subscriber.email,
@@ -313,14 +263,14 @@ router.post('/send-newsletter', async (req, res) => {
           await Promise.all(emailPromises);
 
           // Update lastEmailSent for all subscribers
-          newsletterDb.run(
-            'UPDATE newsletter_subscribers SET lastEmailSent = CURRENT_TIMESTAMP WHERE status = ? AND isActive = ?',
-            ['active', 1]
+          await pool.query(
+            'UPDATE newsletter_subscribers SET last_email_sent = CURRENT_TIMESTAMP WHERE status = $1 AND is_active = $2',
+            ['active', true]
           );
 
           res.json({
             success: true,
-            message: `Newsletter sent to ${rows.length} subscribers successfully!`
+            message: `Newsletter sent to ${result.rows.length} subscribers successfully!`
           });
 
         } catch (emailError) {
@@ -330,8 +280,6 @@ router.post('/send-newsletter', async (req, res) => {
             message: 'Failed to send newsletter emails.'
           });
         }
-      }
-    );
 
   } catch (error) {
     console.error('Send newsletter error:', error);
@@ -345,57 +293,34 @@ router.post('/send-newsletter', async (req, res) => {
 // Get subscriber statistics (admin only)
 router.get('/stats', async (req, res) => {
   try {
-    newsletterDb.get(
-      'SELECT COUNT(*) as totalActive FROM newsletter_subscribers WHERE status = ? AND isActive = ?',
-      ['active', 1],
-      (err, activeRow) => {
-        if (err) {
-          console.error('Database error:', err);
-          return res.status(500).json({
-            success: false,
-            message: 'Failed to fetch statistics.'
-          });
-        }
-
-        newsletterDb.get(
-          'SELECT COUNT(*) as totalInactive FROM newsletter_subscribers WHERE status = ?',
-          ['unsubscribed'],
-          (err, inactiveRow) => {
-            if (err) {
-              console.error('Database error:', err);
-              return res.status(500).json({
-                success: false,
-                message: 'Failed to fetch statistics.'
-              });
-            }
-
-            newsletterDb.get(
-              'SELECT COUNT(*) as thisMonth FROM newsletter_subscribers WHERE status = ? AND isActive = ? AND subscribedAt >= datetime("now", "start of month")',
-              ['active', 1],
-              (err, monthRow) => {
-                if (err) {
-                  console.error('Database error:', err);
-                  return res.status(500).json({
-                    success: false,
-                    message: 'Failed to fetch statistics.'
-                  });
-                }
-
-                res.json({
-                  success: true,
-                  stats: {
-                    totalActive: activeRow.totalActive,
-                    totalInactive: inactiveRow.totalInactive,
-                    thisMonth: monthRow.thisMonth,
-                    total: activeRow.totalActive + inactiveRow.totalInactive
-                  }
-                });
-              }
-            );
-          }
-        );
-      }
+    const activeResult = await pool.query(
+      'SELECT COUNT(*) as totalActive FROM newsletter_subscribers WHERE status = $1 AND is_active = $2',
+      ['active', true]
     );
+
+    const inactiveResult = await pool.query(
+      'SELECT COUNT(*) as totalInactive FROM newsletter_subscribers WHERE status = $1',
+      ['unsubscribed']
+    );
+
+    const monthResult = await pool.query(
+      'SELECT COUNT(*) as thisMonth FROM newsletter_subscribers WHERE status = $1 AND is_active = $2 AND subscribed_at >= DATE_TRUNC(\'month\', CURRENT_DATE)',
+      ['active', true]
+    );
+
+    const totalActive = parseInt(activeResult.rows[0].totalactive);
+    const totalInactive = parseInt(inactiveResult.rows[0].totalinactive);
+    const thisMonth = parseInt(monthResult.rows[0].thismonth);
+
+    res.json({
+      success: true,
+      stats: {
+        totalActive,
+        totalInactive,
+        thisMonth,
+        total: totalActive + totalInactive
+      }
+    });
 
   } catch (error) {
     console.error('Get stats error:', error);

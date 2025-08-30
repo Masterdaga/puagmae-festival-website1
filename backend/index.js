@@ -7,45 +7,52 @@ const PDFDocument = require('pdfkit');
 const fs = require('fs');
 const path = require('path');
 const os = require('os');
-const sqlite3 = require('sqlite3').verbose();
 const validator = require('validator');
 const bcrypt = require('bcryptjs');
 const { adminAuth, readAdminStore, ADMIN_STORE } = require('./middleware/auth');
+const pool = require('./config/database');
 
-// SQLite Database Setup
-const dbPath = path.join(__dirname, 'registrations.db');
-const db = new sqlite3.Database(dbPath);
-// Newsletter DB (for admin subscribers view)
-const newsletterDb = new sqlite3.Database(path.join(__dirname, 'newsletter.db'));
-
-// Create users table if it doesn't exist
-db.serialize(() => {
-  db.run(`
-    CREATE TABLE IF NOT EXISTS users (
-      id INTEGER PRIMARY KEY AUTOINCREMENT,
-      name TEXT NOT NULL,
-      email TEXT UNIQUE NOT NULL,
-      phone TEXT NOT NULL,
-      emailSent INTEGER DEFAULT 0,
-      emailError TEXT DEFAULT NULL,
-      registeredAt DATETIME DEFAULT CURRENT_TIMESTAMP,
-      createdAt DATETIME DEFAULT CURRENT_TIMESTAMP,
-      updatedAt DATETIME DEFAULT CURRENT_TIMESTAMP
-    )
-  `);
-  
-  db.run('CREATE INDEX IF NOT EXISTS idx_email ON users (email)');
-  db.run('CREATE INDEX IF NOT EXISTS idx_phone ON users (phone)');
-});
-
-// Ensure admin store exists with a default account if missing
-if (!fs.existsSync(ADMIN_STORE)) {
-  const defaultUser = process.env.ADMIN_USER || 'admin';
-  const defaultPass = process.env.ADMIN_PASS || 'puagme2023';
-  const passwordHash = bcrypt.hashSync(defaultPass, 10);
-  fs.mkdirSync(require('path').dirname(ADMIN_STORE), { recursive: true });
-  fs.writeFileSync(ADMIN_STORE, JSON.stringify({ username: defaultUser, passwordHash }, null, 2));
+// PostgreSQL Database Setup
+async function initializeDatabase() {
+  try {
+    // Read and execute schema
+    const schemaPath = path.join(__dirname, 'config', 'schema.sql');
+    const schema = fs.readFileSync(schemaPath, 'utf8');
+    
+    // Execute the entire schema as one statement to handle functions properly
+    try {
+      await pool.query(schema);
+      console.log('✅ Database schema initialized successfully');
+    } catch (schemaError) {
+      console.warn('⚠️ Schema execution failed, trying individual statements:', schemaError.message);
+      
+      // Fallback: Split schema into individual statements and filter out empty ones
+      const statements = schema
+        .split(';')
+        .map(stmt => stmt.trim())
+        .filter(stmt => stmt && !stmt.startsWith('--'));
+      
+      for (const statement of statements) {
+        if (statement.trim()) {
+          try {
+            await pool.query(statement);
+          } catch (stmtError) {
+            // Log individual statement errors but continue
+            console.warn('⚠️ Statement failed:', statement.substring(0, 50) + '...', stmtError.message);
+          }
+        }
+      }
+      
+      console.log('✅ Database schema initialized successfully (fallback method)');
+    }
+  } catch (error) {
+    console.error('❌ Error initializing database:', error);
+    // Don't exit, continue with app startup
+  }
 }
+
+// Initialize database on startup
+initializeDatabase();
 
 // Express setup
 const PORT = process.env.PORT || 5000;
@@ -156,75 +163,73 @@ async function generatePDF(user) {
 // 🔒 Admin Routes
 app.use('/admin', adminAuth);
 
-app.get('/admin/registrations', (req, res) => {
-  db.all('SELECT * FROM users ORDER BY registeredAt DESC', (err, rows) => {
-    if (err) {
-      console.error('Database error:', err);
-      return res.status(500).json({ error: 'Failed to fetch registrations' });
-    }
-    res.json(rows);
-  });
+app.get('/admin/registrations', async (req, res) => {
+  try {
+    const result = await pool.query('SELECT * FROM users ORDER BY registered_at DESC');
+    res.json(result.rows);
+  } catch (err) {
+    console.error('Database error:', err);
+    res.status(500).json({ error: 'Failed to fetch registrations' });
+  }
 });
 
 // List newsletter subscribers (all statuses) - admin only
-app.get('/admin/newsletter/subscribers', (req, res) => {
-  newsletterDb.all(
-    'SELECT email, status, isActive, subscribedAt, source, createdAt, updatedAt FROM newsletter_subscribers ORDER BY COALESCE(subscribedAt, createdAt) DESC',
-    (err, rows) => {
-      if (err) {
-        console.error('Newsletter DB error:', err);
-        return res.status(500).json({ success: false, message: 'Failed to fetch subscribers' });
-      }
-      res.json({ success: true, count: rows.length, subscribers: rows });
-    }
-  );
+app.get('/admin/newsletter/subscribers', async (req, res) => {
+  try {
+    const result = await pool.query(
+      'SELECT email, status, is_active, created_at, updated_at FROM newsletter_subscribers ORDER BY created_at DESC'
+    );
+    res.json({ success: true, count: result.rows.length, subscribers: result.rows });
+  } catch (err) {
+    console.error('Newsletter DB error:', err);
+    res.status(500).json({ success: false, message: 'Failed to fetch subscribers' });
+  }
 });
 
 // Delete a registration (admin only)
-app.delete('/admin/registrations/:id', (req, res) => {
+app.delete('/admin/registrations/:id', async (req, res) => {
   const { id } = req.params;
   if (!id) return res.status(400).json({ success: false, message: 'Missing registration id' });
 
-  // Look up user first
-  db.get('SELECT * FROM users WHERE id = ?', [id], (findErr, user) => {
-    if (findErr) {
-      console.error('Database error:', findErr);
-      return res.status(500).json({ success: false, message: 'Failed to fetch registration' });
-    }
-    if (!user) {
+  try {
+    // Look up user first
+    const userResult = await pool.query('SELECT * FROM users WHERE id = $1', [id]);
+    
+    if (userResult.rows.length === 0) {
       return res.status(404).json({ success: false, message: 'Registration not found' });
     }
 
+    const user = userResult.rows[0];
+
     // Delete
-    db.run('DELETE FROM users WHERE id = ?', [id], function (delErr) {
-      if (delErr) {
-        console.error('Database error:', delErr);
-        return res.status(500).json({ success: false, message: 'Failed to delete registration' });
-      }
+    await pool.query('DELETE FROM users WHERE id = $1', [id]);
 
-      // Try to send an email notification (non-blocking)
-      if (process.env.EMAIL_USER && process.env.EMAIL_PASS && user.email) {
-        transporter.sendMail({
-          from: `PUAGMAE Festival <${process.env.EMAIL_USER}>`,
-          to: user.email,
-          subject: 'Your PUAGMAE Festival Registration Has Been Cancelled',
-          html: `
-            <div style="font-family:Arial,sans-serif;max-width:640px;margin:0 auto">
-              <div style="background:#fbbf24;padding:16px 20px;color:#111827;font-weight:700">Registration Update</div>
-              <div style="padding:20px;background:#f9fafb;color:#111827">
-                <p>Dear ${user.name || 'Participant'},</p>
-                <p>Your PUAGMAE Festival registration has been cancelled as requested. If this was a mistake, you can register again on our website.</p>
-                <p style="margin-top:16px">We hope to see you at the festival in the future.</p>
-                <p style="margin-top:24px">— PUAGMAE Festival Team</p>
-              </div>
+    // Try to send an email notification (non-blocking)
+    if (process.env.EMAIL_USER && process.env.EMAIL_PASS && user.email) {
+      transporter.sendMail({
+        from: `PUAGMAE Festival <${process.env.EMAIL_USER}>`,
+        to: user.email,
+        subject: 'Your PUAGMAE Festival Registration Has Been Cancelled',
+        html: `
+          <div style="font-family:Arial,sans-serif;max-width:640px;margin:0 auto">
+            <div style="background:#fbbf24;padding:16px 20px;color:#111827;font-weight:700">Registration Update</div>
+            <div style="padding:20px;background:#f9fafb;color:#111827">
+              <p>Dear ${user.name || 'Participant'},</p>
+              <p>Your PUAGMAE Festival registration has been cancelled as requested. If this was a mistake, you can register again on our website.</p>
+              <p style="margin-top:16px">We hope to see you at the festival in the future.</p>
+              <p style="margin-top:24px">— PUAGMAE Festival Team</p>
             </div>
-          `
-        }).catch(err => console.warn('Unregister email failed:', err.message));
-      }
+          </div>
+        `
+      }).catch(err => console.warn('Unregister email failed:', err.message));
+    }
 
-      return res.json({ success: true });
-    });
-  });
+    return res.json({ success: true });
+
+  } catch (err) {
+    console.error('Database error:', err);
+    return res.status(500).json({ success: false, message: 'Failed to delete registration' });
+  }
 });
 
 // 🔧 Admin settings - update username/password
@@ -339,64 +344,49 @@ app.post('/register', async (req, res) => {
     }
 
     // Check for existing user
-    db.get(
-      'SELECT * FROM users WHERE email = ? OR phone = ?',
-      [email.toLowerCase(), phone.trim()],
-      (err, existingUser) => {
-        if (err) {
-          console.error('Database error:', err);
-          return res.status(500).json({
-            error: 'InternalError',
-            message: 'Registration failed. Please try again.'
-          });
-        }
+    try {
+      const existingUser = await pool.query(
+        'SELECT * FROM users WHERE email = $1 OR phone = $2',
+        [email.toLowerCase(), phone.trim()]
+      );
 
-        if (existingUser) {
-          return res.status(409).json({
-            error: 'DuplicateError',
-            message: 'Email or phone number already registered'
-          });
-        }
-
-        // Create user in database
-        db.run(
-          'INSERT INTO users (name, email, phone, emailSent) VALUES (?, ?, ?, ?)',
-          [name.trim(), email.toLowerCase().trim(), phone.trim(), 0],
-          function (err) {
-            if (err) {
-              console.error('Database error:', err);
-              return res.status(500).json({
-                error: 'InternalError',
-                message: 'Registration failed. Please try again.'
-              });
-            }
-
-            const newUser = {
-              id: this.lastID,
-              name: name.trim(),
-              email: email.toLowerCase().trim(),
-              phone: phone.trim(),
-              emailSent: false
-            };
-
-            console.log('✅ User registered successfully:', newUser.email);
-
-            // Send immediate response - registration is successful
-            res.status(201).json({
-              success: true,
-              message: 'Registration complete!',
-              userId: newUser.id,
-              emailSent: false // Will be updated async
-            });
-
-            // ✅ Handle email in BACKGROUND (non-blocking)
-            sendConfirmationEmail(newUser).catch(emailError => {
-              console.warn('⚠️ Email sending failed (non-critical):', emailError.message);
-            });
-          }
-        );
+      if (existingUser.rows.length > 0) {
+        return res.status(409).json({
+          error: 'DuplicateError',
+          message: 'Email or phone number already registered'
+        });
       }
-    );
+
+      // Create user in database
+      const result = await pool.query(
+        'INSERT INTO users (name, email, phone, email_sent) VALUES ($1, $2, $3, $4) RETURNING *',
+        [name.trim(), email.toLowerCase().trim(), phone.trim(), false]
+      );
+
+      const newUser = result.rows[0];
+
+      console.log('✅ User registered successfully:', newUser.email);
+
+      // Send immediate response - registration is successful
+      res.status(201).json({
+        success: true,
+        message: 'Registration complete!',
+        userId: newUser.id,
+        emailSent: false // Will be updated async
+      });
+
+      // ✅ Handle email in BACKGROUND (non-blocking)
+      sendConfirmationEmail(newUser).catch(emailError => {
+        console.warn('⚠️ Email sending failed (non-critical):', emailError.message);
+      });
+
+    } catch (dbError) {
+      console.error('Database error:', dbError);
+      return res.status(500).json({
+        error: 'InternalError',
+        message: 'Registration failed. Please try again.'
+      });
+    }
 
   } catch (error) {
     console.error('❌ Registration Error:', error);
@@ -438,8 +428,8 @@ async function sendConfirmationEmail(user) {
     });
 
     // Update user record to indicate email was sent
-    db.run(
-      'UPDATE users SET emailSent = 1, emailError = NULL, updatedAt = CURRENT_TIMESTAMP WHERE id = ?',
+    await pool.query(
+      'UPDATE users SET email_sent = true, email_error = NULL, updated_at = CURRENT_TIMESTAMP WHERE id = $1',
       [user.id]
     );
 
@@ -454,35 +444,34 @@ async function sendConfirmationEmail(user) {
     console.error('❌ Email sending failed for:', user.email, emailError.message);
     
     // Update user record with error (but registration still succeeded)
-    db.run(
-      'UPDATE users SET emailSent = 0, emailError = ?, updatedAt = CURRENT_TIMESTAMP WHERE id = ?',
+    await pool.query(
+      'UPDATE users SET email_sent = false, email_error = $1, updated_at = CURRENT_TIMESTAMP WHERE id = $2',
       [emailError.message, user.id]
     );
   }
 }
 
 // Health check endpoint
-app.get('/', (req, res) => {
-  db.get('SELECT COUNT(*) as count FROM users', (err, row) => {
-    if (err) {
-      return res.json({
-        status: 'healthy',
-        server: 'PUAGME Festival Backend',
-        version: '1.0.0',
-        database: 'connected',
-        totalRegistrations: 'error'
-      });
-    }
-    
+app.get('/', async (req, res) => {
+  try {
+    const result = await pool.query('SELECT COUNT(*) as count FROM users');
     res.json({
       status: 'healthy',
       server: 'PUAGME Festival Backend',
       version: '1.0.0',
       database: 'connected',
-      totalRegistrations: row.count,
+      totalRegistrations: result.rows[0].count,
       email: process.env.EMAIL_USER ? 'configured' : 'not configured'
     });
-  });
+  } catch (err) {
+    res.json({
+      status: 'healthy',
+      server: 'PUAGME Festival Backend',
+      version: '1.0.0',
+      database: 'connected',
+      totalRegistrations: 'error'
+    });
+  }
 });
 
 // Start server
@@ -493,18 +482,18 @@ app.listen(PORT, () => {
   console.log(`🔐 Admin panel: http://localhost:${PORT}/admin/registrations`);
   const store = readAdminStore();
   console.log(`🛡️  Admin username: ${store?.username}`);
-  console.log(`💾 Using SQLite database: registrations.db`);
+  console.log(`💾 Using PostgreSQL database: puagmae_festival`);
   console.log(`💡 Registration will succeed even if email fails`);
 });
 
 // Graceful shutdown
 process.on('SIGINT', () => {
   console.log('\n🛑 Shutting down server...');
-  db.close((err) => {
+  pool.end((err) => {
     if (err) {
-      console.error('Error closing database:', err);
+      console.error('Error closing database pool:', err);
     } else {
-      console.log('✅ Database connection closed');
+      console.log('✅ Database pool closed');
     }
     process.exit(0);
   });
