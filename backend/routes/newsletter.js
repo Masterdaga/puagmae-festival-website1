@@ -138,17 +138,33 @@ router.post('/unsubscribe', async (req, res) => {
       });
     }
 
+    // First check if the email exists and is subscribed
+    const checkResult = await pool.query(
+      'SELECT email, status FROM newsletter_subscribers WHERE email = $1',
+      [email.toLowerCase()]
+    );
+
+    if (checkResult.rows.length === 0) {
+      return res.status(404).json({
+        success: false,
+        message: 'This email is not in our subscribers list.'
+      });
+    }
+
+    const subscriber = checkResult.rows[0];
+    
+    if (subscriber.status === 'unsubscribed') {
+      return res.status(409).json({
+        success: false,
+        message: 'This email is already unsubscribed from our newsletter.'
+      });
+    }
+
+    // Now unsubscribe
     const result = await pool.query(
       'UPDATE newsletter_subscribers SET status = $1, is_active = $2, updated_at = CURRENT_TIMESTAMP WHERE email = $3',
       ['unsubscribed', false, email.toLowerCase()]
     );
-
-    if (result.rowCount === 0) {
-      return res.status(404).json({
-        success: false,
-        message: 'Email not found in subscribers list.'
-      });
-    }
 
     // Send unsubscribe confirmation email
     try {
@@ -207,26 +223,47 @@ router.get('/unsubscribe/:token', async (req, res) => {
   try {
     const { token } = req.params;
     
-    // First get the email before updating
-    const emailResult = await pool.query(
-      'SELECT email FROM newsletter_subscribers WHERE unsubscribe_token = $1',
+    // First check if the token exists and get subscriber info
+    const checkResult = await pool.query(
+      'SELECT email, status FROM newsletter_subscribers WHERE unsubscribe_token = $1',
       [token]
     );
 
-    if (emailResult.rows.length === 0) {
-      return res.status(400).send('Invalid unsubscribe link.');
+    if (checkResult.rows.length === 0) {
+      return res.status(400).send(`
+        <html>
+          <head><title>Invalid Link - PUAGMAE Festival</title></head>
+          <body style="font-family: Arial, sans-serif; text-align: center; padding: 50px;">
+            <h1 style="color: #dc2626;">Invalid Unsubscribe Link</h1>
+            <p>This unsubscribe link is invalid or has expired.</p>
+            <p><a href="${process.env.FRONTEND_URL || 'https://puagmae-festival.onrender.com'}">Return to Website</a></p>
+          </body>
+        </html>
+      `);
     }
 
-    const email = emailResult.rows[0].email;
+    const subscriber = checkResult.rows[0];
     
+    if (subscriber.status === 'unsubscribed') {
+      return res.status(400).send(`
+        <html>
+          <head><title>Already Unsubscribed - PUAGMAE Festival</title></head>
+          <body style="font-family: Arial, sans-serif; text-align: center; padding: 50px;">
+            <h1 style="color: #059669;">Already Unsubscribed</h1>
+            <p>This email is already unsubscribed from our newsletter.</p>
+            <p><a href="${process.env.FRONTEND_URL || 'https://puagmae-festival.onrender.com'}">Return to Website</a></p>
+          </body>
+        </html>
+      `);
+    }
+
+    const email = subscriber.email;
+    
+    // Now unsubscribe
     const result = await pool.query(
       'UPDATE newsletter_subscribers SET status = $1, is_active = $2, updated_at = CURRENT_TIMESTAMP WHERE unsubscribe_token = $3',
       ['unsubscribed', false, token]
     );
-
-    if (result.rowCount === 0) {
-      return res.status(400).send('Invalid unsubscribe link.');
-    }
 
     // Send unsubscribe confirmation email
     try {
@@ -266,12 +303,123 @@ router.get('/unsubscribe/:token', async (req, res) => {
       console.warn('⚠️ Failed to send unsubscribe confirmation email:', emailError.message);
     }
 
-    // Redirect to frontend with success message
-    const frontendUrl = process.env.FRONTEND_URL || 'https://puagmae-festival.onrender.com';
-    res.redirect(`${frontendUrl}/newsletter-confirmation/?newsletter=unsubscribed`);
+    // Show success page instead of redirecting
+    res.send(`
+      <html>
+        <head>
+          <title>Unsubscribed Successfully - PUAGMAE Festival</title>
+          <meta name="viewport" content="width=device-width, initial-scale=1.0">
+          <style>
+            body { 
+              font-family: Arial, sans-serif; 
+              margin: 0; 
+              padding: 0; 
+              background: linear-gradient(135deg, #1f2937, #374151);
+              min-height: 100vh;
+              display: flex;
+              align-items: center;
+              justify-content: center;
+            }
+            .container {
+              background: rgba(255, 255, 255, 0.95);
+              border-radius: 15px;
+              padding: 40px;
+              text-align: center;
+              max-width: 500px;
+              box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+            }
+            .logo {
+              background: linear-gradient(135deg, #fbbf24, #f59e0b);
+              color: #1f2937;
+              padding: 20px;
+              border-radius: 10px;
+              margin-bottom: 30px;
+            }
+            .logo h1 {
+              margin: 0;
+              font-size: 2.5em;
+              font-weight: bold;
+            }
+            .success-icon {
+              font-size: 4em;
+              margin: 20px 0;
+            }
+            .btn {
+              background: linear-gradient(135deg, #fbbf24, #f59e0b);
+              color: #1f2937;
+              padding: 15px 30px;
+              text-decoration: none;
+              border-radius: 25px;
+              font-weight: bold;
+              display: inline-block;
+              margin: 10px;
+              transition: transform 0.2s;
+            }
+            .btn:hover {
+              transform: translateY(-2px);
+            }
+            .benefits {
+              background: #f3f4f6;
+              padding: 20px;
+              border-radius: 10px;
+              margin: 20px 0;
+              text-align: left;
+            }
+            .benefits h3 {
+              color: #1f2937;
+              margin-top: 0;
+            }
+            .benefits ul {
+              color: #4b5563;
+              line-height: 1.6;
+            }
+            .footer {
+              margin-top: 30px;
+              padding-top: 20px;
+              border-top: 1px solid #e5e7eb;
+              color: #6b7280;
+              font-size: 0.9em;
+            }
+          </style>
+        </head>
+        <body>
+          <div class="container">
+            <div class="logo">
+              <h1>PUAGMAE Festival</h1>
+            </div>
+            <div class="success-icon">✅</div>
+            <h2 style="color: #059669; margin-bottom: 20px;">Unsubscribed Successfully</h2>
+            <p style="color: #4b5563; line-height: 1.6; margin-bottom: 30px;">
+              You have been successfully unsubscribed from the PUAGMAE Festival newsletter. 
+              We respect your decision and have removed your email from our mailing list.
+            </p>
+            <p style="color: #4b5563; line-height: 1.6; margin-bottom: 30px;">
+              If you change your mind, you can always subscribe again on our website.
+            </p>
+            <div>
+              <a href="${process.env.FRONTEND_URL || 'https://puagmae-festival.onrender.com'}" class="btn">
+                Visit Our Website
+              </a>
+            </div>
+            <div class="footer">
+              <p>© 2025 PUAGMAE Festival. Celebrating the African Golden 13th Month.</p>
+            </div>
+          </div>
+        </body>
+      </html>
+    `);
   } catch (error) {
     console.error('Unsubscribe token error:', error);
-    res.status(500).send('Failed to unsubscribe.');
+    res.status(500).send(`
+      <html>
+        <head><title>Error - PUAGMAE Festival</title></head>
+        <body style="font-family: Arial, sans-serif; text-align: center; padding: 50px;">
+          <h1 style="color: #dc2626;">Error</h1>
+          <p>An error occurred while processing your request.</p>
+          <p><a href="${process.env.FRONTEND_URL || 'https://puagmae-festival.onrender.com'}">Return to Website</a></p>
+        </body>
+      </html>
+    `);
   }
 });
 
@@ -280,23 +428,185 @@ router.get('/confirm/:token', async (req, res) => {
   try {
     const { token } = req.params;
     
+    // First check if token exists and is valid
+    const checkResult = await pool.query(
+      'SELECT email, status, confirm_token_expires FROM newsletter_subscribers WHERE confirm_token = $1',
+      [token]
+    );
+
+    if (checkResult.rows.length === 0) {
+      return res.status(400).send(`
+        <html>
+          <head><title>Invalid Link - PUAGMAE Festival</title></head>
+          <body style="font-family: Arial, sans-serif; text-align: center; padding: 50px;">
+            <h1 style="color: #dc2626;">Invalid Confirmation Link</h1>
+            <p>This confirmation link is invalid or has expired.</p>
+            <p><a href="${process.env.FRONTEND_URL || 'https://puagmae-festival.onrender.com'}">Return to Website</a></p>
+          </body>
+        </html>
+      `);
+    }
+
+    const subscriber = checkResult.rows[0];
+    
+    if (subscriber.status === 'active') {
+      return res.status(400).send(`
+        <html>
+          <head><title>Already Confirmed - PUAGMAE Festival</title></head>
+          <body style="font-family: Arial, sans-serif; text-align: center; padding: 50px;">
+            <h1 style="color: #059669;">Already Confirmed</h1>
+            <p>This email is already confirmed and active in our newsletter.</p>
+            <p><a href="${process.env.FRONTEND_URL || 'https://puagmae-festival.onrender.com'}">Return to Website</a></p>
+          </body>
+        </html>
+      `);
+    }
+
+    if (subscriber.confirm_token_expires < new Date()) {
+      return res.status(400).send(`
+        <html>
+          <head><title>Expired Link - PUAGMAE Festival</title></head>
+          <body style="font-family: Arial, sans-serif; text-align: center; padding: 50px;">
+            <h1 style="color: #dc2626;">Link Expired</h1>
+            <p>This confirmation link has expired. Please subscribe again from our website.</p>
+            <p><a href="${process.env.FRONTEND_URL || 'https://puagmae-festival.onrender.com'}">Return to Website</a></p>
+          </body>
+        </html>
+      `);
+    }
+    
+    // Now confirm the subscription
     const result = await pool.query(
       `UPDATE newsletter_subscribers 
        SET status = $1, is_active = $2, subscribed_at = CURRENT_TIMESTAMP, confirm_token = NULL, confirm_token_expires = NULL, updated_at = CURRENT_TIMESTAMP 
-       WHERE confirm_token = $3 AND confirm_token_expires > NOW()`,
+       WHERE confirm_token = $3`,
       ['active', true, token]
     );
 
-    if (result.rowCount === 0) {
-      return res.status(400).send('Invalid or expired confirmation link.');
-    }
-
-    // Redirect to frontend with success message
-    const frontendUrl = process.env.FRONTEND_URL || 'https://puagmae-festival.onrender.com';
-    res.redirect(`${frontendUrl}/newsletter-confirmation/?newsletter=confirmed`);
+    // Show success page instead of redirecting
+    res.send(`
+      <html>
+        <head>
+          <title>Subscription Confirmed - PUAGMAE Festival</title>
+          <meta name="viewport" content="width=device-width, initial-scale=1.0">
+          <style>
+            body { 
+              font-family: Arial, sans-serif; 
+              margin: 0; 
+              padding: 0; 
+              background: linear-gradient(135deg, #1f2937, #374151);
+              min-height: 100vh;
+              display: flex;
+              align-items: center;
+              justify-content: center;
+            }
+            .container {
+              background: rgba(255, 255, 255, 0.95);
+              border-radius: 15px;
+              padding: 40px;
+              text-align: center;
+              max-width: 500px;
+              box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+            }
+            .logo {
+              background: linear-gradient(135deg, #fbbf24, #f59e0b);
+              color: #1f2937;
+              padding: 20px;
+              border-radius: 10px;
+              margin-bottom: 30px;
+            }
+            .logo h1 {
+              margin: 0;
+              font-size: 2.5em;
+              font-weight: bold;
+            }
+            .success-icon {
+              font-size: 4em;
+              margin: 20px 0;
+            }
+            .btn {
+              background: linear-gradient(135deg, #fbbf24, #f59e0b);
+              color: #1f2937;
+              padding: 15px 30px;
+              text-decoration: none;
+              border-radius: 25px;
+              font-weight: bold;
+              display: inline-block;
+              margin: 10px;
+              transition: transform 0.2s;
+            }
+            .btn:hover {
+              transform: translateY(-2px);
+            }
+            .benefits {
+              background: #f3f4f6;
+              padding: 20px;
+              border-radius: 10px;
+              margin: 20px 0;
+              text-align: left;
+            }
+            .benefits h3 {
+              color: #1f2937;
+              margin-top: 0;
+            }
+            .benefits ul {
+              color: #4b5563;
+              line-height: 1.6;
+            }
+            .footer {
+              margin-top: 30px;
+              padding-top: 20px;
+              border-top: 1px solid #e5e7eb;
+              color: #6b7280;
+              font-size: 0.9em;
+            }
+          </style>
+        </head>
+        <body>
+          <div class="container">
+            <div class="logo">
+              <h1>PUAGMAE Festival</h1>
+            </div>
+            <div class="success-icon">🎉</div>
+            <h2 style="color: #059669; margin-bottom: 20px;">Welcome to PUAGMAE!</h2>
+            <p style="color: #4b5563; line-height: 1.6; margin-bottom: 20px;">
+              Your newsletter subscription has been confirmed successfully! 
+              Welcome to the PUAGMAE Festival community.
+            </p>
+            <div class="benefits">
+              <h3>What's Next?</h3>
+              <ul>
+                <li>🎭 Exclusive festival updates and announcements</li>
+                <li>📅 Early access to event registrations</li>
+                <li>🎪 Special performances and activities</li>
+                <li>🎨 Cultural highlights and stories</li>
+                <li>🎵 Music and entertainment news</li>
+              </ul>
+            </div>
+            <div>
+              <a href="${process.env.FRONTEND_URL || 'https://puagmae-festival.onrender.com'}" class="btn">
+                Visit Our Website
+              </a>
+            </div>
+            <div class="footer">
+              <p>© 2025 PUAGMAE Festival. Celebrating the African Golden 13th Month.</p>
+            </div>
+          </div>
+        </body>
+      </html>
+    `);
   } catch (error) {
     console.error('Confirm subscription error:', error);
-    res.status(500).send('Failed to confirm subscription.');
+    res.status(500).send(`
+      <html>
+        <head><title>Error - PUAGMAE Festival</title></head>
+        <body style="font-family: Arial, sans-serif; text-align: center; padding: 50px;">
+          <h1 style="color: #dc2626;">Error</h1>
+          <p>An error occurred while confirming your subscription.</p>
+          <p><a href="${process.env.FRONTEND_URL || 'https://puagmae-festival.onrender.com'}">Return to Website</a></p>
+        </body>
+      </html>
+    `);
   }
 });
 
