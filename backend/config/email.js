@@ -44,7 +44,7 @@ const emailTemplates = {
             We're excited to share the magic of African culture and unity with you!
           </p>
           <div style="text-align: center; margin-top: 30px;">
-            <a href="${process.env.FRONTEND_URL || 'https://puagmae-festival-e6ql.onrender.com'}" 
+            <a href="${process.env.FRONTEND_URL || 'https://puagmae-festival.onrender.com'}" 
                style="background: linear-gradient(135deg, #fbbf24, #f59e0b); color: #1f2937; padding: 12px 24px; text-decoration: none; border-radius: 25px; font-weight: bold;">
               Visit Our Website
             </a>

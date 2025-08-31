@@ -17,7 +17,7 @@ export default function LandingCarousel() {
         {/* Background Image */}
   <div
     className="absolute inset-0 bg-cover bg-center"
-    style={{ backgroundImage: "url('\puagme.png')" }}
+    style={{ backgroundImage: "url('/puagme.png')" }}
   />
 
   {/* Gradient overlay */}

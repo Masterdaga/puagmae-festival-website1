@@ -9,11 +9,12 @@ interface GalleryItem {
 }
 
 const galleryData: GalleryItem[] = [
-  { image: '/photos/img1.jpg', type: 'photo' },
-  { image: '/photos/img3.jpg', type: 'photo' },
-  { image: '/photos/img5.jpg', type: 'photo' },
-  { image: '/photos/img6.jpg', type: 'photo' },
-  { image: '/photos/img7.jpg', type: 'photo' },
+  { image: '/photos/img1.JPG', type: 'photo' },
+  { image: '/photos/img3.JPG', type: 'photo' },
+  { image: '/photos/img4.JPG', type: 'photo' },
+  { image: '/photos/img5.JPG', type: 'photo' },
+  { image: '/photos/img6.JPG', type: 'photo' },
+  { image: '/photos/img7.JPG', type: 'photo' },
   { image: '/photos/img8.jpg', type: 'photo' },
   { image: '/photos/img9.jpg', type: 'photo' },
   { image: '/photos/img10.jpg', type: 'photo' },
@@ -34,7 +35,7 @@ const galleryData: GalleryItem[] = [
   { image: '/photos/img25.jpg', type: 'photo' },
   { image: '/photos/img26.jpg', type: 'photo' },
   { image: '/photos/img28.jpg', type: 'photo' },
-  { image: '/videos/vid1.mp4', type: 'video' },
+  { image: '/videos/vid1.MP4', type: 'video' },
   { image: '/videos/vid2.mp4', type: 'video' },
 ];
 
@@ -180,6 +181,10 @@ export default function GalleryPage() {
                   loading="lazy"
                   sizes="(max-width: 640px) 50vw, (max-width: 768px) 33vw, 25vw"
                   quality={75}
+                  onError={(e) => {
+                    console.error(`Failed to load image: ${item.image}`);
+                    // You could set a fallback image here if needed
+                  }}
                 />
                 <div className="absolute inset-0 bg-black/20 opacity-0 group-hover:opacity-100 transition-opacity duration-300 rounded-lg" />
               </div>

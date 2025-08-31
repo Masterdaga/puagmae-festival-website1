@@ -267,8 +267,8 @@ router.get('/unsubscribe/:token', async (req, res) => {
     }
 
     // Redirect to frontend with success message
-    const frontendUrl = process.env.FRONTEND_URL || 'https://puagmae-festival-e6ql.onrender.com';
-    res.redirect(`${frontendUrl}?newsletter=unsubscribed`);
+    const frontendUrl = process.env.FRONTEND_URL || 'https://puagmae-festival.onrender.com';
+    res.redirect(`${frontendUrl}/newsletter-confirmation/?newsletter=unsubscribed`);
   } catch (error) {
     console.error('Unsubscribe token error:', error);
     res.status(500).send('Failed to unsubscribe.');
@@ -292,8 +292,8 @@ router.get('/confirm/:token', async (req, res) => {
     }
 
     // Redirect to frontend with success message
-    const frontendUrl = process.env.FRONTEND_URL || 'https://puagmae-festival-e6ql.onrender.com';
-    res.redirect(`${frontendUrl}?newsletter=confirmed`);
+    const frontendUrl = process.env.FRONTEND_URL || 'https://puagmae-festival.onrender.com';
+    res.redirect(`${frontendUrl}/newsletter-confirmation/?newsletter=confirmed`);
   } catch (error) {
     console.error('Confirm subscription error:', error);
     res.status(500).send('Failed to confirm subscription.');
