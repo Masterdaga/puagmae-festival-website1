@@ -265,42 +265,44 @@ router.get('/unsubscribe/:token', async (req, res) => {
       ['unsubscribed', false, token]
     );
 
-    // Send unsubscribe confirmation email
-    try {
-      const transporter = createTransporter();
-      await transporter.sendMail({
-        from: `PUAGMAE Festival <${process.env.EMAIL_USER}>`,
-        to: email,
-        subject: 'Unsubscribed from PUAGMAE Festival Newsletter',
-        html: `
-          <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
-            <div style="background: linear-gradient(135deg, #fbbf24, #f59e0b); padding: 20px; text-align: center;">
-              <h1 style="color: #1f2937; margin: 0;">PUAGMAE Festival</h1>
-            </div>
-            <div style="padding: 30px; background: #f9fafb;">
-              <h2 style="color: #1f2937;">Unsubscribed Successfully</h2>
-              <p style="color: #4b5563; line-height: 1.6;">
-                You have been successfully unsubscribed from the PUAGMAE Festival newsletter.
-              </p>
-              <p style="color: #4b5563; line-height: 1.6;">
-                We're sorry to see you go! If you change your mind, you can always subscribe again on our website.
-              </p>
-              <div style="text-align: center; margin-top: 30px;">
-                <a href="${process.env.FRONTEND_URL || 'https://puagmae-festival-e6ql.onrender.com'}" 
-                   style="background: linear-gradient(135deg, #fbbf24, #f59e0b); color: #1f2937; padding: 12px 24px; text-decoration: none; border-radius: 25px; font-weight: bold;">
-                  Visit Our Website
-                </a>
+    // Only send unsubscribe confirmation email if we actually unsubscribed someone
+    if (result.rowCount > 0) {
+      try {
+        const transporter = createTransporter();
+        await transporter.sendMail({
+          from: `PUAGMAE Festival <${process.env.EMAIL_USER}>`,
+          to: email,
+          subject: 'Unsubscribed from PUAGMAE Festival Newsletter',
+          html: `
+            <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
+              <div style="background: linear-gradient(135deg, #fbbf24, #f59e0b); padding: 20px; text-align: center;">
+                <h1 style="color: #1f2937; margin: 0;">PUAGMAE Festival</h1>
+              </div>
+              <div style="padding: 30px; background: #f9fafb;">
+                <h2 style="color: #1f2937;">Unsubscribed Successfully</h2>
+                <p style="color: #4b5563; line-height: 1.6;">
+                  You have been successfully unsubscribed from the PUAGMAE Festival newsletter.
+                </p>
+                <p style="color: #4b5563; line-height: 1.6;">
+                  We're sorry to see you go! If you change your mind, you can always subscribe again on our website.
+                </p>
+                <div style="text-align: center; margin-top: 30px;">
+                  <a href="${process.env.FRONTEND_URL || 'https://puagmae-festival-e6ql.onrender.com'}" 
+                     style="background: linear-gradient(135deg, #fbbf24, #f59e0b); color: #1f2937; padding: 12px 24px; text-decoration: none; border-radius: 25px; font-weight: bold;">
+                    Visit Our Website
+                  </a>
+                </div>
+              </div>
+              <div style="background: #1f2937; color: #9ca3af; padding: 20px; text-align: center; font-size: 12px;">
+                <p>© 2025 PUAGMAE Festival. All rights reserved.</p>
               </div>
             </div>
-            <div style="background: #1f2937; color: #9ca3af; padding: 20px; text-align: center; font-size: 12px;">
-              <p>© 2025 PUAGMAE Festival. All rights reserved.</p>
-            </div>
-          </div>
-        `
-      });
-      console.log('✅ Unsubscribe confirmation email sent to:', email);
-    } catch (emailError) {
-      console.warn('⚠️ Failed to send unsubscribe confirmation email:', emailError.message);
+          `
+        });
+        console.log('✅ Unsubscribe confirmation email sent to:', email);
+      } catch (emailError) {
+        console.warn('⚠️ Failed to send unsubscribe confirmation email:', emailError.message);
+      }
     }
 
     // Show success page instead of redirecting
