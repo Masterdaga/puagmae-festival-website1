@@ -24,11 +24,16 @@ async function verifyBasicAuth(header) {
   const decoded = Buffer.from(encoded, 'base64').toString('utf8');
   const [username, password] = decoded.split(':');
   if (!username || !password) return false;
-  const store = readAdminStore();
-  if (!store) return false;
-  if (username !== store.username) return false;
-  const ok = await bcrypt.compare(password, store.passwordHash);
-  return ok;
+  
+  // Use environment variables instead of local file
+  const envUsername = process.env.ADMIN_USER;
+  const envPassword = process.env.ADMIN_PASS;
+  
+  if (!envUsername || !envPassword) return false;
+  if (username !== envUsername) return false;
+  
+  // Direct password comparison for environment variables
+  return password === envPassword;
 }
 
 function adminAuth(req, res, next) {
