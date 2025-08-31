@@ -1,0 +1,11 @@
+services:
+  - type: web
+    name: puagmae-festival-frontend
+    env: static
+    buildCommand: npm run build
+    staticPublishPath: ./out
+    envVars:
+      - key: NEXT_PUBLIC_API_BASE_URL
+        value: https://puagmae-festival-backend.onrender.com
+      - key: RENDER
+        value: true

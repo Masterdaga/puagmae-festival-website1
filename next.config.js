@@ -1,8 +1,10 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
-  // Remove static export for development
-  // output: 'export',
-  // trailingSlash: true,
+  // Conditional static export - only for Render
+  ...(process.env.RENDER === 'true' && {
+    output: 'export',
+    trailingSlash: true,
+  }),
   images: {
     unoptimized: true
   },
