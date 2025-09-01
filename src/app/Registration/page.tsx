@@ -1,18 +1,19 @@
 'use client';
 import { useState } from 'react';
 
-// Add this right after your useState hooks
-console.log('API URL:', process.env.NEXT_PUBLIC_API_BASE_URL);
-
+// API URL configuration
+const API_URL = process.env.NEXT_PUBLIC_API_BASE_URL;
 
 export default function RegisterPage() {
   const [formData, setFormData] = useState({
     name: '',
     email: '',
-    phone: ''
+    phone: '',
   });
 
-  const [status, setStatus] = useState<'idle'|'loading'|'success'|'error'>('idle');
+  const [status, setStatus] = useState<
+    'idle' | 'loading' | 'success' | 'error'
+  >('idle');
   const [error, setError] = useState('');
   const [emailWarning, setEmailWarning] = useState(false);
 
@@ -29,49 +30,55 @@ export default function RegisterPage() {
     setEmailWarning(false);
 
     try {
-      const apiUrl = process.env.NEXT_PUBLIC_API_BASE_URL || 'http://localhost:5000';
-      
+      const apiUrl = API_URL || 'http://localhost:5000';
+
       // Add timeout to prevent hanging requests
       const controller = new AbortController();
       const timeoutId = setTimeout(() => controller.abort(), 15000); // 15 second timeout
 
       const response = await fetch(`${apiUrl}/register`, {
         method: 'POST',
-        headers: { 
+        headers: {
           'Content-Type': 'application/json',
-          'Accept': 'application/json'
+          Accept: 'application/json',
         },
         signal: controller.signal,
         body: JSON.stringify({
           name: formData.name.trim(),
           email: formData.email.trim(),
-          phone: formData.phone.trim()
+          phone: formData.phone.trim(),
         }),
       });
 
       clearTimeout(timeoutId);
-      
+
       // Check if response is JSON
       const contentType = response.headers.get('content-type');
       if (!contentType || !contentType.includes('application/json')) {
         throw new Error('Server returned invalid response');
       }
-      
+
       const data = await response.json();
 
       if (!response.ok) {
         if (data?.error === 'DuplicateError') {
-          throw new Error(data?.message || "This email or phone number is already registered.");
+          throw new Error(
+            data?.message || 'This email or phone number is already registered.'
+          );
         }
         if (data?.error === 'ValidationError') {
-          throw new Error(data?.message || "Please check your input fields.");
+          throw new Error(data?.message || 'Please check your input fields.');
         }
-        throw new Error(data?.message || data?.error || 'Registration failed. Please try again.');
+        throw new Error(
+          data?.message ||
+            data?.error ||
+            'Registration failed. Please try again.'
+        );
       }
 
       setStatus('success');
       setFormData({ name: '', email: '', phone: '' });
-      
+
       // Show email warning if email might not have been sent
       if (data.emailSent === false) {
         setEmailWarning(true);
@@ -82,19 +89,25 @@ export default function RegisterPage() {
         setStatus('idle');
         setEmailWarning(false);
       }, 8000);
-      
-    } catch (err: any) {
-      console.error('Registration error:', err);
+    } catch (err: unknown) {
+      // Registration error handled with user feedback
       setStatus('error');
-      
-      if (err.name === 'AbortError') {
-        setError('Request timeout. Please check your connection and try again.');
-      } else if (err.message === 'Server returned invalid response') {
+
+      if (err instanceof Error && err.name === 'AbortError') {
+        setError(
+          'Request timeout. Please check your connection and try again.'
+        );
+      } else if (
+        err instanceof Error &&
+        err.message === 'Server returned invalid response'
+      ) {
         setError('Server error. Please try again later.');
-      } else {
+      } else if (err instanceof Error) {
         setError(
           err.message || 'Failed to connect to server. Please try again.'
         );
+      } else {
+        setError('Failed to connect to server. Please try again.');
       }
     }
   };
@@ -126,15 +139,17 @@ export default function RegisterPage() {
         {status === 'success' ? (
           <div className="space-y-3">
             <div className="text-center text-green-600 font-semibold animate-fade-in">
-              ✅ Registration successful! You are now registered for the festival.
+              ✅ Registration successful! You are now registered for the
+              festival.
             </div>
-            
+
             {emailWarning && (
               <div className="text-center text-amber-600 bg-amber-50 p-3 rounded-md border border-amber-200 animate-fade-in">
-                ⚠️ Note: Confirmation email may be delayed. Your registration is complete.
+                ⚠️ Note: Confirmation email may be delayed. Your registration is
+                complete.
               </div>
             )}
-            
+
             {!emailWarning && (
               <div className="text-center text-blue-600 text-sm mt-2">
                 Check your email for confirmation details.
@@ -145,7 +160,10 @@ export default function RegisterPage() {
           <>
             <form onSubmit={handleSubmit} className="space-y-5">
               <div>
-                <label htmlFor="name" className="block text-sm font-medium text-slate-700 mb-1">
+                <label
+                  htmlFor="name"
+                  className="block text-sm font-medium text-slate-700 mb-1"
+                >
                   Full Name *
                 </label>
                 <input
@@ -164,7 +182,10 @@ export default function RegisterPage() {
               </div>
 
               <div>
-                <label htmlFor="email" className="block text-sm font-medium text-slate-700 mb-1">
+                <label
+                  htmlFor="email"
+                  className="block text-sm font-medium text-slate-700 mb-1"
+                >
                   Email Address *
                 </label>
                 <input
@@ -181,7 +202,10 @@ export default function RegisterPage() {
               </div>
 
               <div>
-                <label htmlFor="phone" className="block text-sm font-medium text-slate-700 mb-1">
+                <label
+                  htmlFor="phone"
+                  className="block text-sm font-medium text-slate-700 mb-1"
+                >
                   Phone Number *
                 </label>
                 <input
@@ -203,14 +227,32 @@ export default function RegisterPage() {
                 type="submit"
                 disabled={status === 'loading'}
                 className={`w-full bg-yellow-600 hover:bg-yellow-700 text-white font-semibold py-3 rounded-md transition-all duration-300 ${
-                  status === 'loading' ? 'opacity-70 cursor-not-allowed' : 'hover:scale-105'
+                  status === 'loading'
+                    ? 'opacity-70 cursor-not-allowed'
+                    : 'hover:scale-105'
                 }`}
               >
                 {status === 'loading' ? (
                   <span className="flex items-center justify-center">
-                    <svg className="animate-spin -ml-1 mr-2 h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                      <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-                      <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                    <svg
+                      className="animate-spin -ml-1 mr-2 h-5 w-5 text-white"
+                      xmlns="http://www.w3.org/2000/svg"
+                      fill="none"
+                      viewBox="0 0 24 24"
+                    >
+                      <circle
+                        className="opacity-25"
+                        cx="12"
+                        cy="12"
+                        r="10"
+                        stroke="currentColor"
+                        strokeWidth="4"
+                      ></circle>
+                      <path
+                        className="opacity-75"
+                        fill="currentColor"
+                        d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+                      ></path>
                     </svg>
                     Processing Registration...
                   </span>
@@ -234,7 +276,8 @@ export default function RegisterPage() {
             )}
 
             <div className="mt-4 text-xs text-gray-500 text-center">
-              * Required fields. Your registration will be processed even if email confirmation is delayed.
+              * Required fields. Your registration will be processed even if
+              email confirmation is delayed.
             </div>
           </>
         )}

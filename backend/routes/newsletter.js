@@ -2,7 +2,12 @@ const crypto = require('crypto');
 const express = require('express');
 const router = express.Router();
 const pool = require('../config/database');
-const { createTransporter, emailTemplates, generateConfirmLink, generateUnsubscribeLink } = require('../config/email');
+const {
+  createTransporter,
+  emailTemplates,
+  generateConfirmLink,
+  generateUnsubscribeLink,
+} = require('../config/email');
 
 // PostgreSQL Database Setup for newsletters
 async function initializeNewsletterTable() {
@@ -23,12 +28,20 @@ async function initializeNewsletterTable() {
         updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
       )
     `);
-    
-    await pool.query('CREATE INDEX IF NOT EXISTS idx_newsletter_email ON newsletter_subscribers (email)');
-    await pool.query('CREATE INDEX IF NOT EXISTS idx_newsletter_status ON newsletter_subscribers (status)');
-    await pool.query('CREATE INDEX IF NOT EXISTS idx_newsletter_confirm_token ON newsletter_subscribers (confirm_token)');
-    await pool.query('CREATE INDEX IF NOT EXISTS idx_newsletter_unsubscribe_token ON newsletter_subscribers (unsubscribe_token)');
-    
+
+    await pool.query(
+      'CREATE INDEX IF NOT EXISTS idx_newsletter_email ON newsletter_subscribers (email)'
+    );
+    await pool.query(
+      'CREATE INDEX IF NOT EXISTS idx_newsletter_status ON newsletter_subscribers (status)'
+    );
+    await pool.query(
+      'CREATE INDEX IF NOT EXISTS idx_newsletter_confirm_token ON newsletter_subscribers (confirm_token)'
+    );
+    await pool.query(
+      'CREATE INDEX IF NOT EXISTS idx_newsletter_unsubscribe_token ON newsletter_subscribers (unsubscribe_token)'
+    );
+
     console.log('✅ Newsletter table initialized successfully');
   } catch (error) {
     console.error('❌ Error initializing newsletter table:', error);
@@ -44,9 +57,9 @@ router.post('/subscribe', async (req, res) => {
     const { email } = req.body;
 
     if (!email || !email.includes('@')) {
-      return res.status(400).json({ 
-        success: false, 
-        message: 'Please provide a valid email address' 
+      return res.status(400).json({
+        success: false,
+        message: 'Please provide a valid email address',
       });
     }
 
@@ -56,43 +69,58 @@ router.post('/subscribe', async (req, res) => {
         'SELECT * FROM newsletter_subscribers WHERE email = $1',
         [email.toLowerCase()]
       );
-      
+
       const subscriber = result.rows[0];
 
       // If already active - prevent double subscription
       if (subscriber && subscriber.status === 'active') {
         return res.status(409).json({
           success: false,
-          message: 'This email is already subscribed to our newsletter.'
+          message: 'This email is already subscribed to our newsletter.',
         });
       }
 
       // If pending but not expired, don't send another email
-      if (subscriber && subscriber.status === 'pending' && subscriber.confirm_token_expires > new Date()) {
+      if (
+        subscriber &&
+        subscriber.status === 'pending' &&
+        subscriber.confirm_token_expires > new Date()
+      ) {
         return res.status(409).json({
           success: false,
-          message: 'Please check your email for the confirmation link. If you didn\'t receive it, please check your spam folder.'
+          message:
+            "Please check your email for the confirmation link. If you didn't receive it, please check your spam folder.",
         });
       }
 
       // Create or reset pending record
       const confirmToken = crypto.randomBytes(24).toString('hex');
       const unsubscribeToken = crypto.randomBytes(24).toString('hex');
-      const confirmTokenExpires = new Date(Date.now() + 1000 * 60 * 60 * 24 * 2); // 48h
+      const confirmTokenExpires = new Date(
+        Date.now() + 1000 * 60 * 60 * 24 * 2
+      ); // 48h
 
       if (!subscriber) {
         // Insert new subscriber
-        const insertResult = await pool.query(
+        await pool.query(
           `INSERT INTO newsletter_subscribers 
            (email, status, is_active, confirm_token, confirm_token_expires, unsubscribe_token, source) 
            VALUES ($1, $2, $3, $4, $5, $6, $7) RETURNING *`,
-          [email.toLowerCase(), 'pending', false, confirmToken, confirmTokenExpires.toISOString(), unsubscribeToken, req.body.source || 'website']
+          [
+            email.toLowerCase(),
+            'pending',
+            false,
+            confirmToken,
+            confirmTokenExpires.toISOString(),
+            unsubscribeToken,
+            req.body.source || 'website',
+          ]
         );
 
         await sendConfirmationEmail(email, confirmToken, unsubscribeToken);
         res.status(201).json({
           success: true,
-          message: 'Please check your email to confirm your subscription.'
+          message: 'Please check your email to confirm your subscription.',
         });
       } else {
         // Update existing subscriber
@@ -100,28 +128,34 @@ router.post('/subscribe', async (req, res) => {
           `UPDATE newsletter_subscribers 
            SET status = $1, is_active = $2, confirm_token = $3, confirm_token_expires = $4, unsubscribe_token = $5, updated_at = CURRENT_TIMESTAMP 
            WHERE email = $6`,
-          ['pending', false, confirmToken, confirmTokenExpires.toISOString(), unsubscribeToken, email.toLowerCase()]
+          [
+            'pending',
+            false,
+            confirmToken,
+            confirmTokenExpires.toISOString(),
+            unsubscribeToken,
+            email.toLowerCase(),
+          ]
         );
 
         await sendConfirmationEmail(email, confirmToken, unsubscribeToken);
         res.status(200).json({
           success: true,
-          message: 'Please check your email to confirm your subscription.'
+          message: 'Please check your email to confirm your subscription.',
         });
       }
     } catch (error) {
       console.error('Subscription error:', error);
       res.status(500).json({
         success: false,
-        message: 'Failed to subscribe. Please try again.'
+        message: 'Failed to subscribe. Please try again.',
       });
     }
-
   } catch (error) {
     console.error('Subscription error:', error);
     res.status(500).json({
       success: false,
-      message: 'Failed to subscribe. Please try again.'
+      message: 'Failed to subscribe. Please try again.',
     });
   }
 });
@@ -134,7 +168,7 @@ router.post('/unsubscribe', async (req, res) => {
     if (!email) {
       return res.status(400).json({
         success: false,
-        message: 'Please provide an email address'
+        message: 'Please provide an email address',
       });
     }
 
@@ -147,21 +181,21 @@ router.post('/unsubscribe', async (req, res) => {
     if (checkResult.rows.length === 0) {
       return res.status(404).json({
         success: false,
-        message: 'This email is not in our subscribers list.'
+        message: 'This email is not in our subscribers list.',
       });
     }
 
     const subscriber = checkResult.rows[0];
-    
+
     if (subscriber.status === 'unsubscribed') {
       return res.status(409).json({
         success: false,
-        message: 'This email is already unsubscribed from our newsletter.'
+        message: 'This email is already unsubscribed from our newsletter.',
       });
     }
 
     // Now unsubscribe
-    const result = await pool.query(
+    await pool.query(
       'UPDATE newsletter_subscribers SET status = $1, is_active = $2, updated_at = CURRENT_TIMESTAMP WHERE email = $3',
       ['unsubscribed', false, email.toLowerCase()]
     );
@@ -197,23 +231,25 @@ router.post('/unsubscribe', async (req, res) => {
               <p>© 2025 PUAGMAE Festival. All rights reserved.</p>
             </div>
           </div>
-        `
+        `,
       });
       console.log('✅ Unsubscribe confirmation email sent to:', email);
     } catch (emailError) {
-      console.warn('⚠️ Failed to send unsubscribe confirmation email:', emailError.message);
+      console.warn(
+        '⚠️ Failed to send unsubscribe confirmation email:',
+        emailError.message
+      );
     }
 
     res.json({
       success: true,
-      message: 'Successfully unsubscribed!'
+      message: 'Successfully unsubscribed!',
     });
-
   } catch (error) {
     console.error('Unsubscribe error:', error);
     res.status(500).json({
       success: false,
-      message: 'Failed to unsubscribe. Please try again.'
+      message: 'Failed to unsubscribe. Please try again.',
     });
   }
 });
@@ -222,7 +258,7 @@ router.post('/unsubscribe', async (req, res) => {
 router.get('/unsubscribe/:token', async (req, res) => {
   try {
     const { token } = req.params;
-    
+
     // First check if the token exists and get subscriber info
     const checkResult = await pool.query(
       'SELECT email, status FROM newsletter_subscribers WHERE unsubscribe_token = $1',
@@ -243,7 +279,7 @@ router.get('/unsubscribe/:token', async (req, res) => {
     }
 
     const subscriber = checkResult.rows[0];
-    
+
     if (subscriber.status === 'unsubscribed') {
       return res.status(400).send(`
         <html>
@@ -258,7 +294,7 @@ router.get('/unsubscribe/:token', async (req, res) => {
     }
 
     const email = subscriber.email;
-    
+
     // Now unsubscribe
     const result = await pool.query(
       'UPDATE newsletter_subscribers SET status = $1, is_active = $2, updated_at = CURRENT_TIMESTAMP WHERE unsubscribe_token = $3',
@@ -267,13 +303,13 @@ router.get('/unsubscribe/:token', async (req, res) => {
 
     // Only send unsubscribe confirmation email if we actually unsubscribed someone
     if (result.rowCount > 0) {
-    try {
-      const transporter = createTransporter();
-      await transporter.sendMail({
-        from: `PUAGMAE Festival <${process.env.EMAIL_USER}>`,
-        to: email,
-        subject: 'Unsubscribed from PUAGMAE Festival Newsletter',
-        html: `
+      try {
+        const transporter = createTransporter();
+        await transporter.sendMail({
+          from: `PUAGMAE Festival <${process.env.EMAIL_USER}>`,
+          to: email,
+          subject: 'Unsubscribed from PUAGMAE Festival Newsletter',
+          html: `
           <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
             <div style="background: linear-gradient(135deg, #fbbf24, #f59e0b); padding: 20px; text-align: center;">
               <h1 style="color: #1f2937; margin: 0;">PUAGMAE Festival</h1>
@@ -297,11 +333,14 @@ router.get('/unsubscribe/:token', async (req, res) => {
               <p>© 2025 PUAGMAE Festival. All rights reserved.</p>
             </div>
           </div>
-        `
-      });
-      console.log('✅ Unsubscribe confirmation email sent to:', email);
-    } catch (emailError) {
-      console.warn('⚠️ Failed to send unsubscribe confirmation email:', emailError.message);
+        `,
+        });
+        console.log('✅ Unsubscribe confirmation email sent to:', email);
+      } catch (emailError) {
+        console.warn(
+          '⚠️ Failed to send unsubscribe confirmation email:',
+          emailError.message
+        );
       }
     }
 
@@ -429,7 +468,7 @@ router.get('/unsubscribe/:token', async (req, res) => {
 router.get('/confirm/:token', async (req, res) => {
   try {
     const { token } = req.params;
-    
+
     // First check if token exists and is valid
     const checkResult = await pool.query(
       'SELECT email, status, confirm_token_expires FROM newsletter_subscribers WHERE confirm_token = $1',
@@ -450,7 +489,7 @@ router.get('/confirm/:token', async (req, res) => {
     }
 
     const subscriber = checkResult.rows[0];
-    
+
     if (subscriber.status === 'active') {
       return res.status(400).send(`
         <html>
@@ -476,9 +515,9 @@ router.get('/confirm/:token', async (req, res) => {
         </html>
       `);
     }
-    
+
     // Now confirm the subscription
-    const result = await pool.query(
+    await pool.query(
       `UPDATE newsletter_subscribers 
        SET status = $1, is_active = $2, subscribed_at = CURRENT_TIMESTAMP, confirm_token = NULL, confirm_token_expires = NULL, updated_at = CURRENT_TIMESTAMP 
        WHERE confirm_token = $3`,
@@ -623,13 +662,13 @@ router.get('/subscribers', async (req, res) => {
     res.json({
       success: true,
       count: result.rows.length,
-      subscribers: result.rows
+      subscribers: result.rows,
     });
   } catch (error) {
     console.error('Get subscribers error:', error);
     res.status(500).json({
       success: false,
-      message: 'Failed to fetch subscribers.'
+      message: 'Failed to fetch subscribers.',
     });
   }
 });
@@ -642,7 +681,7 @@ router.post('/send-newsletter', async (req, res) => {
     if (!subject || !content) {
       return res.status(400).json({
         success: false,
-        message: 'Subject and content are required'
+        message: 'Subject and content are required',
       });
     }
 
@@ -651,53 +690,51 @@ router.post('/send-newsletter', async (req, res) => {
       ['active', true]
     );
 
-        if (rows.length === 0) {
-          return res.status(400).json({
-            success: false,
-            message: 'No active subscribers found'
-          });
-        }
+    if (result.rows.length === 0) {
+      return res.status(400).json({
+        success: false,
+        message: 'No active subscribers found',
+      });
+    }
 
-        try {
-          const transporter = createTransporter();
-          const newsletterEmail = emailTemplates.newsletter(subject, content);
+    try {
+      const transporter = createTransporter();
+      const newsletterEmail = emailTemplates.newsletter(subject, content);
 
-          // Send to all subscribers
-          const emailPromises = result.rows.map(subscriber => {
-            return transporter.sendMail({
-              from: process.env.EMAIL_USER || 'puagmaef@gmail.com',
-              to: subscriber.email,
-              subject: newsletterEmail.subject,
-              html: newsletterEmail.html
-            });
-          });
+      // Send to all subscribers
+      const emailPromises = result.rows.map(subscriber => {
+        return transporter.sendMail({
+          from: process.env.EMAIL_USER || 'puagmaef@gmail.com',
+          to: subscriber.email,
+          subject: newsletterEmail.subject,
+          html: newsletterEmail.html,
+        });
+      });
 
-          await Promise.all(emailPromises);
+      await Promise.all(emailPromises);
 
-          // Update lastEmailSent for all subscribers
-          await pool.query(
-            'UPDATE newsletter_subscribers SET last_email_sent = CURRENT_TIMESTAMP WHERE status = $1 AND is_active = $2',
-            ['active', true]
-          );
+      // Update lastEmailSent for all subscribers
+      await pool.query(
+        'UPDATE newsletter_subscribers SET last_email_sent = CURRENT_TIMESTAMP WHERE status = $1 AND is_active = $2',
+        ['active', true]
+      );
 
-          res.json({
-            success: true,
-            message: `Newsletter sent to ${result.rows.length} subscribers successfully!`
-          });
-
-        } catch (emailError) {
-          console.error('Email sending error:', emailError);
-          res.status(500).json({
-            success: false,
-            message: 'Failed to send newsletter emails.'
-          });
-        }
-
+      res.json({
+        success: true,
+        message: `Newsletter sent to ${result.rows.length} subscribers successfully!`,
+      });
+    } catch (emailError) {
+      console.error('Email sending error:', emailError);
+      res.status(500).json({
+        success: false,
+        message: 'Failed to send newsletter emails.',
+      });
+    }
   } catch (error) {
     console.error('Send newsletter error:', error);
     res.status(500).json({
       success: false,
-      message: 'Failed to send newsletter. Please try again.'
+      message: 'Failed to send newsletter. Please try again.',
     });
   }
 });
@@ -716,13 +753,13 @@ router.get('/stats', async (req, res) => {
     );
 
     const monthResult = await pool.query(
-      'SELECT COUNT(*) as thisMonth FROM newsletter_subscribers WHERE status = $1 AND is_active = $2 AND subscribed_at >= DATE_TRUNC(\'month\', CURRENT_DATE)',
+      "SELECT COUNT(*) as thisMonth FROM newsletter_subscribers WHERE status = $1 AND is_active = $2 AND subscribed_at >= DATE_TRUNC('month', CURRENT_DATE)",
       ['active', true]
     );
 
-    const totalActive = parseInt(activeResult.rows[0].totalactive);
-    const totalInactive = parseInt(inactiveResult.rows[0].totalinactive);
-    const thisMonth = parseInt(monthResult.rows[0].thismonth);
+    const totalActive = parseInt(activeResult.rows[0].totalactive, 10);
+    const totalInactive = parseInt(inactiveResult.rows[0].totalinactive, 10);
+    const thisMonth = parseInt(monthResult.rows[0].thismonth, 10);
 
     res.json({
       success: true,
@@ -730,15 +767,14 @@ router.get('/stats', async (req, res) => {
         totalActive,
         totalInactive,
         thisMonth,
-        total: totalActive + totalInactive
-      }
+        total: totalActive + totalInactive,
+      },
     });
-
   } catch (error) {
     console.error('Get stats error:', error);
     res.status(500).json({
       success: false,
-      message: 'Failed to fetch statistics.'
+      message: 'Failed to fetch statistics.',
     });
   }
 });
@@ -762,26 +798,27 @@ async function sendConfirmationEmail(email, confirmToken, unsubscribeToken) {
       from: process.env.EMAIL_USER || 'puagmaef@gmail.com',
       to: email,
       subject: 'Confirm your subscription to PUAGMAE Festival',
-      html
+      html,
     });
 
     // Admin notification (optional)
     const adminEmail = emailTemplates.adminNotification({
       email,
-      subscribedAt: new Date()
+      subscribedAt: new Date(),
     });
     await transporter.sendMail({
       from: process.env.EMAIL_USER || 'puagmaef@gmail.com',
-      to: process.env.ADMIN_EMAIL ? process.env.ADMIN_EMAIL : 'puagmaef@gmail.com',
+      to: process.env.ADMIN_EMAIL
+        ? process.env.ADMIN_EMAIL
+        : 'puagmaef@gmail.com',
       subject: adminEmail.subject,
-      html: adminEmail.html
+      html: adminEmail.html,
     });
 
     console.log('✅ Confirmation email sent to:', email);
-
   } catch (emailError) {
     console.error('❌ Email sending failed for:', email, emailError.message);
   }
 }
 
-module.exports = router; 
+module.exports = router;

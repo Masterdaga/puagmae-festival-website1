@@ -1,4 +1,4 @@
-@import "tailwindcss";
+@import 'tailwindcss';
 
 /* Prevent body scroll when mobile menu is open */
 body.menu-open {

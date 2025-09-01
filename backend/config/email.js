@@ -1,7 +1,7 @@
 const nodemailer = require('nodemailer');
 
 // Base URLs for links in emails
-const BACKEND_BASE_URL = process.env.FRONTEND_URL || 'https://puagmae-festival-e6ql.onrender.com';
+// const BACKEND_BASE_URL = process.env.FRONTEND_URL || 'https://puagmae-festival-e6ql.onrender.com';
 
 // Create transporter for sending emails
 const createTransporter = () => {
@@ -9,18 +9,20 @@ const createTransporter = () => {
     service: 'gmail',
     auth: {
       user: process.env.EMAIL_USER || 'puagmaef@gmail.com',
-      pass: process.env.EMAIL_PASS || 'your-app-password'
-    }
+      pass: process.env.EMAIL_PASS || 'your-app-password',
+    },
   });
 };
 
 // Helpers to generate action links
-const generateConfirmLink = (token) => `${process.env.BACKEND_URL || 'https://puagmae-festival-backend.onrender.com'}/api/newsletter/confirm/${token}`;
-const generateUnsubscribeLink = (token) => `${process.env.BACKEND_URL || 'https://puagmae-festival-backend.onrender.com'}/api/newsletter/unsubscribe/${token}`;
+const generateConfirmLink = token =>
+  `${process.env.BACKEND_URL || 'https://puagmae-festival-backend.onrender.com'}/api/newsletter/confirm/${token}`;
+const generateUnsubscribeLink = token =>
+  `${process.env.BACKEND_URL || 'https://puagmae-festival-backend.onrender.com'}/api/newsletter/unsubscribe/${token}`;
 
 // Email templates
 const emailTemplates = {
-  welcome: (email) => ({
+  welcome: () => ({
     subject: 'Welcome to PUAGMAE Festival Newsletter! 🎉',
     html: `
       <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
@@ -55,9 +57,9 @@ const emailTemplates = {
           <p>To unsubscribe, reply to this email with "UNSUBSCRIBE" in the subject.</p>
         </div>
       </div>
-    `
+    `,
   }),
-  
+
   newsletter: (subject, content) => ({
     subject: subject || 'PUAGMAE Festival Newsletter',
     html: `
@@ -73,10 +75,10 @@ const emailTemplates = {
           <p>To unsubscribe, reply to this email with "UNSUBSCRIBE" in the subject.</p>
         </div>
       </div>
-    `
+    `,
   }),
-  
-  adminNotification: (newSubscriber) => ({
+
+  adminNotification: newSubscriber => ({
     subject: 'New Newsletter Subscriber - PUAGMAE Festival',
     html: `
       <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
@@ -101,13 +103,13 @@ const emailTemplates = {
           <p>© 2025 PUAGMAE Festival. All rights reserved.</p>
         </div>
       </div>
-    `
-  })
+    `,
+  }),
 };
 
 module.exports = {
   createTransporter,
   emailTemplates,
   generateConfirmLink,
-  generateUnsubscribeLink
-}; 
+  generateUnsubscribeLink,
+};

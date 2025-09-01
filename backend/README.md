@@ -62,6 +62,7 @@ JWT_SECRET=your-super-secret-jwt-key-here
 ### 4. Set Up MongoDB
 
 #### Option A: Local MongoDB
+
 ```bash
 # Install MongoDB locally
 # Then start the service
@@ -69,6 +70,7 @@ mongod
 ```
 
 #### Option B: MongoDB Atlas (Recommended)
+
 1. Create account at [MongoDB Atlas](https://cloud.mongodb.com)
 2. Create a new cluster
 3. Get your connection string
@@ -77,11 +79,13 @@ mongod
 ## 🚀 Running the Backend
 
 ### Development Mode
+
 ```bash
 npm run dev
 ```
 
 ### Production Mode
+
 ```bash
 npm start
 ```
@@ -92,22 +96,24 @@ The server will start on `http://localhost:5000`
 
 ### Newsletter Management
 
-| Method | Endpoint | Description |
-|--------|----------|-------------|
-| `POST` | `/api/newsletter/subscribe` | Subscribe to newsletter |
-| `POST` | `/api/newsletter/unsubscribe` | Unsubscribe from newsletter |
-| `GET` | `/api/newsletter/subscribers` | Get all subscribers |
+| Method | Endpoint                          | Description                        |
+| ------ | --------------------------------- | ---------------------------------- |
+| `POST` | `/api/newsletter/subscribe`       | Subscribe to newsletter            |
+| `POST` | `/api/newsletter/unsubscribe`     | Unsubscribe from newsletter        |
+| `GET`  | `/api/newsletter/subscribers`     | Get all subscribers                |
 | `POST` | `/api/newsletter/send-newsletter` | Send newsletter to all subscribers |
-| `GET` | `/api/newsletter/stats` | Get subscriber statistics |
+| `GET`  | `/api/newsletter/stats`           | Get subscriber statistics          |
 
 ### Health Check
-| Method | Endpoint | Description |
-|--------|----------|-------------|
-| `GET` | `/health` | Server health status |
+
+| Method | Endpoint  | Description          |
+| ------ | --------- | -------------------- |
+| `GET`  | `/health` | Server health status |
 
 ## 📊 Database Schema
 
 ### Subscriber Model
+
 ```javascript
 {
   email: String (required, unique, lowercase),
@@ -131,11 +137,13 @@ The system includes beautiful HTML email templates:
 ## 🔧 Configuration
 
 ### Email Settings
+
 - **Service**: Gmail
 - **Authentication**: App Password
 - **Templates**: Customizable HTML templates
 
 ### Database Settings
+
 - **Database**: MongoDB
 - **Connection**: Local or Atlas
 - **Indexes**: Optimized for email queries
@@ -150,11 +158,13 @@ The system includes beautiful HTML email templates:
 ## 📈 Monitoring
 
 ### Health Check
+
 ```bash
 curl http://localhost:5000/health
 ```
 
 ### Statistics
+
 ```bash
 curl http://localhost:5000/api/newsletter/stats
 ```
@@ -185,6 +195,7 @@ The frontend has been updated to use these API endpoints:
    - Frontend should connect to `http://localhost:5000`
 
 ### Debug Mode
+
 ```bash
 # Enable debug logging
 DEBUG=* npm run dev
@@ -192,15 +203,15 @@ DEBUG=* npm run dev
 
 ## 📝 Environment Variables
 
-| Variable | Description | Default |
-|----------|-------------|---------|
-| `PORT` | Server port | `5000` |
+| Variable      | Description               | Default                                      |
+| ------------- | ------------------------- | -------------------------------------------- |
+| `PORT`        | Server port               | `5000`                                       |
 | `MONGODB_URI` | MongoDB connection string | `mongodb://localhost:27017/puagmae-festival` |
-| `EMAIL_USER` | Gmail account | `puagmaef@gmail.com` |
-| `EMAIL_PASS` | Gmail app password | `your-app-password` |
-| `ADMIN_EMAIL` | Admin notification email | `puagmaef@gmail.com` |
-| `WEBSITE_URL` | Frontend URL | `http://localhost:3000` |
-| `JWT_SECRET` | JWT secret key | `your-super-secret-jwt-key-here` |
+| `EMAIL_USER`  | Gmail account             | `puagmaef@gmail.com`                         |
+| `EMAIL_PASS`  | Gmail app password        | `your-app-password`                          |
+| `ADMIN_EMAIL` | Admin notification email  | `puagmaef@gmail.com`                         |
+| `WEBSITE_URL` | Frontend URL              | `http://localhost:3000`                      |
+| `JWT_SECRET`  | JWT secret key            | `your-super-secret-jwt-key-here`             |
 
 ## 🎯 Next Steps
 
@@ -214,6 +225,7 @@ DEBUG=* npm run dev
 ## 📞 Support
 
 For issues or questions:
+
 - Check the troubleshooting section
 - Verify all environment variables
-- Ensure MongoDB and Gmail are properly configured 
+- Ensure MongoDB and Gmail are properly configured

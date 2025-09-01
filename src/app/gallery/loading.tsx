@@ -2,19 +2,19 @@ export default function GalleryLoading() {
   return (
     <div className="min-h-screen pt-24 bg-gradient-to-b from-[#3b2f23] to-black">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 text-center">
-        
         <div className="text-4xl font-bold text-yellow-400 mb-4 animate-pulse">
           <div className="h-10 bg-gray-200 rounded-lg mb-2 animate-pulse"></div>
         </div>
 
-        
         <div className="text-xl text-yellow-200/80 mb-4 animate-pulse">
           <div className="h-6 bg-gray-200 rounded-lg max-w-3xl mx-auto animate-pulse"></div>
         </div>
       </div>
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-        <h2 className="text-2xl font-bold text-yellow-400 mb-4 animate-pulse">Photos</h2>
+        <h2 className="text-2xl font-bold text-yellow-400 mb-4 animate-pulse">
+          Photos
+        </h2>
         <div className="flex flex-wrap justify-center">
           {[...Array(6)].map((_, index) => (
             <div
@@ -24,7 +24,9 @@ export default function GalleryLoading() {
           ))}
         </div>
 
-        <h2 className="text-2xl font-bold text-yellow-400 mb-4 mt-12 animate-pulse">Videos</h2>
+        <h2 className="text-2xl font-bold text-yellow-400 mb-4 mt-12 animate-pulse">
+          Videos
+        </h2>
         <div className="flex flex-wrap justify-center">
           {[...Array(3)].map((_, index) => (
             <div

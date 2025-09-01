@@ -8,14 +8,21 @@ async function resetAdmin() {
   try {
     const defaultUsername = 'admin';
     const defaultPassword = 'puagme2023';
-    
+
     const passwordHash = await bcrypt.hash(defaultPassword, 10);
-    
-    fs.writeFileSync(ADMIN_STORE, JSON.stringify({ 
-      username: defaultUsername, 
-      passwordHash 
-    }, null, 2));
-    
+
+    fs.writeFileSync(
+      ADMIN_STORE,
+      JSON.stringify(
+        {
+          username: defaultUsername,
+          passwordHash,
+        },
+        null,
+        2
+      )
+    );
+
     console.log('✅ Admin credentials reset successfully!');
     console.log('Username:', defaultUsername);
     console.log('Password:', defaultPassword);

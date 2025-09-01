@@ -1,12 +1,13 @@
-"use client";
+'use client';
 import Link from 'next/link';
 
 const landingSlides = [
   {
     id: 1,
     title: 'PUAGMAE FESTIVAL',
-            subtitle: 'A vibrant and immersive celebration of the African Golden 13th Month.'
-  }
+    subtitle:
+      'A vibrant and immersive celebration of the African Golden 13th Month.',
+  },
 ];
 
 export default function LandingCarousel() {
@@ -14,15 +15,14 @@ export default function LandingCarousel() {
 
   return (
     <div className="relative h-screen w-full overflow-hidden">
-        {/* Background Image */}
-  <div
-    className="absolute inset-0 bg-cover bg-center"
-    style={{ backgroundImage: "url('/puagme.png')" }}
-  />
+      {/* Background Image */}
+      <div
+        className="absolute inset-0 bg-cover bg-center"
+        style={{ backgroundImage: "url('/puagme.png')" }}
+      />
 
-  {/* Gradient overlay */}
-  <div className="absolute inset-0 bg-gradient-to-br from-black via-yellow-900 to-yellow-700 opacity-70" />
-
+      {/* Gradient overlay */}
+      <div className="absolute inset-0 bg-gradient-to-br from-black via-yellow-900 to-yellow-700 opacity-70" />
 
       {/* Optional: Add a subtle pattern overlay */}
       <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top_right,_var(--tw-gradient-stops))] from-yellow-900/30 via-transparent to-transparent pointer-events-none" />
@@ -37,17 +37,18 @@ export default function LandingCarousel() {
             {landingSlides[currentIndex].subtitle}
           </p>
           <div className="flex justify-center space-x-4">
-            <Link 
+            <Link
               href="/about"
               className="bg-white/20 backdrop-blur-sm border border-white/30 text-white px-6 py-3 rounded-full font-medium hover:bg-white/30 transition-all duration-300"
             >
               LEARN MORE
             </Link>
-            <Link href="/Registration"
-             className="bg-yellow-500 text-black px-6 py-3 rounded-full font-medium hover:bg-yellow-600 transition-all duration-300">
-            Register now
+            <Link
+              href="/Registration"
+              className="bg-yellow-500 text-black px-6 py-3 rounded-full font-medium hover:bg-yellow-600 transition-all duration-300"
+            >
+              Register now
             </Link>
-
           </div>
         </div>
       </div>

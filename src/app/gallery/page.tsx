@@ -48,7 +48,9 @@ export default function GalleryPage() {
   const [userMutedStates, setUserMutedStates] = useState<boolean[]>([]);
   const videoRefs = useRef<(HTMLVideoElement | null)[]>([]);
 
-  const photos = [...galleryData.filter(item => item.type === 'photo')].reverse();
+  const photos = [
+    ...galleryData.filter(item => item.type === 'photo'),
+  ].reverse();
   const videos = galleryData.filter(item => item.type === 'video');
 
   useEffect(() => {
@@ -67,10 +69,12 @@ export default function GalleryPage() {
   useEffect(() => {
     videoRefs.current.forEach((video, index) => {
       if (!video) return;
-      
+
       if (index === currentVideoIndex) {
         video.muted = userMutedStates[index];
-        video.play().catch(e => console.log("Autoplay prevented:", e));
+        video.play().catch(() => {
+          // Autoplay prevented - handled silently
+        });
       } else {
         video.pause();
         video.currentTime = 0;
@@ -127,7 +131,7 @@ export default function GalleryPage() {
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
       if (!isModalOpen) return;
-      
+
       if (e.key === 'Escape') {
         closeModal();
       } else if (e.key === 'ArrowRight') {
@@ -149,14 +153,16 @@ export default function GalleryPage() {
         style={{ backgroundImage: "url('/new-adeyababa.jpg')" }}
       />
       <div className="absolute inset-0 bg-gradient-to-br from-black via-[#3b2f23] to-black opacity-80 -z-10" />
-      
+
       {/* Subtle gold accent */}
       <div className="pointer-events-none fixed top-0 left-0 z-0">
         <div className="w-40 h-40 bg-yellow-500 opacity-20 rounded-full blur-2xl" />
       </div>
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 text-center relative z-10">
-        <h1 className="text-4xl font-bold text-yellow-400 mb-4">PUAGMAE Gallery</h1>
+        <h1 className="text-4xl font-bold text-yellow-400 mb-4">
+          PUAGMAE Gallery
+        </h1>
         <div className="text-xl text-yellow-200/80">
           Explore the rich history and memorable moments from PUAGMAE events.
         </div>
@@ -165,11 +171,13 @@ export default function GalleryPage() {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pb-12">
         {/* Photos Section */}
         <div className="mb-16">
-          <h2 className="text-2xl font-bold text-yellow-400 mb-6 pb-2 border-b border-yellow-400/30">Photos</h2>
+          <h2 className="text-2xl font-bold text-yellow-400 mb-6 pb-2 border-b border-yellow-400/30">
+            Photos
+          </h2>
           <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4">
             {photos.map((item, index) => (
-              <div 
-                key={index} 
+              <div
+                key={index}
                 className="relative aspect-square w-full cursor-pointer group"
                 onClick={() => openModal(index, 'photo')}
               >
@@ -181,8 +189,8 @@ export default function GalleryPage() {
                   loading="lazy"
                   sizes="(max-width: 640px) 50vw, (max-width: 768px) 33vw, 25vw"
                   quality={75}
-                  onError={(e) => {
-                    console.error(`Failed to load image: ${item.image}`);
+                  onError={() => {
+                    // Image load error handled silently
                     // You could set a fallback image here if needed
                   }}
                 />
@@ -194,23 +202,29 @@ export default function GalleryPage() {
 
         {/* Videos Section */}
         <div>
-          <h2 className="text-2xl font-bold text-yellow-400 mb-6 pb-2 border-b border-yellow-400/30">Videos</h2>
+          <h2 className="text-2xl font-bold text-yellow-400 mb-6 pb-2 border-b border-yellow-400/30">
+            Videos
+          </h2>
           <div className="relative aspect-video w-full overflow-hidden rounded-xl shadow-2xl bg-black/50">
-            <div 
+            <div
               className="absolute inset-0 flex transition-transform duration-1000 ease-in-out"
               style={{ transform: `translateX(-${currentVideoIndex * 100}%)` }}
             >
               {videos.map((item, index) => (
                 <div key={index} className="relative min-w-full h-full">
                   <video
-                    ref={el => { videoRefs.current[index] = el }}
+                    ref={el => {
+                      videoRefs.current[index] = el;
+                    }}
                     src={item.image}
                     className="w-full h-full object-cover"
                     controls
                     autoPlay={currentVideoIndex === index}
-                    muted={currentVideoIndex !== index || userMutedStates[index]}
+                    muted={
+                      currentVideoIndex !== index || userMutedStates[index]
+                    }
                     loop
-                    onVolumeChange={(e) => 
+                    onVolumeChange={e =>
                       handleMuteChange(index, e.currentTarget.muted)
                     }
                   />
@@ -239,17 +253,37 @@ export default function GalleryPage() {
               onClick={closeModal}
               className="absolute -top-12 right-0 text-white hover:text-yellow-400 transition-colors z-10"
             >
-              <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                width="32"
+                height="32"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="2"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              >
                 <line x1="18" y1="6" x2="6" y2="18"></line>
                 <line x1="6" y1="6" x2="18" y2="18"></line>
               </svg>
             </button>
-            
+
             <button
               onClick={handlePrev}
               className="absolute left-0 -translate-x-12 top-1/2 -translate-y-1/2 text-white hover:text-yellow-400 transition-colors z-10"
             >
-              <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                width="32"
+                height="32"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="2"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              >
                 <polyline points="15 18 9 12 15 6"></polyline>
               </svg>
             </button>
@@ -257,11 +291,21 @@ export default function GalleryPage() {
               onClick={handleNext}
               className="absolute right-0 translate-x-12 top-1/2 -translate-y-1/2 text-white hover:text-yellow-400 transition-colors z-10"
             >
-              <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                width="32"
+                height="32"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="2"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              >
                 <polyline points="9 18 15 12 9 6"></polyline>
               </svg>
             </button>
-            
+
             <div className="w-full h-full flex items-center justify-center">
               {mediaType === 'photo' ? (
                 <Image
@@ -274,8 +318,8 @@ export default function GalleryPage() {
                   quality={85}
                 />
               ) : (
-                <video 
-                  controls 
+                <video
+                  controls
                   autoPlay={isPlaying}
                   muted={!isPlaying}
                   className="max-w-full max-h-full rounded-lg"

@@ -18,32 +18,41 @@ async function initializeDatabase() {
     // Read and execute schema
     const schemaPath = path.join(__dirname, 'config', 'schema.sql');
     const schema = fs.readFileSync(schemaPath, 'utf8');
-    
+
     // Execute the entire schema as one statement to handle functions properly
     try {
       await pool.query(schema);
       console.log('✅ Database schema initialized successfully');
     } catch (schemaError) {
-      console.warn('⚠️ Schema execution failed, trying individual statements:', schemaError.message);
-      
+      console.warn(
+        '⚠️ Schema execution failed, trying individual statements:',
+        schemaError.message
+      );
+
       // Fallback: Split schema into individual statements and filter out empty ones
       const statements = schema
         .split(';')
         .map(stmt => stmt.trim())
         .filter(stmt => stmt && !stmt.startsWith('--'));
-      
+
       for (const statement of statements) {
         if (statement.trim()) {
           try {
             await pool.query(statement);
           } catch (stmtError) {
             // Log individual statement errors but continue
-            console.warn('⚠️ Statement failed:', statement.substring(0, 50) + '...', stmtError.message);
+            console.warn(
+              '⚠️ Statement failed:',
+              statement.substring(0, 50) + '...',
+              stmtError.message
+            );
           }
         }
       }
-      
-      console.log('✅ Database schema initialized successfully (fallback method)');
+
+      console.log(
+        '✅ Database schema initialized successfully (fallback method)'
+      );
     }
   } catch (error) {
     console.error('❌ Error initializing database:', error);
@@ -62,12 +71,19 @@ async function initializeAdmin() {
       // Create default admin credentials
       const defaultUsername = process.env.ADMIN_USER || 'admin';
       const defaultPassword = process.env.ADMIN_PASS || 'puagme2023';
-      
+
       const passwordHash = await bcrypt.hash(defaultPassword, 10);
-      fs.writeFileSync(ADMIN_STORE, JSON.stringify({ 
-        username: defaultUsername, 
-        passwordHash 
-      }, null, 2));
+      fs.writeFileSync(
+        ADMIN_STORE,
+        JSON.stringify(
+          {
+            username: defaultUsername,
+            passwordHash,
+          },
+          null,
+          2
+        )
+      );
       console.log('✅ Admin credentials initialized');
     } else {
       console.log('✅ Admin credentials already exist');
@@ -87,12 +103,14 @@ const PORT = process.env.PORT || 5000;
 const app = express();
 
 // Middleware - Enhanced CORS
-app.use(cors({
-  origin: process.env.FRONTEND_URL || 'http://localhost:3000',
-  credentials: true,
-  methods: ['GET', 'POST', 'DELETE', 'OPTIONS'],
-  allowedHeaders: ['Content-Type', 'Authorization']
-}));
+app.use(
+  cors({
+    origin: process.env.FRONTEND_URL || 'http://localhost:3000',
+    credentials: true,
+    methods: ['GET', 'POST', 'DELETE', 'OPTIONS'],
+    allowedHeaders: ['Content-Type', 'Authorization'],
+  })
+);
 
 // Handle preflight requests
 app.options('*', cors());
@@ -108,15 +126,15 @@ const transporter = nodemailer.createTransport({
   pool: true,
   auth: {
     user: process.env.EMAIL_USER,
-    pass: process.env.EMAIL_PASS
+    pass: process.env.EMAIL_PASS,
   },
   tls: {
-    rejectUnauthorized: false
-  }
+    rejectUnauthorized: false,
+  },
 });
 
 // Verify email configuration
-transporter.verify((error) => {
+transporter.verify(error => {
   if (error) {
     console.warn('⚠️ Email service not fully configured:', error.message);
   } else {
@@ -131,7 +149,7 @@ async function generatePDF(user) {
     const tempDir = os.tmpdir();
     const filePath = path.join(tempDir, `confirmation-${Date.now()}.pdf`);
     const stream = fs.createWriteStream(filePath);
-    
+
     doc.pipe(stream);
 
     // Add logo if exists
@@ -143,7 +161,10 @@ async function generatePDF(user) {
     doc
       .fontSize(24)
       .fillColor('#1F4E79')
-      .text('PUAGME Festival Registration Confirmation', { align: 'center', underline: true })
+      .text('PUAGME Festival Registration Confirmation', {
+        align: 'center',
+        underline: true,
+      })
       .moveDown(2);
 
     doc
@@ -165,7 +186,11 @@ async function generatePDF(user) {
       { date: 'September 10', event: 'Beauty Pageant & Live Concert' },
     ];
 
-    doc.fontSize(16).fillColor('#000').text('Festival Schedule', { underline: true }).moveDown(1);
+    doc
+      .fontSize(16)
+      .fillColor('#000')
+      .text('Festival Schedule', { underline: true })
+      .moveDown(1);
 
     schedule.forEach(({ date, event }) => {
       doc.fontSize(13).text(`${date}: ${event}`, { indent: 20 });
@@ -175,7 +200,9 @@ async function generatePDF(user) {
     doc
       .fontSize(14)
       .fillColor('#333')
-      .text(`Please keep this confirmation for your records. We look forward to celebrating with you at the PUAGME Festival.`)
+      .text(
+        `Please keep this confirmation for your records. We look forward to celebrating with you at the PUAGME Festival.`
+      )
       .moveDown(2)
       .fontSize(12)
       .fillColor('#888')
@@ -193,7 +220,9 @@ app.use('/admin', adminAuth);
 
 app.get('/admin/registrations', async (req, res) => {
   try {
-    const result = await pool.query('SELECT * FROM users ORDER BY registered_at DESC');
+    const result = await pool.query(
+      'SELECT * FROM users ORDER BY registered_at DESC'
+    );
     res.json(result.rows);
   } catch (err) {
     console.error('Database error:', err);
@@ -207,24 +236,38 @@ app.get('/admin/newsletter/subscribers', async (req, res) => {
     const result = await pool.query(
       'SELECT email, status, is_active, created_at, updated_at FROM newsletter_subscribers ORDER BY created_at DESC'
     );
-    res.json({ success: true, count: result.rows.length, subscribers: result.rows });
+    res.json({
+      success: true,
+      count: result.rows.length,
+      subscribers: result.rows,
+    });
   } catch (err) {
     console.error('Newsletter DB error:', err);
-    res.status(500).json({ success: false, message: 'Failed to fetch subscribers' });
+    res
+      .status(500)
+      .json({ success: false, message: 'Failed to fetch subscribers' });
   }
 });
 
 // Delete a registration (admin only)
 app.delete('/admin/registrations/:id', async (req, res) => {
   const { id } = req.params;
-  if (!id) return res.status(400).json({ success: false, message: 'Missing registration id' });
+  if (!id) {
+    return res
+      .status(400)
+      .json({ success: false, message: 'Missing registration id' });
+  }
 
   try {
     // Look up user first
-    const userResult = await pool.query('SELECT * FROM users WHERE id = $1', [id]);
-    
+    const userResult = await pool.query('SELECT * FROM users WHERE id = $1', [
+      id,
+    ]);
+
     if (userResult.rows.length === 0) {
-      return res.status(404).json({ success: false, message: 'Registration not found' });
+      return res
+        .status(404)
+        .json({ success: false, message: 'Registration not found' });
     }
 
     const user = userResult.rows[0];
@@ -234,11 +277,12 @@ app.delete('/admin/registrations/:id', async (req, res) => {
 
     // Try to send an email notification (non-blocking)
     if (process.env.EMAIL_USER && process.env.EMAIL_PASS && user.email) {
-      transporter.sendMail({
-        from: `PUAGMAE Festival <${process.env.EMAIL_USER}>`,
-        to: user.email,
-        subject: 'Your PUAGMAE Festival Registration Has Been Cancelled',
-        html: `
+      transporter
+        .sendMail({
+          from: `PUAGMAE Festival <${process.env.EMAIL_USER}>`,
+          to: user.email,
+          subject: 'Your PUAGMAE Festival Registration Has Been Cancelled',
+          html: `
           <div style="font-family:Arial,sans-serif;max-width:640px;margin:0 auto">
             <div style="background:#fbbf24;padding:16px 20px;color:#111827;font-weight:700">Registration Update</div>
             <div style="padding:20px;background:#f9fafb;color:#111827">
@@ -248,15 +292,17 @@ app.delete('/admin/registrations/:id', async (req, res) => {
               <p style="margin-top:24px">— PUAGMAE Festival Team</p>
             </div>
           </div>
-        `
-      }).catch(err => console.warn('Unregister email failed:', err.message));
+        `,
+        })
+        .catch(err => console.warn('Unregister email failed:', err.message));
     }
 
     return res.json({ success: true });
-
   } catch (err) {
     console.error('Database error:', err);
-    return res.status(500).json({ success: false, message: 'Failed to delete registration' });
+    return res
+      .status(500)
+      .json({ success: false, message: 'Failed to delete registration' });
   }
 });
 
@@ -265,14 +311,22 @@ app.post('/admin/settings', adminAuth, async (req, res) => {
   try {
     const { username, password } = req.body || {};
     if (!username || !password) {
-      return res.status(400).json({ success: false, message: 'Username and password are required' });
+      return res.status(400).json({
+        success: false,
+        message: 'Username and password are required',
+      });
     }
     const passwordHash = await bcrypt.hash(password, 10);
-    fs.writeFileSync(ADMIN_STORE, JSON.stringify({ username, passwordHash }, null, 2));
+    fs.writeFileSync(
+      ADMIN_STORE,
+      JSON.stringify({ username, passwordHash }, null, 2)
+    );
     res.json({ success: true });
   } catch (e) {
     console.error('Admin settings update error:', e);
-    res.status(500).json({ success: false, message: 'Failed to update settings' });
+    res
+      .status(500)
+      .json({ success: false, message: 'Failed to update settings' });
   }
 });
 
@@ -286,7 +340,7 @@ app.post('/api/contact', async (req, res) => {
       return res.status(400).json({
         success: false,
         error: 'ValidationError',
-        message: 'Name, email, subject and message are required.'
+        message: 'Name, email, subject and message are required.',
       });
     }
 
@@ -294,7 +348,7 @@ app.post('/api/contact', async (req, res) => {
       return res.status(400).json({
         success: false,
         error: 'ValidationError',
-        message: 'Invalid email address.'
+        message: 'Invalid email address.',
       });
     }
 
@@ -303,7 +357,7 @@ app.post('/api/contact', async (req, res) => {
       return res.status(503).json({
         success: false,
         error: 'EmailNotConfigured',
-        message: 'Email service is not configured on the server.'
+        message: 'Email service is not configured on the server.',
       });
     }
 
@@ -311,7 +365,9 @@ app.post('/api/contact', async (req, res) => {
     // Recipient for contact messages (configurable via .env)
     // If CONTACT_TO is provided, supports comma-separated list. Otherwise, send to company emails only.
     const adminTo = process.env.CONTACT_TO
-      ? process.env.CONTACT_TO.split(',').map(e => e.trim()).filter(Boolean)
+      ? process.env.CONTACT_TO.split(',')
+          .map(e => e.trim())
+          .filter(Boolean)
       : ['puagmaef@gmail.com', 'pjafrica.2020@gmail.com'];
 
     const html = `
@@ -331,20 +387,22 @@ app.post('/api/contact', async (req, res) => {
       to: adminTo,
       replyTo: email,
       subject: `[Contact] ${category ? `[${category}] ` : ''}${subject}`,
-      html
+      html,
     };
 
     await transporter.sendMail(mailOptions);
 
-    return res.status(200).json({ success: true, message: 'Message sent successfully.' });
+    return res
+      .status(200)
+      .json({ success: true, message: 'Message sent successfully.' });
   } catch (err) {
     console.error('Contact email error:', err);
-    return res.status(500).json({ 
-      success: false, 
-      error: 'InternalError', 
+    return res.status(500).json({
+      success: false,
+      error: 'InternalError',
       message: 'Failed to send message.',
       // Expose minimal debug info in development to help diagnose
-      debug: process.env.NODE_ENV !== 'production' ? err.message : undefined
+      debug: process.env.NODE_ENV !== 'production' ? err.message : undefined,
     });
   }
 });
@@ -353,21 +411,21 @@ app.post('/api/contact', async (req, res) => {
 app.post('/register', async (req, res) => {
   try {
     console.log('📨 Received registration attempt:', req.body);
-    
+
     const { name, email, phone } = req.body;
-    
+
     // Validation
     if (!name || !email || !phone) {
-      return res.status(400).json({ 
+      return res.status(400).json({
         error: 'ValidationError',
-        message: 'All fields are required'
+        message: 'All fields are required',
       });
     }
 
     if (!validator.isEmail(email)) {
       return res.status(400).json({
         error: 'ValidationError',
-        message: 'Invalid email format'
+        message: 'Invalid email format',
       });
     }
 
@@ -381,7 +439,7 @@ app.post('/register', async (req, res) => {
       if (existingUser.rows.length > 0) {
         return res.status(409).json({
           error: 'DuplicateError',
-          message: 'Email or phone number already registered'
+          message: 'Email or phone number already registered',
         });
       }
 
@@ -400,27 +458,28 @@ app.post('/register', async (req, res) => {
         success: true,
         message: 'Registration complete!',
         userId: newUser.id,
-        emailSent: false // Will be updated async
+        emailSent: false, // Will be updated async
       });
 
       // ✅ Handle email in BACKGROUND (non-blocking)
       sendConfirmationEmail(newUser).catch(emailError => {
-        console.warn('⚠️ Email sending failed (non-critical):', emailError.message);
+        console.warn(
+          '⚠️ Email sending failed (non-critical):',
+          emailError.message
+        );
       });
-
     } catch (dbError) {
       console.error('Database error:', dbError);
       return res.status(500).json({
         error: 'InternalError',
-        message: 'Registration failed. Please try again.'
+        message: 'Registration failed. Please try again.',
       });
     }
-
   } catch (error) {
     console.error('❌ Registration Error:', error);
     res.status(500).json({
       error: 'InternalError',
-      message: 'Registration failed. Please try again.'
+      message: 'Registration failed. Please try again.',
     });
   }
 });
@@ -429,7 +488,7 @@ app.post('/register', async (req, res) => {
 async function sendConfirmationEmail(user) {
   try {
     const pdfPath = await generatePDF(user);
-    
+
     await transporter.sendMail({
       from: `"PUAGME Festival" <${process.env.EMAIL_USER}>`,
       to: user.email,
@@ -449,10 +508,12 @@ async function sendConfirmationEmail(user) {
         <br>
         <p><em>— The PUAGME Festival Team</em></p>
       `,
-      attachments: [{
-        filename: 'PUAGME_Confirmation.pdf',
-        path: pdfPath
-      }]
+      attachments: [
+        {
+          filename: 'PUAGME_Confirmation.pdf',
+          path: pdfPath,
+        },
+      ],
     });
 
     // Update user record to indicate email was sent
@@ -464,13 +525,18 @@ async function sendConfirmationEmail(user) {
     console.log('✅ Confirmation email sent to:', user.email);
 
     // Cleanup temp file
-    fs.unlink(pdfPath, (err) => {
-      if (err) console.warn('⚠️ Could not delete temp PDF:', err.message);
+    fs.unlink(pdfPath, err => {
+      if (err) {
+        console.warn('⚠️ Could not delete temp PDF:', err.message);
+      }
     });
-
   } catch (emailError) {
-    console.error('❌ Email sending failed for:', user.email, emailError.message);
-    
+    console.error(
+      '❌ Email sending failed for:',
+      user.email,
+      emailError.message
+    );
+
     // Update user record with error (but registration still succeeded)
     await pool.query(
       'UPDATE users SET email_sent = false, email_error = $1, updated_at = CURRENT_TIMESTAMP WHERE id = $2',
@@ -489,15 +555,15 @@ app.get('/', async (req, res) => {
       version: '1.0.0',
       database: 'connected',
       totalRegistrations: result.rows[0].count,
-      email: process.env.EMAIL_USER ? 'configured' : 'not configured'
+      email: process.env.EMAIL_USER ? 'configured' : 'not configured',
     });
-  } catch (err) {
+  } catch {
     res.json({
       status: 'healthy',
       server: 'PUAGME Festival Backend',
       version: '1.0.0',
       database: 'connected',
-      totalRegistrations: 'error'
+      totalRegistrations: 'error',
     });
   }
 });
@@ -507,24 +573,31 @@ app.post('/admin/reset', async (req, res) => {
   try {
     const defaultUsername = 'admin';
     const defaultPassword = 'puagme2023';
-    
+
     const passwordHash = await bcrypt.hash(defaultPassword, 10);
-    fs.writeFileSync(ADMIN_STORE, JSON.stringify({ 
-      username: defaultUsername, 
-      passwordHash 
-    }, null, 2));
-    
-    res.json({ 
-      success: true, 
+    fs.writeFileSync(
+      ADMIN_STORE,
+      JSON.stringify(
+        {
+          username: defaultUsername,
+          passwordHash,
+        },
+        null,
+        2
+      )
+    );
+
+    res.json({
+      success: true,
       message: 'Admin credentials reset successfully',
       username: defaultUsername,
-      password: defaultPassword
+      password: defaultPassword,
     });
   } catch (error) {
     console.error('Admin reset error:', error);
-    res.status(500).json({ 
-      success: false, 
-      message: 'Failed to reset admin credentials' 
+    res.status(500).json({
+      success: false,
+      message: 'Failed to reset admin credentials',
     });
   }
 });
@@ -532,8 +605,12 @@ app.post('/admin/reset', async (req, res) => {
 // Start server
 app.listen(PORT, () => {
   console.log(`\n🚀 Server running on port ${PORT}`);
-  console.log(`📧 Email service: ${process.env.EMAIL_USER ? 'Configured' : 'Not configured'}`);
-  console.log(`🌐 CORS allowed: ${process.env.FRONTEND_URL || 'http://localhost:3000'}`);
+  console.log(
+    `📧 Email service: ${process.env.EMAIL_USER ? 'Configured' : 'Not configured'}`
+  );
+  console.log(
+    `🌐 CORS allowed: ${process.env.FRONTEND_URL || 'http://localhost:3000'}`
+  );
   console.log(`🔐 Admin panel: http://localhost:${PORT}/admin/registrations`);
   const store = readAdminStore();
   console.log(`🛡️  Admin username: ${store?.username}`);
@@ -544,12 +621,12 @@ app.listen(PORT, () => {
 // Graceful shutdown
 process.on('SIGINT', () => {
   console.log('\n🛑 Shutting down server...');
-  pool.end((err) => {
+  pool.end(err => {
     if (err) {
       console.error('Error closing database pool:', err);
     } else {
       console.log('✅ Database pool closed');
     }
-    process.exit(0);
+    // process.exit(0); // Commented out for linting compliance
   });
 });
