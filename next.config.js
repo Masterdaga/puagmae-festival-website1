@@ -11,6 +11,8 @@ const nextConfig = {
   env: {
     NEXT_PUBLIC_API_BASE_URL: process.env.NEXT_PUBLIC_API_BASE_URL,
   },
+  // Fix workspace root warning
+  outputFileTracingRoot: process.cwd(),
 };
 
 module.exports = nextConfig;

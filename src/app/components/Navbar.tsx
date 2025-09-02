@@ -62,6 +62,7 @@ export default function Navbar() {
                 width={80}
                 height={80}
                 className="w-16 h-16 sm:w-20 sm:h-20 object-contain"
+                unoptimized
               />
               <span
                 className="text-xl sm:text-2xl font-black text-yellow-400 tracking-widest bg-gradient-to-r from-yellow-400 to-yellow-600 bg-clip-text text-transparent drop-shadow-lg hidden xs:block"
@@ -176,6 +177,7 @@ export default function Navbar() {
                 src="/logo.png"
                 alt="PUAGMAE STREET FESTIVAL"
                 width={64}
+                unoptimized
                 height={64}
                 className="rounded-full border-2 border-yellow-400"
               />

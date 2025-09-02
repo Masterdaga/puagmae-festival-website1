@@ -49,19 +49,7 @@ export default function AboutPage() {
                 days.
               </p>
 
-              {/* Small image inside info card */}
-              <div className="mt-4">
-                <Image
-                  src="/photos/img4.jpg"
-                  alt="Puagmae celebration"
-                  width={400}
-                  height={192}
-                  className="w-full h-48 object-cover rounded-lg border border-yellow-600 shadow-md"
-                />
-                <p className="text-sm text-yellow-300 mt-2">
-                  Traditional gathering during Puagmae
-                </p>
-              </div>
+
             </div>
 
             {/* Festival Card - shows illustrative image with overlay */}
@@ -73,6 +61,7 @@ export default function AboutPage() {
                   width={384}
                   height={224}
                   className="absolute inset-0 w-full h-full object-cover"
+                  unoptimized
                 />
                 <div className="relative z-10 p-4 bg-black/40 w-full">
                   <span className="text-yellow-100 text-2xl font-extrabold drop-shadow-lg tracking-wide">

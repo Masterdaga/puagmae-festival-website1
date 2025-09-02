@@ -9,3 +9,5 @@ services:
         value: https://puagmae-festival-backend.onrender.com
       - key: RENDER
         value: true
+      - key: NODE_ENV
+        value: production

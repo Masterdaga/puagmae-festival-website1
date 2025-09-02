@@ -52,6 +52,7 @@ export default function NewsletterConfirmation() {
             alt="PUAGMAE Festival"
             width={60}
             height={60}
+            unoptimized
             className="w-12 h-12 sm:w-16 sm:h-16 object-contain"
           />
           <span className="text-xl sm:text-2xl font-black text-yellow-400 tracking-widest hidden sm:block">

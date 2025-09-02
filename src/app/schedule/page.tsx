@@ -191,6 +191,7 @@ export default function FestivalSchedule() {
                                 width={400}
                                 height={224}
                                 className="w-full h-full object-contain"
+                                unoptimized
                               />
                             </div>
                           </div>

@@ -76,6 +76,7 @@ const Testimonials = () => {
                       width={96}
                       height={96}
                       className="rounded-full h-20 w-20 md:h-24 md:w-24 border-4 border-yellow-400 shadow-lg"
+                      unoptimized
                     />
                     <div className="text-center md:text-left">
                       <h4 className="text-xl md:text-2xl text-gray-100 font-semibold">

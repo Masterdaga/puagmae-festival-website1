@@ -189,6 +189,7 @@ export default function GalleryPage() {
                   loading="lazy"
                   sizes="(max-width: 640px) 50vw, (max-width: 768px) 33vw, 25vw"
                   quality={75}
+                  unoptimized
                   onError={() => {
                     // Image load error handled silently
                     // You could set a fallback image here if needed
@@ -316,6 +317,7 @@ export default function GalleryPage() {
                   className="max-w-full max-h-full object-contain rounded-lg"
                   priority
                   quality={85}
+                  unoptimized
                 />
               ) : (
                 <video
