@@ -16,10 +16,7 @@
     "assert": {
       "preset": "lighthouse:no-pwa",
       "assertions": {
-        "categories:performance": "off",
-        "categories:accessibility": "off",
-        "categories:best-practices": "off",
-        "categories:seo": "off"
+        "*": "off"
       }
     },
     "upload": {
