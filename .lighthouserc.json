@@ -16,7 +16,26 @@
     "assert": {
       "preset": "lighthouse:no-pwa",
       "assertions": {
-        "*": "off"
+        "categories:performance": "off",
+        "categories:accessibility": "off",
+        "categories:best-practices": "off",
+        "categories:seo": "off",
+        "color-contrast": "off",
+        "csp-xss": "off",
+        "link-text": "off",
+        "tap-targets": "off",
+        "unused-javascript": "off",
+        "uses-responsive-images": "off",
+        "interactive": "off",
+        "largest-contentful-paint": "off",
+        "mainthread-work-breakdown": "off",
+        "max-potential-fid": "off",
+        "modern-image-formats": "off",
+        "render-blocking-resources": "off",
+        "heading-order": "off",
+        "lcp-lazy-loaded": "off",
+        "total-byte-weight": "off",
+        "video-caption": "off"
       }
     },
     "upload": {
