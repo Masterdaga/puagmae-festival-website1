@@ -1,137 +1,98 @@
-# 🎉 PUAGMAE Festival Website
+# PUAGMAE Festival Website
 
-A modern, responsive website for the PUAGMAE Festival - a vibrant celebration of the African Golden 13th Month.
+Modern, responsive web app for the PUAGMAE Festival — celebrating the African Golden 13th Month.
 
-## 🚀 Features
+## Features
 
-- **Responsive Design**: Works perfectly on desktop, tablet, and mobile
-- **User Registration**: Festival registration with email confirmation
-- **Newsletter Subscription**: Email newsletter management
-- **Admin Panel**: Manage registrations and subscribers
-- **Contact Form**: Direct communication with festival team
-- **Gallery**: Photo and video showcase
-- **Mobile Menu**: Optimized mobile navigation with social media links
+- **Responsive UI**: Desktop, tablet, and mobile
+- **Registration**: Festival signup with confirmation page
+- **Newsletter**: Double opt‑in subscription, unsubscribe by link or email
+- **Admin**: Manage registrations and subscribers
+- **Contact**: Email the team via form
+- **Gallery**: Photos and videos
 
-## 🛠️ Tech Stack
+## Tech Stack
 
-- **Frontend**: Next.js 14, TypeScript, Tailwind CSS
-- **Backend**: Node.js, Express, PostgreSQL
-- **Email**: Nodemailer with Gmail
-- **Deployment**: Render (Backend) + Vercel/Netlify (Frontend)
+- **Frontend**: Next.js 15, TypeScript, Tailwind CSS
+- **Backend**: Node.js, Express
+- **Data**: PostgreSQL (newsletter subscribers)
+- **Email**: Nodemailer (Gmail App Password)
+- **CI/CD**: GitHub Actions (quality, security, deploy, performance)
+- **Hosting**: Render (Backend), any static host for Frontend
 
-## 🏃‍♂️ Quick Start
+## Quick Start
 
-### Development
-
+### Frontend (root)
 ```bash
-# Install dependencies
 npm install
-
-# Start development server
 npm run dev
-```
-
-Open [http://localhost:3000](http://localhost:3000) to view the website.
-
-### Backend Development
-
-```bash
-# Navigate to backend directory
-cd backend
-
-# Install dependencies
-npm install
-
-# Start backend server
-npm start
-```
-
-## 📋 Project Structure
-
-```
-puagmae-festival-website1/
-├── src/
-│   └── app/
-│       ├── components/     # Reusable components
-│       ├── about/         # About page
-│       ├── admin/         # Admin panel
-│       ├── contact/       # Contact page
-│       ├── gallery/       # Photo/video gallery
-│       ├── Registration/  # User registration
-│       ├── schedule/      # Festival schedule
-│       └── testimonials/  # Testimonials page
-├── backend/               # Node.js backend
-│   ├── config/           # Database and email config
-│   ├── routes/           # API routes
-│   └── middleware/       # Authentication middleware
-├── public/               # Static assets
-│   ├── photos/          # Gallery images
-│   ├── videos/          # Gallery videos
-│   └── testimonials/    # Testimonial images
-└── DEPLOYMENT_GUIDE.md  # Complete deployment instructions
-```
-
-## 🌐 Deployment
-
-### For Development Team
-The code is ready for deployment! See:
-- `DEPLOYMENT_GUIDE.md` - Complete deployment instructions
-- `DEPLOYMENT_CHECKLIST.md` - Quick deployment checklist
-
-### Key Configuration
-- **Frontend**: Set `NEXT_PUBLIC_API_BASE_URL` to your backend URL
-- **Backend**: Set `FRONTEND_URL` to your frontend domain for CORS
-- **Database**: PostgreSQL on Render
-- **Email**: Gmail with App Password
-
-## 🎯 API Endpoints
-
-- `POST /register` - User registration
-- `POST /api/newsletter/subscribe` - Newsletter subscription
-- `POST /api/newsletter/unsubscribe` - Newsletter unsubscription
-- `POST /api/contact` - Contact form
-- `GET /admin/registrations` - Admin panel
-- `DELETE /admin/registrations/:id` - Delete registration
-
-## 🔧 Environment Variables
-
-### Frontend
-```
-NEXT_PUBLIC_API_BASE_URL=https://your-backend-url.com
+# open http://localhost:3000
 ```
 
 ### Backend
+```bash
+cd backend
+npm install
+npm run dev   # or: npm start
 ```
-DB_USER=postgres
-DB_HOST=your-db-host
-DB_NAME=puagmae_festival
-DB_PASSWORD=your-password
+
+## Project Structure
+```
+puagmae-festival-website1/
+├── src/app/                # Next.js app router
+│   ├── components/         # Reusable UI
+│   ├── about/              # About page
+│   ├── admin/              # Admin panel
+│   ├── contact/            # Contact page
+│   ├── gallery/            # Photos & videos
+│   ├── Registration/       # User registration
+│   ├── schedule/           # Festival schedule
+│   └── testimonials/       # Testimonials
+├── backend/                # Express API
+│   ├── config/             # db, email, admin config
+│   ├── routes/             # newsletter endpoints
+│   └── middleware/         # auth
+└── public/                 # static assets
+```
+
+## API (selected)
+
+- POST `/api/newsletter/subscribe`
+- POST `/api/newsletter/unsubscribe`
+- GET  `/api/newsletter/confirm/:token`
+- GET  `/api/newsletter/unsubscribe/:token`
+
+## Environment Variables
+
+### Frontend
+```
+NEXT_PUBLIC_API_BASE_URL=https://your-backend-url
+```
+
+### Backend (PostgreSQL + Email)
+```
+PGHOST=your-db-host
+PGUSER=postgres
+PGPASSWORD=your-password
+PGDATABASE=puagmae_festival
+PGPORT=5432
 EMAIL_USER=your-email@gmail.com
 EMAIL_PASS=your-app-password
-FRONTEND_URL=https://your-frontend-url.com
+FRONTEND_URL=https://your-frontend-url
 ```
 
-## 📞 Support
+## Development Notes
 
-For deployment and technical support, refer to:
-- `DEPLOYMENT_GUIDE.md` - Complete setup instructions
-- `DEPLOYMENT_CHECKLIST.md` - Quick reference checklist
+- Lint: `npm run lint` (frontend) and `cd backend && npm run lint`
+- CI quality job runs lint and build for both workspaces
+- Set `NEXT_PUBLIC_API_BASE_URL` to point the frontend to the backend
 
-## 🎨 Design Features
+## Security
 
-- **Modern UI**: Clean, professional design with yellow/gold theme
-- **Mobile-First**: Responsive design optimized for all devices
-- **Accessibility**: WCAG compliant with proper contrast and navigation
-- **Performance**: Optimized images and fast loading times
-- **SEO**: Meta tags and structured data for search engines
+- CORS configured in backend
+- Email double opt‑in and secure unsubscribe tokens
+- Admin actions protected server‑side
 
-## 🔒 Security
+—
 
-- **CORS**: Properly configured for cross-origin requests
-- **Input Validation**: Server-side validation for all forms
-- **Admin Authentication**: Secure admin panel with bcrypt hashing
-- **Email Security**: Gmail App Password authentication
-
----
-
-**PUAGMAE Festival** - Celebrating the African Golden 13th Month
+PUAGMAE Festival — Celebrating the African Golden 13th Month
