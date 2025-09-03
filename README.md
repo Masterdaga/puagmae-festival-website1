@@ -17,7 +17,7 @@ Modern, responsive web app for the PUAGMAE Festival — celebrating the African 
 - **Backend**: Node.js, Express
 - **Data**: PostgreSQL (newsletter subscribers)
 - **Email**: Nodemailer (Gmail App Password)
-- **CI/CD**: GitHub Actions (quality, security, deploy, performance)
+-- **CI/CD**: GitHub Actions (quality, security, deploy)
 - **Hosting**: Render (Backend), any static host for Frontend
 
 ## Quick Start
@@ -25,8 +25,8 @@ Modern, responsive web app for the PUAGMAE Festival — celebrating the African 
 ### Frontend (root)
 ```bash
 npm install
-npm run dev
-# open http://localhost:3000
+npm run export   # outputs static site to ./out
+npm run start    # serves ./out locally at http://localhost:3000
 ```
 
 ### Backend
@@ -84,7 +84,7 @@ FRONTEND_URL=https://your-frontend-url
 ## Development Notes
 
 - Lint: `npm run lint` (frontend) and `cd backend && npm run lint`
-- CI quality job runs lint and build for both workspaces
+- For deployment, upload the `out/` folder to any static host (Vercel static, Netlify, GitHub Pages, Cloudflare Pages, S3+CloudFront, etc.)
 - Set `NEXT_PUBLIC_API_BASE_URL` to point the frontend to the backend
 
 ## Security
